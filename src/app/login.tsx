@@ -1,5 +1,5 @@
 import { Image, Text, View } from "react-native";
-import { LoginForm } from "../componentes/login-form/login-form";
+import { LoginForm } from "../features/login-form/login-form";
 
 export default function Login() {
   return (
