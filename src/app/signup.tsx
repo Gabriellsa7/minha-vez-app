@@ -10,7 +10,7 @@ export default function Signup() {
       />
       <View className="gap-2 items-center">
         <Text className="font-bold text-xl">Bem vindo</Text>
-        <Text className="text-sm">Digite seus dados de login abaixo</Text>
+        <Text className="text-sm">Digite seus dados abaixo</Text>
       </View>
       <SignupForm />
     </View>
