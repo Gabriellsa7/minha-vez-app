@@ -21,6 +21,7 @@
     "axios": "^1.13.6",
     "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.33",
+    "expo-blur": "~15.0.8",
     "expo-checkbox": "~5.0.8",
     "expo-constants": "~18.0.13",
     "expo-font": "~14.0.11",
