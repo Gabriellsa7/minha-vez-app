@@ -8,6 +8,7 @@ module.exports = {
         textPrimary: "#FFFFFF",
         textSecondary: "#006673",
         textThird: "#1EC2D8",
+        textFourth: "#A8A8A8",
         textBlack: "#191C1D",
         textDanger: "#BA1A1A",
         button: {
@@ -15,6 +16,8 @@ module.exports = {
           secondary: "#E7E8E9",
         },
         borderPrimary: "#E6E6E6",
+        bgPrimary: "#FFFFFF",
+        bgSecondary: "#007C8F",
       },
     },
   },
