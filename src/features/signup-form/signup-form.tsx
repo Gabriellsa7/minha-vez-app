@@ -20,7 +20,7 @@ export function SignupForm() {
     <View className="gap-6 w-full items-center">
       <View className="w-[80%] gap-3">
         <Text>
-          Nome <span className="text-textDanger">*</span>
+          Nome <Text className="text-textDanger">*</Text>
         </Text>
         <View>
           <Controller
@@ -42,7 +42,7 @@ export function SignupForm() {
       </View>
       <View className="w-[80%] gap-3">
         <Text>
-          Email <span className="text-textDanger">*</span>
+          Email <Text className="text-textDanger">*</Text>
         </Text>
         <View>
           <Controller
@@ -64,7 +64,7 @@ export function SignupForm() {
       </View>
       <View className="w-[80%] gap-3">
         <Text>
-          Password <span className="text-textDanger">*</span>
+          Password <Text className="text-textDanger">*</Text>
         </Text>
         <View>
           <Controller
@@ -94,7 +94,7 @@ export function SignupForm() {
         <View className="items-center">
           <Text onPress={() => router.push("/login")}>
             Já tem uma conta?{" "}
-            <span className="text-textSecondary underline">Entrar</span>
+            <Text className="text-textSecondary underline">Entrar</Text>
           </Text>
         </View>
       </View>
