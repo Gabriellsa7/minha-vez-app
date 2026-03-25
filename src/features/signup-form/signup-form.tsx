@@ -1,3 +1,4 @@
+import { useSignup } from "@/src/hooks/useSignup";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
@@ -12,8 +13,17 @@ export function SignupForm() {
     formState: { errors },
   } = useForm<SignupFormSchema>({ resolver: zodResolver(SIGNUP_FORM_SCHEMA) });
 
-  const onSubmit = () => {
-    console.log("Clicked");
+  const { mutate: createUser } = useSignup();
+
+  const onSubmit = (data: SignupFormSchema) => {
+    createUser(
+      { name: data.name, email: data.email, password: data.password },
+      {
+        onSuccess: () => {
+          router.replace("/login");
+        },
+      },
+    );
   };
 
   return (
@@ -75,6 +85,7 @@ export function SignupForm() {
                 placeholder="Digite sua senha..."
                 onChange={onChange}
                 value={value}
+                secureTextEntry={true}
                 className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
               />
             )}
