@@ -5,6 +5,7 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LOGIN_FORM_SCHEMA } from "./entities/login-form.constants";
 import { LoginFormSchema } from "./entities/login-form.types";
 
+import { useLogin } from "@/src/hooks/useLogin";
 import { Checkbox } from "expo-checkbox";
 import { useState } from "react";
 
@@ -21,11 +22,13 @@ export function LoginForm() {
   const email = watch("email");
   const password = watch("password");
 
-  const onSubmit = (data: LoginFormSchema) => {
-    console.log("dados:", data);
-  };
-
   const [isChecked, setChecked] = useState(false);
+
+  const { mutate: loginUser } = useLogin();
+
+  const onSubmit = () => {
+    loginUser({ email, password });
+  };
 
   return (
     <View className="gap-6 items-center w-full">
@@ -40,8 +43,9 @@ export function LoginForm() {
             <TextInput
               placeholder="Digite seu email"
               value={value}
+              inputMode="email"
               onChangeText={onChange}
-              className="p-3 rounded-lg border-[#E6E6E6] border-[2px] focus:outline-none focus:ring-0"
+              className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
             />
           )}
         />
@@ -65,7 +69,8 @@ export function LoginForm() {
                 placeholder="Digite sua senha..."
                 value={value}
                 onChangeText={onChange}
-                className="p-3 rounded border-[#E6E6E6] border-[2px] focus:outline-none focus:ring-0"
+                secureTextEntry={true}
+                className="p-3 rounded border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
               />
             )}
           />
