@@ -5,18 +5,27 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LOGIN_FORM_SCHEMA } from "./entities/login-form.constants";
 import { LoginFormSchema } from "./entities/login-form.types";
 
+import { Checkbox } from "expo-checkbox";
+import { useState } from "react";
+
 export function LoginForm() {
   const {
     control,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(LOGIN_FORM_SCHEMA),
   });
 
+  const email = watch("email");
+  const password = watch("password");
+
   const onSubmit = (data: LoginFormSchema) => {
     console.log("dados:", data);
   };
+
+  const [isChecked, setChecked] = useState(false);
 
   return (
     <View className="gap-6 items-center w-full">
@@ -29,10 +38,10 @@ export function LoginForm() {
           name="email"
           render={({ field: { onChange, value } }) => (
             <TextInput
-              placeholder="Email"
+              placeholder="Digite seu email"
               value={value}
               onChangeText={onChange}
-              className="p-3 rounded-lg border-[#E6E6E6] border-[2px]"
+              className="p-3 rounded-lg border-[#E6E6E6] border-[2px] focus:outline-none focus:ring-0"
             />
           )}
         />
@@ -45,7 +54,7 @@ export function LoginForm() {
           <Text>
             Senha <span className="text-textDanger">*</span>
           </Text>
-          <Text className="text-textSecondary">Esqueceu a senha</Text>
+          <Text className="text-textSecondary text-xs">Esqueceu a senha</Text>
         </View>
         <View className="gap-5">
           <Controller
@@ -53,18 +62,23 @@ export function LoginForm() {
             name="password"
             render={({ field: { onChange, value } }) => (
               <TextInput
-                placeholder="Password"
+                placeholder="Digite sua senha..."
                 value={value}
                 onChangeText={onChange}
-                className="p-3 rounded border-[#E6E6E6] border-[2px]"
+                className="p-3 rounded border-[#E6E6E6] border-[2px] focus:outline-none focus:ring-0"
               />
             )}
           />
           {errors.password && (
             <Text className="text-red-500">{errors.password.message}</Text>
           )}
-          <View>
-            {/* add a radioButton or similar */}
+          <View className="flex-row items-center gap-2">
+            <Checkbox
+              value={isChecked}
+              onValueChange={setChecked}
+              disabled={!email || !password}
+              className={`${isChecked ? "to-button-primary" : undefined}`}
+            />
             <Text>Lembrar senha</Text>
           </View>
         </View>
