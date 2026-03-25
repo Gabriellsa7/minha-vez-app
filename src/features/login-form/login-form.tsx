@@ -26,15 +26,27 @@ export function LoginForm() {
 
   const { mutate: loginUser } = useLogin();
 
-  const onSubmit = () => {
-    loginUser({ email, password });
+  const onSubmit = (data: LoginFormSchema) => {
+    console.log("submit", data);
+    loginUser(
+      { email, password },
+      {
+        onSuccess: () => {
+          console.log("login sucesso");
+          router.replace("/home");
+        },
+        onError: (err) => {
+          console.log("ERRO AQUI >>>", err);
+        },
+      },
+    );
   };
 
   return (
     <View className="gap-6 items-center w-full">
       <View className="w-[80%] gap-3">
         <Text>
-          Email <span className="text-textDanger">*</span>
+          Email <Text className="text-textDanger">*</Text>
         </Text>
         <Controller
           control={control}
@@ -56,7 +68,7 @@ export function LoginForm() {
       <View className="w-[80%] gap-3">
         <View className="flex-row justify-between">
           <Text>
-            Senha <span className="text-textDanger">*</span>
+            Senha <Text className="text-textDanger">*</Text>
           </Text>
           <Text className="text-textSecondary text-xs">Esqueceu a senha</Text>
         </View>
@@ -98,7 +110,7 @@ export function LoginForm() {
         <View className="items-center">
           <Text onPress={() => router.push("/signup")}>
             Ainda não tem uma conta?{" "}
-            <span className="text-textSecondary underline">Crie Agora</span>
+            <Text className="text-textSecondary underline">Crie Agora</Text>
           </Text>
         </View>
       </View>
