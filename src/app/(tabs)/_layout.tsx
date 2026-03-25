@@ -63,14 +63,14 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: "explore",
+          title: "Explorar",
           tabBarIcon: ({ color, size }) => <Search color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="agenda"
         options={{
-          title: "agenda",
+          title: "Agenda",
           tabBarIcon: ({ color, size }) => (
             <Calendar color={color} size={size} />
           ),
@@ -79,7 +79,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "profile",
+          title: "Perfil",
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}
       />
