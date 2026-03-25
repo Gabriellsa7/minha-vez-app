@@ -1,15 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
-import { router } from "expo-router";
 import { login } from "../services/auth/auth.api";
-import { saveToken } from "../services/auth/auth.storage";
+import { saveRefreshToken, saveToken } from "../services/auth/auth.storage";
 
 export const useLogin = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: async (data) => {
-      await saveToken(data.token);
+      if (!data?.accessToken) {
+        throw new Error("Token inválido");
+      }
 
-      router.replace("/home");
+      await saveToken(data.accessToken);
+      await saveRefreshToken(data.refreshToken);
     },
   });
 };
