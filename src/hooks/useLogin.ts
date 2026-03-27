@@ -1,11 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../lib/react-query";
-import { login } from "../services/auth/auth.api";
+import { IAuthLogin, login } from "../services/auth/auth.api";
 import { saveRefreshToken, saveToken } from "../services/auth/auth.storage";
 
 export const useLogin = () => {
-  return useMutation({
-    mutationFn: async (payload) => {
+  return useMutation<Awaited<ReturnType<typeof login>>, Error, IAuthLogin>({
+    mutationFn: async (payload: IAuthLogin) => {
       const data = await login(payload);
 
       if (!data?.accessToken) {
