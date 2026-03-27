@@ -7,13 +7,13 @@ export const GET_USER_ME_KEY = "GET_USER_ME_KEY";
 export type GetUserParamsResponse = IUser;
 
 export const getUser = async (): Promise<GetUserParamsResponse> => {
-  const path: string = "/auth/me";
+  const path: string = "/users/me";
 
   try {
     const response: GetUserParamsResponse = (await httpClient.get(path)).data;
     return response;
-  } catch {
-    throw new Error(path);
+  } catch (error: any) {
+    throw error;
   }
 };
 

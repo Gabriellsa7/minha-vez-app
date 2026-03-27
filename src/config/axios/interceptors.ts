@@ -1,6 +1,7 @@
 import { httpClient } from "@/src/services/api";
 import {
   getRefreshToken,
+  getToken,
   removeToken,
   saveToken,
 } from "@/src/services/auth/auth.storage";
@@ -73,3 +74,13 @@ httpClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+httpClient.interceptors.request.use(async (config) => {
+  const token = await getToken();
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});

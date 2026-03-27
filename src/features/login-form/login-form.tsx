@@ -27,16 +27,11 @@ export function LoginForm() {
   const { mutate: loginUser } = useLogin();
 
   const onSubmit = (data: LoginFormSchema) => {
-    console.log("submit", data);
     loginUser(
-      { email, password },
+      { email: data.email, password: data.password },
       {
         onSuccess: () => {
-          console.log("login sucesso");
           router.replace("/home");
-        },
-        onError: (err) => {
-          console.log("ERRO AQUI >>>", err);
         },
       },
     );
