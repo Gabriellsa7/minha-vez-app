@@ -27,6 +27,7 @@ export default function TabsLayout() {
           left: 20,
           right: 20,
           height: 80,
+          marginHorizontal: 12,
 
           borderRadius: 40,
           overflow: "hidden",
