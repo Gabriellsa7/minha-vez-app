@@ -77,7 +77,7 @@ export function LoginForm() {
                 value={value}
                 onChangeText={onChange}
                 secureTextEntry={true}
-                className="p-3 rounded border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
+                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
               />
             )}
           />
