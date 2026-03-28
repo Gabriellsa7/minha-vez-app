@@ -1,10 +1,22 @@
 import { useGetUser } from "@/src/api/get-user-me";
 import { LinearGradient } from "expo-linear-gradient";
-import { ArrowRight, Bell, Info, Smile, User } from "lucide-react-native";
-import { Text, View } from "react-native";
+import {
+  ArrowRight,
+  Bell,
+  Info,
+  Search,
+  Smile,
+  User,
+} from "lucide-react-native";
+import { useState } from "react";
+import { Dimensions, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const { width } = Dimensions.get("window");
+
   const { data: user } = useGetUser();
 
   return (
@@ -12,7 +24,7 @@ export default function Home() {
       <View className="items-center justify-center">
         <LinearGradient
           colors={["#006579", "#008096"]}
-          style={{ width: "100%", gap: 12 }}
+          style={{ width: "100%", gap: 12, paddingBottom: 20 }}
         >
           <View className="w-full gap-3 p-5">
             <View className="flex-row items-center justify-between pb-2">
@@ -37,36 +49,72 @@ export default function Home() {
             </View>
             <View className="gap-2">
               <Text className="text-textThird text-sm">Filas Ativas</Text>
-              <View>
-                <View className="w-full flex-row items-center justify-between bg-[#0092AA] p-3 rounded-t-xl">
-                  <View className="flex-row items-center gap-2">
-                    <View className="rounded-full bg-bgSecondary p-2">
-                      {/* Clinic Image */}
-                      <Smile color="#FFFFFF" size={24} />
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                onScroll={(event) => {
+                  const index = Math.round(
+                    event.nativeEvent.contentOffset.x /
+                      event.nativeEvent.layoutMeasurement.width,
+                  );
+                  setActiveIndex(index);
+                }}
+                scrollEventThrottle={16}
+              >
+                <View style={{ width }}>
+                  <View className="w-[90%] flex-row items-center justify-between bg-[#0092AA] p-3 rounded-t-xl">
+                    <View className="flex-row items-center gap-2">
+                      <View className="rounded-full bg-bgSecondary p-2">
+                        {/* Clinic Image */}
+                        <Smile color="#FFFFFF" size={24} />
+                      </View>
+                      <View className="gap-1">
+                        <Text className="text-textPrimary">
+                          Fila da Clinica Ortopedica
+                        </Text>
+                        <Text className="text-textPrimary text-sm opacity-50">
+                          Atual Fila 5 de 20
+                        </Text>
+                      </View>
                     </View>
-                    <View className="gap-1">
-                      <Text className="text-textPrimary">
-                        Fila da Clinica Ortopedica
-                      </Text>
-                      <Text className="text-textPrimary text-sm opacity-50">
-                        Atual Fila 5 de 20
+                    <ArrowRight size={28} color="#FFFFFF" />
+                  </View>
+                  <View className="bg-bgPrimary rounded-b-xl p-3 w-[90%]">
+                    <View className="border border-[#D8D8D8] gap-1 p-3 rounded-xl">
+                      <Text className="font-bold text-xl">Posição 6</Text>
+                      <Text className="text-textFourth text-sm">
+                        Sua vez 11:12 #YU78
                       </Text>
                     </View>
                   </View>
-                  <ArrowRight size={28} color="#FFFFFF" />
                 </View>
-                <View className="bg-bgPrimary rounded-b-xl p-3">
-                  <View className="border border-[#D8D8D8] gap-1 p-3 rounded-xl">
-                    <Text className="font-bold text-xl">Posição 6</Text>
-                    <Text className="text-textFourth text-sm">
-                      Sua vez 11:12 #YU78
-                    </Text>
-                  </View>
-                </View>
+              </ScrollView>
+              <View className="flex-row gap-2 mt-2 justify-center">
+                {[0, 1].map((_, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      width: activeIndex === index ? 20 : 6,
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: activeIndex === index ? "#FFF" : "#FFF",
+                    }}
+                  />
+                ))}
               </View>
             </View>
           </View>
         </LinearGradient>
+        <View className="absolute -bottom-6 left-5 right-5">
+          <View className="flex-row items-center gap-2 bg-bgPrimary px-5 py-4 rounded-2xl">
+            <Search size={18} color="#888" />
+            <TextInput
+              placeholder="Search doctor or clinic"
+              placeholderTextColor="#888"
+              className="flex-1 text-black"
+            />
+          </View>
+        </View>
       </View>
     </SafeAreaView>
   );
