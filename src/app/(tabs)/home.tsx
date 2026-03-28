@@ -3,6 +3,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import {
   ArrowRight,
   Bell,
+  Calendar,
+  Clock,
+  Compass,
+  FileText,
+  History,
   Info,
   Search,
   Smile,
@@ -105,14 +110,59 @@ export default function Home() {
             </View>
           </View>
         </LinearGradient>
-        <View className="absolute -bottom-6 left-5 right-5">
-          <View className="flex-row items-center gap-2 bg-bgPrimary px-5 py-4 rounded-2xl">
-            <Search size={18} color="#888" />
-            <TextInput
-              placeholder="Search doctor or clinic"
-              placeholderTextColor="#888"
-              className="flex-1 text-black"
-            />
+        <View className="relative w-full mb-6">
+          <View className="absolute -bottom-6 left-5 right-5">
+            <View className="flex-row items-center gap-2 bg-bgPrimary px-5 py-4 rounded-2xl">
+              <Search size={18} color="#888" />
+              <TextInput
+                placeholder="Search doctor or clinic"
+                placeholderTextColor="#888"
+                className="flex-1 text-black"
+              />
+            </View>
+          </View>
+        </View>
+        <View className="w-full p-5 gap-5">
+          <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
+            <View className="flex-row gap-2 items-center">
+              <Bell size={20} color="#FFFFFF" />
+              <Text className=" text-textPrimary">
+                Seu proximo exame medico
+              </Text>
+            </View>
+            <View className="flex-row gap-2 items-center">
+              <Clock size={20} color="#FFFFFF" />
+              <Text className="text-textPrimary">Tomorrow</Text>
+            </View>
+          </View>
+          <View className="gap-5">
+            <Text>Serviços Rapidos</Text>
+            <View className="flex-row justify-between">
+              <View className="items-center gap-4">
+                <View className="rounded-lg p-6 bg-[#F4F4F4]">
+                  <Calendar size={20} color="#008493" />
+                </View>
+                <Text>Agendar</Text>
+              </View>
+              <View className="items-center gap-4">
+                <View className="rounded-lg p-6 bg-[#F4F4F4]">
+                  <History size={20} color="#008493" />
+                </View>
+                <Text>Histórico</Text>
+              </View>
+              <View className="items-center gap-4">
+                <View className="rounded-lg p-6 bg-[#F4F4F4]">
+                  <Compass size={20} color="#008493" />
+                </View>
+                <Text>Explorar</Text>
+              </View>
+              <View className="items-center gap-4">
+                <View className="rounded-lg p-6 bg-[#F4F4F4]">
+                  <FileText size={20} color="#008493" />
+                </View>
+                <Text>Exames</Text>
+              </View>
+            </View>
           </View>
         </View>
       </View>
