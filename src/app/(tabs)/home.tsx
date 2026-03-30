@@ -1,4 +1,6 @@
+import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
+import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -26,6 +28,25 @@ export default function Home() {
   const { data: user } = useGetUser();
 
   const { data: healthUnits } = useGetHealthUnits();
+
+  const { data: patient } = useGetPatientById({ userId: user?._id || "" });
+
+  const patientId = patient?.find((p) => p.userId === user?.id)?._id;
+
+  const { data: userAppointments } = useGetAppointmentsByPatientId(
+    { patientId: patientId || "" },
+    {
+      enabled: !!patientId,
+    },
+  );
+
+  console.log("User Data:", user);
+  console.log("Patient ID:", patient);
+  console.log("User Appointments:", userAppointments);
+
+  const appointment = userAppointments?.[0];
+
+  console.log(appointment?.dateTime?.toLocaleString());
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -126,18 +147,23 @@ export default function Home() {
           </View>
         </View>
         <View className="w-full p-5 gap-5">
-          <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
-            <View className="flex-row gap-2 items-center">
-              <Bell size={20} color="#FFFFFF" />
-              <Text className=" text-textPrimary">
-                Seu proximo exame medico
-              </Text>
+          {userAppointments && (
+            <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
+              <View className="flex-row gap-2 items-center">
+                <Bell size={20} color="#FFFFFF" />
+                <Text className=" text-textPrimary">
+                  Seu proximo exame medico
+                </Text>
+              </View>
+              <View className="flex-row gap-2 items-center">
+                <Text className="text-textPrimary">
+                  {appointment?.dateTime &&
+                    new Date(appointment.dateTime).toLocaleString("pt-BR")}
+                </Text>
+                <Clock size={20} color="#FFFFFF" />
+              </View>
             </View>
-            <View className="flex-row gap-2 items-center">
-              <Clock size={20} color="#FFFFFF" />
-              <Text className="text-textPrimary">Tomorrow</Text>
-            </View>
-          </View>
+          )}
           <View className="gap-5">
             <Text>Serviços Rapidos</Text>
             <View className="flex-row justify-between">
