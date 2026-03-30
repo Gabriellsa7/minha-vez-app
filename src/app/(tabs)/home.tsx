@@ -1,3 +1,4 @@
+import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetUser } from "@/src/api/get-user-me";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -23,6 +24,8 @@ export default function Home() {
   const { width } = Dimensions.get("window");
 
   const { data: user } = useGetUser();
+
+  const { data: healthUnits } = useGetHealthUnits();
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -112,7 +115,7 @@ export default function Home() {
         </LinearGradient>
         <View className="relative w-full mb-6">
           <View className="absolute -bottom-6 left-5 right-5">
-            <View className="flex-row items-center gap-2 bg-bgPrimary px-5 py-4 rounded-2xl">
+            <View className="flex-row items-center gap-2 bg-bgPrimary px-5 py-1 rounded-2xl">
               <Search size={18} color="#888" />
               <TextInput
                 placeholder="Search doctor or clinic"
@@ -162,6 +165,27 @@ export default function Home() {
                 </View>
                 <Text>Exames</Text>
               </View>
+            </View>
+          </View>
+          <View className="mt-5 gap-3">
+            <View className="flex-row items-center justify-between">
+              <Text>UBS & Clinicas</Text>
+              <Text className="text-sm text-textThird">See All</Text>
+            </View>
+            <View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {healthUnits?.map((unit) => (
+                  <View
+                    key={unit._id}
+                    className="w-64 h-40 bg-[#F4F4F4] rounded-lg mr-4 p-3"
+                  >
+                    <Text className="font-bold text-lg">{unit.name}</Text>
+                    <Text className="text-sm text-textThird">
+                      {unit.address.street}, {unit.address.number}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
             </View>
           </View>
         </View>
