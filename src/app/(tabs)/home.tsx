@@ -145,8 +145,9 @@ export default function Home() {
                             <Text className="font-bold text-xl">
                               Posição {patientQueueItem?.position || "N/A"}
                             </Text>
+                            {/* Add dinamic code in backend to bring an show here this the queue item code */}
                             <Text className="text-textFourth text-sm">
-                              Sua vez 11:12 #YU78
+                              Codigo #YU78
                             </Text>
                           </View>
                         </View>
