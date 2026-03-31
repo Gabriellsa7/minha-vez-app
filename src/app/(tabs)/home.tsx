@@ -2,16 +2,13 @@ import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-pati
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
+import { QuickServices } from "@/src/features/home/quick-services";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ArrowRight,
   Bell,
-  Calendar,
   Clock,
-  Compass,
-  FileText,
-  History,
   Info,
   Search,
   Smile,
@@ -170,35 +167,7 @@ export default function Home() {
               </View>
             </View>
           )}
-          <View className="gap-5">
-            <Text>Serviços Rapidos</Text>
-            <View className="flex-row justify-between">
-              <View className="items-center gap-4">
-                <View className="rounded-lg p-6 bg-[#F4F4F4]">
-                  <Calendar size={20} color="#008493" />
-                </View>
-                <Text>Agendar</Text>
-              </View>
-              <View className="items-center gap-4">
-                <View className="rounded-lg p-6 bg-[#F4F4F4]">
-                  <History size={20} color="#008493" />
-                </View>
-                <Text>Histórico</Text>
-              </View>
-              <View className="items-center gap-4">
-                <View className="rounded-lg p-6 bg-[#F4F4F4]">
-                  <Compass size={20} color="#008493" />
-                </View>
-                <Text>Explorar</Text>
-              </View>
-              <View className="items-center gap-4">
-                <View className="rounded-lg p-6 bg-[#F4F4F4]">
-                  <FileText size={20} color="#008493" />
-                </View>
-                <Text>Exames</Text>
-              </View>
-            </View>
-          </View>
+          <QuickServices />
           <View className="mt-5 gap-3">
             <View className="flex-row items-center justify-between">
               <Text>UBS & Clinicas</Text>
