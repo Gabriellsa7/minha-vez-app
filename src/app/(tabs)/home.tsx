@@ -68,6 +68,11 @@ export default function Home() {
 
   const appointment = userAppointments?.[0];
 
+  const now = new Date();
+
+  const isFutureAppointment =
+    appointment?.dateTime && new Date(appointment.dateTime) > now;
+
   if (isAppointmentsLoading) {
     console.log("Carregando appointments...");
   }
@@ -183,8 +188,9 @@ export default function Home() {
             </View>
           </View>
         </View>
+
         <View className="w-full p-5 gap-5">
-          {userAppointments && (
+          {userAppointments && isFutureAppointment && (
             <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
               <View className="flex-row gap-2 items-center">
                 <Bell size={20} color="#FFFFFF" />
