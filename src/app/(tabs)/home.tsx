@@ -2,6 +2,7 @@ import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-pati
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
+import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import { QuickServices } from "@/src/features/home/quick-services";
 import { formatDateTime } from "@/src/utils/format-date-time";
@@ -46,6 +47,15 @@ export default function Home() {
         enabled: !!patientId,
       },
     );
+
+  const { data: queueDetails } = useGetQueuesWithDetailsByPatientId(
+    {
+      patientId: patientId || "",
+    },
+    {
+      enabled: !!patientId,
+    },
+  );
 
   const { data: queueItem } = useGetQueueItemByPatientId(
     {
@@ -92,48 +102,58 @@ export default function Home() {
             </View>
             <View className="gap-2">
               <Text className="text-textThird text-sm">Filas Ativas</Text>
-              {queueItem && (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  onScroll={(event) => {
-                    const index = Math.round(
-                      event.nativeEvent.contentOffset.x /
-                        event.nativeEvent.layoutMeasurement.width,
-                    );
-                    setActiveIndex(index);
-                  }}
-                  scrollEventThrottle={16}
-                >
-                  <View style={{ width }}>
-                    <View className="w-[90%] flex-row items-center justify-between bg-[#0092AA] p-3 rounded-t-xl">
-                      <View className="flex-row items-center gap-2">
-                        <View className="rounded-full bg-bgSecondary p-2">
-                          {/* Clinic Image */}
-                          <Smile color="#FFFFFF" size={24} />
+              {queueDetails &&
+                queueDetails.map((item) => {
+                  const patientQueueItem = queueItem?.find(
+                    (queue) => queue.queueId === item._id,
+                  );
+                  return (
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      onScroll={(event) => {
+                        const index = Math.round(
+                          event.nativeEvent.contentOffset.x /
+                            event.nativeEvent.layoutMeasurement.width,
+                        );
+                        setActiveIndex(index);
+                      }}
+                      scrollEventThrottle={16}
+                      key={item._id}
+                    >
+                      <View style={{ width }}>
+                        <View className="w-[90%] flex-row items-center justify-between bg-[#0092AA] p-3 rounded-t-xl">
+                          <View className="flex-row items-center gap-2">
+                            <View className="rounded-full bg-bgSecondary p-2">
+                              {/* Clinic Image */}
+                              <Smile color="#FFFFFF" size={24} />
+                            </View>
+                            <View className="gap-1">
+                              <Text className="text-textPrimary">
+                                {item.healthUnitName}
+                              </Text>
+                              <Text className="text-textPrimary text-sm opacity-50">
+                                Atual Fila {patientQueueItem?.position || "N/A"}{" "}
+                                de {item.queueSize}
+                              </Text>
+                            </View>
+                          </View>
+                          <ArrowRight size={28} color="#FFFFFF" />
                         </View>
-                        <View className="gap-1">
-                          <Text className="text-textPrimary">
-                            Fila da Clinica Ortopedica
-                          </Text>
-                          <Text className="text-textPrimary text-sm opacity-50">
-                            Atual Fila 5 de 20
-                          </Text>
+                        <View className="bg-bgPrimary rounded-b-xl p-3 w-[90%]">
+                          <View className="border border-[#D8D8D8] gap-1 p-3 rounded-xl">
+                            <Text className="font-bold text-xl">
+                              Posição {patientQueueItem?.position || "N/A"}
+                            </Text>
+                            <Text className="text-textFourth text-sm">
+                              Sua vez 11:12 #YU78
+                            </Text>
+                          </View>
                         </View>
                       </View>
-                      <ArrowRight size={28} color="#FFFFFF" />
-                    </View>
-                    <View className="bg-bgPrimary rounded-b-xl p-3 w-[90%]">
-                      <View className="border border-[#D8D8D8] gap-1 p-3 rounded-xl">
-                        <Text className="font-bold text-xl">Posição 6</Text>
-                        <Text className="text-textFourth text-sm">
-                          Sua vez 11:12 #YU78
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </ScrollView>
-              )}
+                    </ScrollView>
+                  );
+                })}
               <View className="flex-row gap-2 mt-2 justify-center">
                 {[0, 1].map((_, index) => (
                   <View
