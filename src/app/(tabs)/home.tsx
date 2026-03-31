@@ -2,6 +2,7 @@ import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-pati
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
+import { formatDateTime } from "@/src/utils/format-date-time";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ArrowRight,
@@ -163,8 +164,7 @@ export default function Home() {
               </View>
               <View className="flex-row gap-2 items-center">
                 <Text className="text-textPrimary">
-                  {appointment?.dateTime &&
-                    new Date(appointment.dateTime).toLocaleString("pt-BR")}
+                  {formatDateTime(appointment?.dateTime)}
                 </Text>
                 <Clock size={20} color="#FFFFFF" />
               </View>
