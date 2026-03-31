@@ -11,7 +11,7 @@ export interface IGetPatientByIdParams {
 const getPatientById = async (
   params: IGetPatientByIdParams,
 ): Promise<IPatient> => {
-  const path = `/patients/${params.userId}`;
+  const path = `/patients/user/${params.userId}`;
 
   try {
     const response = await httpClient.get(path);

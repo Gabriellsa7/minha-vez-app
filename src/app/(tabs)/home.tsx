@@ -29,24 +29,30 @@ export default function Home() {
 
   const { data: healthUnits } = useGetHealthUnits();
 
-  const { data: patient } = useGetPatientById({ userId: user?._id || "" });
-
-  const patientId = patient?.find((p) => p.userId === user?.id)?._id;
-
-  const { data: userAppointments } = useGetAppointmentsByPatientId(
-    { patientId: patientId || "" },
+  const { data: patient } = useGetPatientById(
+    { userId: user?._id || "" },
     {
-      enabled: !!patientId,
+      enabled: !!user?._id,
     },
   );
 
-  console.log("User Data:", user);
-  console.log("Patient ID:", patient);
-  console.log("User Appointments:", userAppointments);
+  const patientId = patient?._id;
+
+  const { data: userAppointments, isLoading: isAppointmentsLoading } =
+    useGetAppointmentsByPatientId(
+      {
+        patientId: patientId || "",
+      },
+      {
+        enabled: !!patientId,
+      },
+    );
 
   const appointment = userAppointments?.[0];
 
-  console.log(appointment?.dateTime?.toLocaleString());
+  if (isAppointmentsLoading) {
+    console.log("Carregando appointments...");
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
