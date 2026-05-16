@@ -39,7 +39,7 @@ export function SignupForm() {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 placeholder="Digite seu nome..."
-                onChange={onChange}
+                onChangeText={onChange}
                 value={value}
                 className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
               />
@@ -61,7 +61,7 @@ export function SignupForm() {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 placeholder="Digite seu email..."
-                onChange={onChange}
+                onChangeText={onChange}
                 value={value}
                 className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
               />
@@ -83,7 +83,7 @@ export function SignupForm() {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 placeholder="Digite sua senha..."
-                onChange={onChange}
+                onChangeText={onChange}
                 value={value}
                 secureTextEntry={true}
                 className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"

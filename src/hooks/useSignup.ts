@@ -15,9 +15,22 @@ export const signup = async ({
   password,
 }: ICreateUser): Promise<void> => {
   const path = "/users";
+
+  console.log("ENVIANDO:");
+  console.log({ email, name, password });
   try {
-    await httpClient.post(path, { email, name, password });
+    const response = await httpClient.post(path, {
+      email,
+      name,
+      password,
+    });
+
+    console.log("RESPOSTA BACK:");
+    console.log(response.data);
   } catch (error) {
+    console.log("ERRO AXIOS:");
+    console.log(error.response?.data);
+    console.log(error.message);
     throw error;
   }
 };
