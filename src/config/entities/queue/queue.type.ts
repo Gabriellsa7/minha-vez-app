@@ -19,4 +19,5 @@ export interface IQueueWithDetails {
   _id: string;
   healthUnitName: string;
   queueSize: number;
+  code: string;
 }
