@@ -1,13 +1,15 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
+import SearchInput from "@/src/components/search-input/search-input";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { LinearGradient } from "expo-linear-gradient";
-import { Bell, Clock, Search } from "lucide-react-native";
+import { Bell, Clock } from "lucide-react-native";
 import React from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 import HomeHeader from "./componentes/header/header";
+import HealthUnits from "./componentes/health-units/health-units";
 import QueueDetails from "./componentes/queue-details/queue-details";
 import { QuickServices } from "./componentes/quick-services/quick-services";
 
@@ -55,14 +57,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
       </LinearGradient>
       <View className="relative w-full mb-6">
         <View className="absolute -bottom-6 left-5 right-5">
-          <View className="flex-row items-center gap-2 bg-bgPrimary px-5 py-3 rounded-2xl">
-            <Search size={18} color="#888" />
-            <TextInput
-              placeholder="Search doctor or clinic"
-              placeholderTextColor="#888"
-              className="flex-1 text-black"
-            />
-          </View>
+          <SearchInput placeholder="Search doctor or clinic" />
         </View>
       </View>
 
@@ -84,27 +79,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
           </View>
         )}
         <QuickServices />
-        <View className="mt-5 gap-3">
-          <View className="flex-row items-center justify-between">
-            <Text>UBS & Clinicas</Text>
-            <Text className="text-sm text-textThird">See All</Text>
-          </View>
-          <View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {healthUnits?.map((unit) => (
-                <View
-                  key={unit._id}
-                  className="w-64 h-40 bg-[#F4F4F4] rounded-lg mr-4 p-3"
-                >
-                  <Text className="font-bold text-lg">{unit.name}</Text>
-                  <Text className="text-sm text-textThird">
-                    {unit.address.street}, {unit.address.number}
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
+        <HealthUnits healthUnits={healthUnits} />
       </View>
     </View>
   );
