@@ -1,10 +1,4 @@
-import { httpClient } from "@/src/services/api";
-import {
-  getRefreshToken,
-  getToken,
-  removeToken,
-  saveToken,
-} from "@/src/services/auth/auth.storage";
+import { removeToken } from "@/src/services/auth/auth.storage";
 import { AxiosError, AxiosResponse } from "axios";
 import Toast from "react-native-toast-message";
 
@@ -38,49 +32,13 @@ export const handleErrorResponse = async (error: AxiosError) => {
     if (status === 401 || status === 403) {
       await removeToken();
     }
+  } else {
+    Toast.show({
+      type: "error",
+      text1: "Nao foi possivel conectar ao servidor",
+      text2: error.message,
+    });
   }
 
   return Promise.reject(error);
 };
-
-let isRefreshing = false;
-
-httpClient.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    if (error.response?.status === 401 && !isRefreshing) {
-      isRefreshing = true;
-
-      const refreshToken = await getRefreshToken();
-
-      try {
-        const response = await httpClient.post("/refresh-token", {
-          refreshToken,
-        });
-
-        await saveToken(response.data.accessToken);
-
-        isRefreshing = false;
-
-        // refaz request original
-        error.config.headers.Authorization = `Bearer ${response.data.accessToken}`;
-        return httpClient(error.config);
-      } catch (err) {
-        isRefreshing = false;
-        throw err;
-      }
-    }
-
-    return Promise.reject(error);
-  },
-);
-
-httpClient.interceptors.request.use(async (config) => {
-  const token = await getToken();
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});

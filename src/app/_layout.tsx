@@ -3,8 +3,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../../global.css";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "../lib/react-query";
+import Toast from "react-native-toast-message";
 import "../config/axios";
+import { queryClient } from "../lib/react-query";
 
 export default function RootLayout() {
   return (
@@ -14,6 +15,7 @@ export default function RootLayout() {
           <Stack.Screen name="login" />
           <Stack.Screen name="(tabs)" />
         </Stack>
+        <Toast />
       </SafeAreaProvider>
     </QueryClientProvider>
   );
