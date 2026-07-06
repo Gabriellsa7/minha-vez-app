@@ -16,12 +16,15 @@ export const CREATE_APPOINTMENT_KEY = "CREATE_APPOINTMENT_KEY";
 const createAppointment = async (
   payload: ICreateAppointmentPayload,
 ): Promise<IAppointment> => {
-  console.log('[createAppointment] baseURL:', httpClient.defaults.baseURL);
-  console.log('[createAppointment] payload:', JSON.stringify(payload));
+  const path = "/appointments";
 
-  const response = await httpClient.post('/appointments', payload);
-
-  return response.data;
+  try {
+    const response = await httpClient.post(path, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating appointment:", error);
+    throw error;
+  }
 };
 
 export const useCreateAppointment = generateReactQueryMutation<

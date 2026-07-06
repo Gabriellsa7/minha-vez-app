@@ -2,30 +2,30 @@ import { useCreateAppointment } from "@/src/api/create-appointment";
 import { useCreatePatient } from "@/src/api/create-patient";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
 import {
-  GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY,
-  useGetAppointmentsByProfessionalId,
+    GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY,
+    useGetAppointmentsByProfessionalId,
 } from "@/src/api/get-appointments-by-professional-id";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { GET_QUEUE_ITEMS_KEY } from "@/src/api/get-queue-item-by-patient-id";
 import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "@/src/api/get-queues-with-details-by-patient-id";
-import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import Header from "@/src/components/header/header";
+import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
-import { useQueryClient } from "@tanstack/react-query";
 import {
-    CalendarDays,
-    CheckCircle2,
-    ChevronLeft,
-    ChevronRight,
-    Clock3,
-    Sparkles,
-    Stethoscope,
-} from "lucide-react-native";
+    formatBirthDate,
+    formatCpf,
+    formatPhone,
+    getDateKey,
+    getDateTimeFromDateAndTime,
+    normalizeBirthDate,
+} from "@/src/utils/util";
+import { useQueryClient } from "@tanstack/react-query";
+import { CalendarDays, CheckCircle2, Sparkles } from "lucide-react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
@@ -34,81 +34,17 @@ import {
     ScrollView,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-
-const formatCpf = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 11);
-
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
-  if (digits.length <= 9) {
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
-  }
-
-  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
-};
-
-const formatPhone = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 11);
-
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-  if (digits.length <= 10) {
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-  }
-
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-};
-
-const formatBirthDate = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 8);
-
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-};
-
-const normalizeBirthDate = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 8);
-  if (digits.length !== 8) return value;
-
-  const day = digits.slice(0, 2);
-  const month = digits.slice(2, 4);
-  const year = digits.slice(4, 8);
-
-  return `${year}-${month}-${day}`;
-};
-
-const getDateTimeFromDateAndTime = (date: string, time: string) => {
-  const [year, month, day] = date.split("-").map(Number);
-  const [hour, minute] = time.split(":").map(Number);
-
-  return new Date(year, month - 1, day, hour, minute);
-};
-
-const getDateKey = (date: Date) => {
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const dd = String(date.getDate()).padStart(2, "0");
-
-  return `${yyyy}-${mm}-${dd}`;
-};
-
-const isSameMonth = (firstDate: Date, secondDate: Date) =>
-  firstDate.getFullYear() === secondDate.getFullYear() &&
-  firstDate.getMonth() === secondDate.getMonth();
-
-const startOfDay = (date: Date) =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+import AvaliableDays from "./componentes/avaliable-days/avaliable-days";
+import AvaliableTimes from "./componentes/avaliable-time/avaliable-time";
+import HealthProfessionalsSection from "./componentes/health-professional/health-professional";
+import HealthUnitsSection from "./componentes/health-units-section/healt-units-section";
 
 interface AgendaContentProps {
   user: IUser;
 }
-
-const AVAILABLE_TIMES = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"];
 
 export default function AgendaContent({ user }: AgendaContentProps) {
   const queryClient = useQueryClient();
@@ -117,25 +53,31 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     string | null
   >(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [calendarMonth, setCalendarMonth] = useState(() => {
-    const today = new Date();
-    return new Date(today.getFullYear(), today.getMonth(), 1);
-  });
+
   const [selectedTime, setSelectedTime] = useState<string>("");
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showPatientRegistrationModal, setShowPatientRegistrationModal] = useState(false);
+
+  const [showPatientRegistrationModal, setShowPatientRegistrationModal] =
+    useState(false);
+
   const [cpf, setCpf] = useState("");
+
   const [birthDate, setBirthDate] = useState("");
+
   const [phone, setPhone] = useState("");
 
   const { data: patient, isLoading: isPatientLoading } = useGetPatientById(
     { userId: user._id },
     { enabled: Boolean(user._id), retry: false },
   );
+
   const { data: healthUnits, isLoading: isHealthUnitsLoading } =
     useGetHealthUnits();
+
   const { data: healthProfessionals, isLoading: isHealthProfessionalsLoading } =
     useGetHealthProfessionals();
+
   const {
     data: professionalAppointments,
     isLoading: isProfessionalAppointmentsLoading,
@@ -161,39 +103,6 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     }
   }, [selectedDate]);
 
-  const calendarDays = useMemo(() => {
-    const firstDayOfMonth = new Date(
-      calendarMonth.getFullYear(),
-      calendarMonth.getMonth(),
-      1,
-    );
-    const firstVisibleDay = new Date(firstDayOfMonth);
-    firstVisibleDay.setDate(firstVisibleDay.getDate() - firstDayOfMonth.getDay());
-
-    return Array.from({ length: 42 }, (_, index) => {
-      const date = new Date(firstVisibleDay);
-      date.setDate(firstVisibleDay.getDate() + index);
-
-      return date;
-    });
-  }, [calendarMonth]);
-
-  const calendarMonthLabel = useMemo(() => {
-    const label = calendarMonth.toLocaleDateString("pt-BR", {
-      month: "long",
-      year: "numeric",
-    });
-
-    return label.charAt(0).toUpperCase() + label.slice(1);
-  }, [calendarMonth]);
-
-  const canGoToPreviousMonth = useMemo(() => {
-    const today = new Date();
-    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    return calendarMonth > currentMonth;
-  }, [calendarMonth]);
-
   const professionalsForUnit = useMemo(() => {
     if (!healthProfessionals) {
       return [];
@@ -210,17 +119,6 @@ export default function AgendaContent({ user }: AgendaContentProps) {
   );
 
   const selectedUnit = healthUnits?.find((unit) => unit._id === selectedUnitId);
-
-  const handleChangeCalendarMonth = (direction: "previous" | "next") => {
-    setCalendarMonth((currentMonth) => {
-      const nextMonth = new Date(currentMonth);
-      nextMonth.setMonth(
-        currentMonth.getMonth() + (direction === "next" ? 1 : -1),
-      );
-
-      return nextMonth;
-    });
-  };
 
   const bookedTimes = useMemo(() => {
     if (!professionalAppointments || !selectedDate) {
@@ -286,7 +184,12 @@ export default function AgendaContent({ user }: AgendaContentProps) {
   const handlePatientRegistrationSubmit = () => {
     const normalizedBirthDate = normalizeBirthDate(birthDate);
 
-    if (!user._id || !cpf.trim() || !normalizedBirthDate.trim() || !phone.trim()) {
+    if (
+      !user._id ||
+      !cpf.trim() ||
+      !normalizedBirthDate.trim() ||
+      !phone.trim()
+    ) {
       Toast.show({
         type: "error",
         text1: "Preencha todos os dados",
@@ -421,250 +324,44 @@ export default function AgendaContent({ user }: AgendaContentProps) {
             {!patient && !isPatientLoading && (
               <View className="mb-5 rounded-[20px] border border-[#FDE68A] bg-[#FEF3C7] p-4">
                 <Text className="text-sm font-medium text-[#92400E]">
-                  Seu cadastro ainda não foi concluído. Você pode continuar navegando no app, mas precisa finalizar o cadastro para agendar.
+                  Seu cadastro ainda não foi concluído. Você pode continuar
+                  navegando no app, mas precisa finalizar o cadastro para
+                  agendar.
                 </Text>
               </View>
             )}
 
-            <View className="mb-5">
-              <Text className="mb-3 text-base font-semibold text-[#0F172A]">
-                Unidade de saúde
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                {healthUnits?.map((unit) => {
-                  const isActive = selectedUnitId === unit._id;
+            <HealthUnitsSection
+              healthUnits={healthUnits}
+              selectedUnitId={selectedUnitId ?? ""}
+              setSelectedUnitId={setSelectedUnitId}
+              setSelectedProfessionalId={setSelectedProfessionalId}
+              setSelectedTime={setSelectedTime}
+            />
 
-                  return (
-                    <Pressable
-                      key={unit._id}
-                      onPress={() => {
-                        setSelectedUnitId(unit._id);
-                        setSelectedProfessionalId(null);
-                        setSelectedTime("");
-                      }}
-                      className={`rounded-full border px-4 py-2 ${
-                        isActive
-                          ? "border-[#008096] bg-[#008096]"
-                          : "border-[#D7EEF2] bg-white"
-                      }`}
-                    >
-                      <Text
-                        className={`text-sm ${isActive ? "text-white" : "text-[#0F172A]"}`}
-                      >
-                        {unit.name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
+            <HealthProfessionalsSection
+              professionalsForUnit={professionalsForUnit}
+              selectedProfessionalId={selectedProfessionalId || ""}
+              setSelectedProfessionalId={setSelectedProfessionalId}
+              setSelectedTime={setSelectedTime}
+              selectedUnit={selectedUnit}
+            />
 
-            <View className="mb-5">
-              <Text className="mb-3 text-base font-semibold text-[#0F172A]">
-                Profissionais disponíveis
-              </Text>
-              {professionalsForUnit.length === 0 ? (
-                <View className="rounded-[20px] border border-dashed border-[#D7EEF2] bg-white p-4">
-                  <Text className="text-sm text-[#64748B]">
-                    Não há profissionais disponíveis para essa unidade ainda.
-                  </Text>
-                </View>
-              ) : (
-                <View className="gap-3">
-                  {professionalsForUnit.map((professional) => {
-                    const isSelected =
-                      selectedProfessionalId === professional._id;
+            <AvaliableDays
+              selectedDate={selectedDate}
+              setSelectedTime={setSelectedTime}
+              setSelectedDate={setSelectedDate}
+            />
 
-                    return (
-                      <Pressable
-                        key={professional._id}
-                        onPress={() => {
-                          setSelectedProfessionalId(professional._id);
-                          setSelectedTime("");
-                        }}
-                        className={`rounded-[20px] border p-4 ${
-                          isSelected
-                            ? "border-[#008096] bg-[#E8F8FA]"
-                            : "border-[#E2E8F0] bg-white"
-                        }`}
-                      >
-                        <View className="flex-row items-center gap-3">
-                          <View className="rounded-full bg-[#008096]/10 p-3">
-                            <Stethoscope size={18} color="#008096" />
-                          </View>
-                          <View className="flex-1">
-                            <Text className="text-base font-semibold text-[#0F172A]">
-                              {professional.specialty}
-                            </Text>
-                            <Text className="text-sm text-[#64748B]">
-                              {selectedUnit?.name || "Unidade selecionada"}
-                            </Text>
-                          </View>
-                        </View>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              )}
-            </View>
-
-            <View className="mb-5">
-              <Text className="mb-3 text-base font-semibold text-[#0F172A]">
-                Escolha o dia
-              </Text>
-              <View className="rounded-[28px] bg-white p-5 shadow-sm">
-                <View className="mb-5 flex-row items-center justify-between">
-                  <Text className="text-base font-semibold text-[#0F172A]">
-                    {calendarMonthLabel}
-                  </Text>
-                  <View className="flex-row gap-3">
-                    <Pressable
-                      onPress={() => handleChangeCalendarMonth("previous")}
-                      disabled={!canGoToPreviousMonth}
-                      className={`h-10 w-10 items-center justify-center rounded-full ${
-                        canGoToPreviousMonth ? "bg-[#F1F5F9]" : "bg-[#F8FAFC]"
-                      }`}
-                    >
-                      <ChevronLeft
-                        size={18}
-                        color={canGoToPreviousMonth ? "#008096" : "#CBD5E1"}
-                      />
-                    </Pressable>
-                    <Pressable
-                      onPress={() => handleChangeCalendarMonth("next")}
-                      className="h-10 w-10 items-center justify-center rounded-full bg-[#F1F5F9]"
-                    >
-                      <ChevronRight size={18} color="#008096" />
-                    </Pressable>
-                  </View>
-                </View>
-
-                <View className="mb-3 flex-row">
-                  {["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"].map(
-                    (weekday) => (
-                      <Text
-                        key={weekday}
-                        className="flex-1 text-center text-[11px] font-semibold text-[#94A3B8]"
-                      >
-                        {weekday}
-                      </Text>
-                    ),
-                  )}
-                </View>
-
-                <View className="flex-row flex-wrap">
-                  {calendarDays.map((day) => {
-                    const dateKey = getDateKey(day);
-                    const isCurrentMonth = isSameMonth(day, calendarMonth);
-                    const isSelected = selectedDate === dateKey;
-                    const isPastDay = startOfDay(day) < startOfDay(new Date());
-                    const isDisabled = !isCurrentMonth || isPastDay;
-
-                    return (
-                      <View
-                        key={dateKey}
-                        style={{
-                          width: `${100 / 7}%`,
-                          alignItems: "center",
-                          paddingVertical: 4,
-                        }}
-                      >
-                        <TouchableOpacity
-                          onPress={() => {
-                            setSelectedDate(dateKey);
-                            setSelectedTime("");
-                          }}
-                          disabled={isDisabled}
-                          activeOpacity={0.75}
-                          style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 20,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            backgroundColor: isSelected
-                              ? "#008096"
-                              : "transparent",
-                          }}
-                        >
-                          <Text
-                            className={`text-sm ${
-                              isSelected
-                                ? "font-semibold text-white"
-                                : isDisabled
-                                  ? "text-[#CBD5E1]"
-                                  : "text-[#0F172A]"
-                            }`}
-                          >
-                            {day.getDate()}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  })}
-                </View>
-              </View>
-            </View>
-
-            <View className="mb-5">
-              <Text className="mb-3 text-base font-semibold text-[#0F172A]">
-                Horários disponíveis
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                {AVAILABLE_TIMES.map((time) => {
-                  const isSelected = selectedTime === time;
-                  const isBooked = bookedTimes.has(time);
-                  const isPast =
-                    selectedDate &&
-                    getDateTimeFromDateAndTime(selectedDate, time) <=
-                      new Date();
-                  const isUnavailable =
-                    isBooked || isPast || isProfessionalAppointmentsLoading;
-
-                  return (
-                    <Pressable
-                      key={time}
-                      onPress={() => setSelectedTime(time)}
-                      disabled={isUnavailable}
-                      className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
-                        isUnavailable
-                          ? "border-[#E2E8F0] bg-[#F1F5F9] opacity-60"
-                          : isSelected
-                          ? "border-[#008096] bg-[#008096]"
-                          : "border-[#D7EEF2] bg-white"
-                      }`}
-                    >
-                      <Clock3
-                        size={16}
-                        color={
-                          isUnavailable
-                            ? "#94A3B8"
-                            : isSelected
-                              ? "#FFFFFF"
-                              : "#008096"
-                        }
-                      />
-                      <Text
-                        className={`text-sm ${
-                          isUnavailable
-                            ? "text-[#94A3B8]"
-                            : isSelected
-                              ? "text-white"
-                              : "text-[#0F172A]"
-                        }`}
-                      >
-                        {time}
-                      </Text>
-                      {(isBooked || isPast) && (
-                        <Text className="text-xs font-medium text-[#94A3B8]">
-                          {isBooked ? "Ocupado" : "Indisponível"}
-                        </Text>
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
+            <AvaliableTimes
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              setSelectedTime={setSelectedTime}
+              bookedTimes={bookedTimes}
+              isProfessionalAppointmentsLoading={
+                isProfessionalAppointmentsLoading
+              }
+            />
 
             <Pressable
               onPress={handleConfirmPress}
@@ -699,7 +396,8 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                 Complete seu cadastro
               </Text>
               <Text className="mt-1 text-sm text-[#64748B]">
-                Precisamos de alguns dados para criar seu perfil de paciente e concluir o agendamento.
+                Precisamos de alguns dados para criar seu perfil de paciente e
+                concluir o agendamento.
               </Text>
             </View>
 
