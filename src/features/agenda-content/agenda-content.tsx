@@ -1,10 +1,12 @@
 import { useCreateAppointment } from "@/src/api/create-appointment";
+import { useCreatePatient } from "@/src/api/create-patient";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import Header from "@/src/components/header/header";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
+import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,12 +18,56 @@ import {
     Stethoscope,
 } from "lucide-react-native";
 import React, { useEffect, useMemo, useState } from "react";
+
+const formatCpf = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9) {
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  }
+
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+};
+
+const formatPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
+
+const formatBirthDate = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+};
+
+const normalizeBirthDate = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length !== 8) return value;
+
+  const day = digits.slice(0, 2);
+  const month = digits.slice(2, 4);
+  const year = digits.slice(4, 8);
+
+  return `${year}-${month}-${day}`;
+};
 import {
     ActivityIndicator,
     Modal,
     Pressable,
     ScrollView,
     Text,
+    TextInput,
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
@@ -41,10 +87,14 @@ export default function AgendaContent({ user }: AgendaContentProps) {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>(AVAILABLE_TIMES[0]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showPatientRegistrationModal, setShowPatientRegistrationModal] = useState(false);
+  const [cpf, setCpf] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [phone, setPhone] = useState("");
 
   const { data: patient, isLoading: isPatientLoading } = useGetPatientById(
     { userId: user._id },
-    { enabled: Boolean(user._id) },
+    { enabled: Boolean(user._id), retry: false },
   );
   const { data: healthUnits, isLoading: isHealthUnitsLoading } =
     useGetHealthUnits();
@@ -53,6 +103,8 @@ export default function AgendaContent({ user }: AgendaContentProps) {
 
   const { mutate: createAppointment, isPending: isCreatingAppointment } =
     useCreateAppointment();
+  const { mutate: createPatient, isPending: isCreatingPatient } =
+    useCreatePatient();
 
   useEffect(() => {
     if (healthUnits?.length && !selectedUnitId) {
@@ -108,7 +160,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
   const selectedUnit = healthUnits?.find((unit) => unit._id === selectedUnitId);
 
   const handleConfirmPress = () => {
-    if (!patient || !selectedProfessional || !selectedDate || !selectedTime) {
+    if (!selectedProfessional || !selectedDate || !selectedTime) {
       Toast.show({
         type: "error",
         text1: "Preencha todos os campos",
@@ -116,11 +168,64 @@ export default function AgendaContent({ user }: AgendaContentProps) {
       return;
     }
 
+    if (!patient) {
+      setShowPatientRegistrationModal(true);
+      return;
+    }
+
     setShowConfirmModal(true);
+  };
+
+  const handlePatientRegistrationSubmit = () => {
+    const normalizedBirthDate = normalizeBirthDate(birthDate);
+
+    if (!user._id || !cpf.trim() || !normalizedBirthDate.trim() || !phone.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Preencha todos os dados",
+      });
+      return;
+    }
+
+    createPatient(
+      {
+        userId: user._id,
+        cpf: cpf.trim(),
+        birthDate: normalizedBirthDate,
+        phone: phone.trim(),
+        priority: EPatientPriority.NORMAL,
+      },
+      {
+        onSuccess: (createdPatient) => {
+          queryClient.invalidateQueries({
+            queryKey: ["GET_PATIENT_BY_ID_KEY"],
+          });
+          setShowPatientRegistrationModal(false);
+          setShowConfirmModal(true);
+          Toast.show({
+            type: "success",
+            text1: "Cadastro concluído",
+            text2: "Agora você pode confirmar o agendamento.",
+          });
+        },
+        onError: (error: any) => {
+          Toast.show({
+            type: "error",
+            text1: "Não foi possível salvar seu cadastro",
+            text2: error?.message || "Tente novamente em instantes.",
+          });
+        },
+      },
+    );
   };
 
   const handleCreateAppointment = () => {
     if (!patient || !selectedProfessional || !selectedDate || !selectedTime) {
+      Toast.show({
+        type: "info",
+        text1: "Cadastro pendente",
+        text2: "Complete seu cadastro para agendar uma consulta.",
+      });
       return;
     }
 
@@ -191,6 +296,14 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                 para você.
               </Text>
             </View>
+
+            {!patient && !isPatientLoading && (
+              <View className="mb-5 rounded-[20px] border border-[#FDE68A] bg-[#FEF3C7] p-4">
+                <Text className="text-sm font-medium text-[#92400E]">
+                  Seu cadastro ainda não foi concluído. Você pode continuar navegando no app, mas precisa finalizar o cadastro para agendar.
+                </Text>
+              </View>
+            )}
 
             <View className="mb-5">
               <Text className="mb-3 text-base font-semibold text-[#0F172A]">
@@ -355,6 +468,93 @@ export default function AgendaContent({ user }: AgendaContentProps) {
           </View>
         </ScrollView>
       )}
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showPatientRegistrationModal}
+        onRequestClose={() => setShowPatientRegistrationModal(false)}
+      >
+        <View className="flex-1 items-center justify-center bg-black/50 px-5">
+          <View className="w-full rounded-[24px] bg-white p-5">
+            <View className="mb-4">
+              <Text className="text-lg font-semibold text-[#0F172A]">
+                Complete seu cadastro
+              </Text>
+              <Text className="mt-1 text-sm text-[#64748B]">
+                Precisamos de alguns dados para criar seu perfil de paciente e concluir o agendamento.
+              </Text>
+            </View>
+
+            <View className="gap-3">
+              <View>
+                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                  CPF
+                </Text>
+                <TextInput
+                  value={cpf}
+                  onChangeText={(value) => setCpf(formatCpf(value))}
+                  placeholder="000.000.000-00"
+                  keyboardType="numeric"
+                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                />
+              </View>
+
+              <View>
+                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                  Data de nascimento
+                </Text>
+                <TextInput
+                  value={birthDate}
+                  onChangeText={(value) => setBirthDate(formatBirthDate(value))}
+                  placeholder="DD/MM/YYYY"
+                  keyboardType="numeric"
+                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                />
+              </View>
+
+              <View>
+                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                  Telefone
+                </Text>
+                <TextInput
+                  value={phone}
+                  onChangeText={(value) => setPhone(formatPhone(value))}
+                  placeholder="(11) 99999-9999"
+                  keyboardType="numeric"
+                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                />
+              </View>
+            </View>
+
+            <View className="mt-5 flex-row gap-3">
+              <Pressable
+                onPress={() => setShowPatientRegistrationModal(false)}
+                className="flex-1 rounded-[16px] border border-[#CBD5E1] bg-white px-4 py-3"
+              >
+                <Text className="text-center text-sm font-semibold text-[#0F172A]">
+                  Cancelar
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={handlePatientRegistrationSubmit}
+                disabled={isCreatingPatient}
+                className={`flex-1 rounded-[16px] px-4 py-3 ${
+                  isCreatingPatient ? "bg-[#67B5C0]" : "bg-[#008096]"
+                }`}
+              >
+                {isCreatingPatient ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text className="text-center text-sm font-semibold text-white">
+                    Salvar e continuar
+                  </Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         transparent

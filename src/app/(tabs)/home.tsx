@@ -5,17 +5,17 @@ import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
-  const { data: user } = useGetUser();
+  const { data: user, isLoading: isUserLoading } = useGetUser();
 
-  const { data: patient } = useGetPatientById(
+  const { data: patient, isLoading: isPatientLoading } = useGetPatientById(
     { userId: user?._id || "" },
     {
       enabled: !!user?._id,
+      retry: false,
     },
   );
 
-  //add a skeleton loading here, install the dependency react-native-skeleton-placeholder
-  if (!user || !patient) {
+  if (isUserLoading || (user?._id && isPatientLoading)) {
     return (
       <SafeAreaView
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -25,9 +25,19 @@ export default function Home() {
     );
   }
 
+  if (!user) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Não foi possível carregar o usuário.</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <MainContent user={user} patient={patient} />
+      <MainContent user={user} patient={patient ?? null} />
     </SafeAreaView>
   );
 }

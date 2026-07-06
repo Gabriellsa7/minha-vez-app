@@ -15,7 +15,7 @@ import { QuickServices } from "./componentes/quick-services/quick-services";
 
 interface MainContentProps {
   user: IUser;
-  patient: IPatient;
+  patient?: IPatient | null;
 }
 
 export default function MainContent({ user, patient }: MainContentProps) {
@@ -62,6 +62,13 @@ export default function MainContent({ user, patient }: MainContentProps) {
       </View>
 
       <View className="w-full p-5 gap-5">
+        {!patient && (
+          <View className="w-full rounded-[16px] border border-[#FDE68A] bg-[#FEF3C7] p-3">
+            <Text className="text-sm font-medium text-[#92400E]">
+              Complete seu cadastro para agendar consultas e acessar todos os recursos.
+            </Text>
+          </View>
+        )}
         {userAppointments && isFutureAppointment && (
           <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
             <View className="flex-row gap-2 items-center">

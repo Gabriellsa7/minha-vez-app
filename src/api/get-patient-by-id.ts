@@ -10,19 +10,23 @@ export interface IGetPatientByIdParams {
 
 const getPatientById = async (
   params: IGetPatientByIdParams,
-): Promise<IPatient> => {
+): Promise<IPatient | null> => {
   const path = `/patients/user/${params.userId}`;
 
   try {
     const response = await httpClient.get(path);
 
-    return response.data;
+    return response.data ?? null;
   } catch (error: any) {
+    if (error?.response?.status === 404) {
+      return null;
+    }
+
     throw error;
   }
 };
 
 export const useGetPatientById = generateReactQuery<
-  IPatient,
+  IPatient | null,
   IGetPatientByIdParams
 >(GET_PATIENT_BY_ID_KEY, getPatientById);

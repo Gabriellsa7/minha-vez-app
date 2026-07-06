@@ -16,7 +16,10 @@ export const CREATE_APPOINTMENT_KEY = "CREATE_APPOINTMENT_KEY";
 const createAppointment = async (
   payload: ICreateAppointmentPayload,
 ): Promise<IAppointment> => {
-  const response = await httpClient.post("/appointments", payload);
+  console.log('[createAppointment] baseURL:', httpClient.defaults.baseURL);
+  console.log('[createAppointment] payload:', JSON.stringify(payload));
+
+  const response = await httpClient.post('/appointments', payload);
 
   return response.data;
 };
