@@ -1,9 +1,16 @@
 import { useCreateAppointment } from "@/src/api/create-appointment";
 import { useCreatePatient } from "@/src/api/create-patient";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
+import {
+  GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY,
+  useGetAppointmentsByProfessionalId,
+} from "@/src/api/get-appointments-by-professional-id";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
+import { GET_QUEUE_ITEMS_KEY } from "@/src/api/get-queue-item-by-patient-id";
+import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "@/src/api/get-queues-with-details-by-patient-id";
+import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import Header from "@/src/components/header/header";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
@@ -18,6 +25,16 @@ import {
     Stethoscope,
 } from "lucide-react-native";
 import React, { useEffect, useMemo, useState } from "react";
+import {
+    ActivityIndicator,
+    Modal,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
+import Toast from "react-native-toast-message";
 
 const formatCpf = (value: string) => {
   const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -61,16 +78,6 @@ const normalizeBirthDate = (value: string) => {
 
   return `${year}-${month}-${day}`;
 };
-import {
-    ActivityIndicator,
-    Modal,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    View,
-} from "react-native";
-import Toast from "react-native-toast-message";
 
 interface AgendaContentProps {
   user: IUser;
@@ -85,7 +92,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     string | null
   >(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [selectedTime, setSelectedTime] = useState<string>(AVAILABLE_TIMES[0]);
+  const [selectedTime, setSelectedTime] = useState<string>("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showPatientRegistrationModal, setShowPatientRegistrationModal] = useState(false);
   const [cpf, setCpf] = useState("");
@@ -100,6 +107,13 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     useGetHealthUnits();
   const { data: healthProfessionals, isLoading: isHealthProfessionalsLoading } =
     useGetHealthProfessionals();
+  const {
+    data: professionalAppointments,
+    isLoading: isProfessionalAppointmentsLoading,
+  } = useGetAppointmentsByProfessionalId(
+    { professionalId: selectedProfessionalId ?? "" },
+    { enabled: Boolean(selectedProfessionalId) },
+  );
 
   const { mutate: createAppointment, isPending: isCreatingAppointment } =
     useCreateAppointment();
@@ -158,6 +172,41 @@ export default function AgendaContent({ user }: AgendaContentProps) {
   );
 
   const selectedUnit = healthUnits?.find((unit) => unit._id === selectedUnitId);
+
+  const bookedTimes = useMemo(() => {
+    if (!professionalAppointments || !selectedDate) {
+      return new Set<string>();
+    }
+
+    return professionalAppointments.reduce((times, appointment) => {
+      if (
+        appointment.status === EAppointmentStatus.COMPLETED ||
+        appointment.status === EAppointmentStatus.CANCELED
+      ) {
+        return times;
+      }
+
+      const appointmentDate = new Date(appointment.dateTime);
+      const yyyy = appointmentDate.getFullYear();
+      const mm = String(appointmentDate.getMonth() + 1).padStart(2, "0");
+      const dd = String(appointmentDate.getDate()).padStart(2, "0");
+      const dateKey = `${yyyy}-${mm}-${dd}`;
+
+      if (dateKey === selectedDate) {
+        const hour = String(appointmentDate.getHours()).padStart(2, "0");
+        const minute = String(appointmentDate.getMinutes()).padStart(2, "0");
+        times.add(`${hour}:${minute}`);
+      }
+
+      return times;
+    }, new Set<string>());
+  }, [professionalAppointments, selectedDate]);
+
+  useEffect(() => {
+    if (selectedTime && bookedTimes.has(selectedTime)) {
+      setSelectedTime("");
+    }
+  }, [bookedTimes, selectedTime]);
 
   const handleConfirmPress = () => {
     if (!selectedProfessional || !selectedDate || !selectedTime) {
@@ -257,6 +306,15 @@ export default function AgendaContent({ user }: AgendaContentProps) {
           queryClient.invalidateQueries({
             queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
           });
+          queryClient.invalidateQueries({
+            queryKey: [GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [GET_QUEUE_ITEMS_KEY],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
+          });
           setShowConfirmModal(false);
         },
         onError: (error: any) => {
@@ -319,6 +377,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                       onPress={() => {
                         setSelectedUnitId(unit._id);
                         setSelectedProfessionalId(null);
+                        setSelectedTime("");
                       }}
                       className={`rounded-full border px-4 py-2 ${
                         isActive
@@ -356,9 +415,10 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                     return (
                       <Pressable
                         key={professional._id}
-                        onPress={() =>
-                          setSelectedProfessionalId(professional._id)
-                        }
+                        onPress={() => {
+                          setSelectedProfessionalId(professional._id);
+                          setSelectedTime("");
+                        }}
                         className={`rounded-[20px] border p-4 ${
                           isSelected
                             ? "border-[#008096] bg-[#E8F8FA]"
@@ -397,7 +457,10 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                     return (
                       <Pressable
                         key={day.key}
-                        onPress={() => setSelectedDate(day.value)}
+                        onPress={() => {
+                          setSelectedDate(day.value);
+                          setSelectedTime("");
+                        }}
                         className={`rounded-[16px] border px-3 py-3 ${
                           isSelected
                             ? "border-[#008096] bg-[#008096]"
@@ -423,26 +486,47 @@ export default function AgendaContent({ user }: AgendaContentProps) {
               <View className="flex-row flex-wrap gap-2">
                 {AVAILABLE_TIMES.map((time) => {
                   const isSelected = selectedTime === time;
+                  const isBooked = bookedTimes.has(time);
 
                   return (
                     <Pressable
                       key={time}
                       onPress={() => setSelectedTime(time)}
+                      disabled={isBooked || isProfessionalAppointmentsLoading}
                       className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
-                        isSelected
+                        isBooked || isProfessionalAppointmentsLoading
+                          ? "border-[#E2E8F0] bg-[#F1F5F9] opacity-60"
+                          : isSelected
                           ? "border-[#008096] bg-[#008096]"
                           : "border-[#D7EEF2] bg-white"
                       }`}
                     >
                       <Clock3
                         size={16}
-                        color={isSelected ? "#FFFFFF" : "#008096"}
+                        color={
+                          isBooked || isProfessionalAppointmentsLoading
+                            ? "#94A3B8"
+                            : isSelected
+                              ? "#FFFFFF"
+                              : "#008096"
+                        }
                       />
                       <Text
-                        className={`text-sm ${isSelected ? "text-white" : "text-[#0F172A]"}`}
+                        className={`text-sm ${
+                          isBooked || isProfessionalAppointmentsLoading
+                            ? "text-[#94A3B8]"
+                            : isSelected
+                              ? "text-white"
+                              : "text-[#0F172A]"
+                        }`}
                       >
                         {time}
                       </Text>
+                      {isBooked && (
+                        <Text className="text-xs font-medium text-[#94A3B8]">
+                          Ocupado
+                        </Text>
+                      )}
                     </Pressable>
                   );
                 })}

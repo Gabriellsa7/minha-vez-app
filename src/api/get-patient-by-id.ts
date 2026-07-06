@@ -14,7 +14,13 @@ const getPatientById = async (
   const path = `/patients/user/${params.userId}`;
 
   try {
-    const response = await httpClient.get(path);
+    const response = await httpClient.get(path, {
+      validateStatus: (status) => status === 404 || (status >= 200 && status < 300),
+    });
+
+    if (response.status === 404) {
+      return null;
+    }
 
     return response.data ?? null;
   } catch (error: any) {

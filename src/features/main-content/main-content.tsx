@@ -6,7 +6,7 @@ import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { LinearGradient } from "expo-linear-gradient";
 import { Bell, Clock } from "lucide-react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 import HomeHeader from "./componentes/header/header";
 import HealthUnits from "./componentes/health-units/health-units";
@@ -33,12 +33,17 @@ export default function MainContent({ user, patient }: MainContentProps) {
       },
     );
 
-  const appointment = userAppointments?.[0];
+  const appointment = useMemo(() => {
+    const now = new Date();
 
-  const now = new Date();
-
-  const isFutureAppointment =
-    appointment?.dateTime && new Date(appointment.dateTime) > now;
+    return userAppointments
+      ?.filter((item) => new Date(item.dateTime) > now)
+      .sort(
+        (first, second) =>
+          new Date(first.dateTime).getTime() -
+          new Date(second.dateTime).getTime(),
+      )[0];
+  }, [userAppointments]);
 
   if (isAppointmentsLoading) {
     console.log("Carregando appointments...");
@@ -69,7 +74,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
             </Text>
           </View>
         )}
-        {userAppointments && isFutureAppointment && (
+        {appointment && (
           <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
             <View className="flex-row gap-2 items-center">
               <Bell size={20} color="#FFFFFF" />
