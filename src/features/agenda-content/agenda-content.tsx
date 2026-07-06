@@ -20,6 +20,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
     CalendarDays,
     CheckCircle2,
+    ChevronLeft,
+    ChevronRight,
     Clock3,
     Sparkles,
     Stethoscope,
@@ -32,6 +34,7 @@ import {
     ScrollView,
     Text,
     TextInput,
+    TouchableOpacity,
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
@@ -79,6 +82,28 @@ const normalizeBirthDate = (value: string) => {
   return `${year}-${month}-${day}`;
 };
 
+const getDateTimeFromDateAndTime = (date: string, time: string) => {
+  const [year, month, day] = date.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+
+  return new Date(year, month - 1, day, hour, minute);
+};
+
+const getDateKey = (date: Date) => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const isSameMonth = (firstDate: Date, secondDate: Date) =>
+  firstDate.getFullYear() === secondDate.getFullYear() &&
+  firstDate.getMonth() === secondDate.getMonth();
+
+const startOfDay = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
 interface AgendaContentProps {
   user: IUser;
 }
@@ -92,6 +117,10 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     string | null
   >(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
+  });
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showPatientRegistrationModal, setShowPatientRegistrationModal] = useState(false);
@@ -128,33 +157,42 @@ export default function AgendaContent({ user }: AgendaContentProps) {
 
   useEffect(() => {
     if (!selectedDate) {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
-      const dd = String(today.getDate()).padStart(2, "0");
-      setSelectedDate(`${yyyy}-${mm}-${dd}`);
+      setSelectedDate(getDateKey(new Date()));
     }
   }, [selectedDate]);
 
-  const nextDays = useMemo(() => {
-    return Array.from({ length: 7 }, (_, index) => {
-      const date = new Date();
-      date.setDate(date.getDate() + index);
+  const calendarDays = useMemo(() => {
+    const firstDayOfMonth = new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth(),
+      1,
+    );
+    const firstVisibleDay = new Date(firstDayOfMonth);
+    firstVisibleDay.setDate(firstVisibleDay.getDate() - firstDayOfMonth.getDay());
 
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, "0");
-      const dd = String(date.getDate()).padStart(2, "0");
+    return Array.from({ length: 42 }, (_, index) => {
+      const date = new Date(firstVisibleDay);
+      date.setDate(firstVisibleDay.getDate() + index);
 
-      return {
-        key: `${yyyy}-${mm}-${dd}`,
-        label: date.toLocaleDateString("pt-BR", {
-          weekday: "short",
-          day: "2-digit",
-        }),
-        value: `${yyyy}-${mm}-${dd}`,
-      };
+      return date;
     });
-  }, []);
+  }, [calendarMonth]);
+
+  const calendarMonthLabel = useMemo(() => {
+    const label = calendarMonth.toLocaleDateString("pt-BR", {
+      month: "long",
+      year: "numeric",
+    });
+
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  }, [calendarMonth]);
+
+  const canGoToPreviousMonth = useMemo(() => {
+    const today = new Date();
+    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    return calendarMonth > currentMonth;
+  }, [calendarMonth]);
 
   const professionalsForUnit = useMemo(() => {
     if (!healthProfessionals) {
@@ -172,6 +210,17 @@ export default function AgendaContent({ user }: AgendaContentProps) {
   );
 
   const selectedUnit = healthUnits?.find((unit) => unit._id === selectedUnitId);
+
+  const handleChangeCalendarMonth = (direction: "previous" | "next") => {
+    setCalendarMonth((currentMonth) => {
+      const nextMonth = new Date(currentMonth);
+      nextMonth.setMonth(
+        currentMonth.getMonth() + (direction === "next" ? 1 : -1),
+      );
+
+      return nextMonth;
+    });
+  };
 
   const bookedTimes = useMemo(() => {
     if (!professionalAppointments || !selectedDate) {
@@ -203,10 +252,19 @@ export default function AgendaContent({ user }: AgendaContentProps) {
   }, [professionalAppointments, selectedDate]);
 
   useEffect(() => {
-    if (selectedTime && bookedTimes.has(selectedTime)) {
+    if (!selectedTime || !selectedDate) {
+      return;
+    }
+
+    const selectedDateTime = getDateTimeFromDateAndTime(
+      selectedDate,
+      selectedTime,
+    );
+
+    if (bookedTimes.has(selectedTime) || selectedDateTime <= new Date()) {
       setSelectedTime("");
     }
-  }, [bookedTimes, selectedTime]);
+  }, [bookedTimes, selectedDate, selectedTime]);
 
   const handleConfirmPress = () => {
     if (!selectedProfessional || !selectedDate || !selectedTime) {
@@ -278,22 +336,27 @@ export default function AgendaContent({ user }: AgendaContentProps) {
       return;
     }
 
-    const [year, month, day] = selectedDate.split("-").map(Number);
-    const [hour, minute] = selectedTime.split(":").map(Number);
-    const selectedDateTime = new Date(
-      year,
-      month - 1,
-      day,
-      hour,
-      minute,
-    ).toISOString();
+    const selectedDateTime = getDateTimeFromDateAndTime(
+      selectedDate,
+      selectedTime,
+    );
+
+    if (selectedDateTime <= new Date()) {
+      Toast.show({
+        type: "error",
+        text1: "Horário indisponível",
+        text2: "Escolha um horário futuro para agendar.",
+      });
+      setSelectedTime("");
+      return;
+    }
 
     createAppointment(
       {
         patientId: patient._id,
         professionalId: selectedProfessional._id,
         healthUnitId: selectedUnitId ?? selectedProfessional.healthUnitId,
-        dateTime: selectedDateTime,
+        dateTime: selectedDateTime.toISOString(),
         notes: "Agendamento realizado pelo app MinhaVez",
       },
       {
@@ -449,34 +512,98 @@ export default function AgendaContent({ user }: AgendaContentProps) {
               <Text className="mb-3 text-base font-semibold text-[#0F172A]">
                 Escolha o dia
               </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View className="flex-row gap-2">
-                  {nextDays.map((day) => {
-                    const isSelected = selectedDate === day.value;
+              <View className="rounded-[28px] bg-white p-5 shadow-sm">
+                <View className="mb-5 flex-row items-center justify-between">
+                  <Text className="text-base font-semibold text-[#0F172A]">
+                    {calendarMonthLabel}
+                  </Text>
+                  <View className="flex-row gap-3">
+                    <Pressable
+                      onPress={() => handleChangeCalendarMonth("previous")}
+                      disabled={!canGoToPreviousMonth}
+                      className={`h-10 w-10 items-center justify-center rounded-full ${
+                        canGoToPreviousMonth ? "bg-[#F1F5F9]" : "bg-[#F8FAFC]"
+                      }`}
+                    >
+                      <ChevronLeft
+                        size={18}
+                        color={canGoToPreviousMonth ? "#008096" : "#CBD5E1"}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => handleChangeCalendarMonth("next")}
+                      className="h-10 w-10 items-center justify-center rounded-full bg-[#F1F5F9]"
+                    >
+                      <ChevronRight size={18} color="#008096" />
+                    </Pressable>
+                  </View>
+                </View>
+
+                <View className="mb-3 flex-row">
+                  {["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"].map(
+                    (weekday) => (
+                      <Text
+                        key={weekday}
+                        className="flex-1 text-center text-[11px] font-semibold text-[#94A3B8]"
+                      >
+                        {weekday}
+                      </Text>
+                    ),
+                  )}
+                </View>
+
+                <View className="flex-row flex-wrap">
+                  {calendarDays.map((day) => {
+                    const dateKey = getDateKey(day);
+                    const isCurrentMonth = isSameMonth(day, calendarMonth);
+                    const isSelected = selectedDate === dateKey;
+                    const isPastDay = startOfDay(day) < startOfDay(new Date());
+                    const isDisabled = !isCurrentMonth || isPastDay;
 
                     return (
-                      <Pressable
-                        key={day.key}
-                        onPress={() => {
-                          setSelectedDate(day.value);
-                          setSelectedTime("");
+                      <View
+                        key={dateKey}
+                        style={{
+                          width: `${100 / 7}%`,
+                          alignItems: "center",
+                          paddingVertical: 4,
                         }}
-                        className={`rounded-[16px] border px-3 py-3 ${
-                          isSelected
-                            ? "border-[#008096] bg-[#008096]"
-                            : "border-[#D7EEF2] bg-white"
-                        }`}
                       >
-                        <Text
-                          className={`text-center text-xs ${isSelected ? "text-white" : "text-[#0F172A]"}`}
+                        <TouchableOpacity
+                          onPress={() => {
+                            setSelectedDate(dateKey);
+                            setSelectedTime("");
+                          }}
+                          disabled={isDisabled}
+                          activeOpacity={0.75}
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 20,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: isSelected
+                              ? "#008096"
+                              : "transparent",
+                          }}
                         >
-                          {day.label}
-                        </Text>
-                      </Pressable>
+                          <Text
+                            className={`text-sm ${
+                              isSelected
+                                ? "font-semibold text-white"
+                                : isDisabled
+                                  ? "text-[#CBD5E1]"
+                                  : "text-[#0F172A]"
+                            }`}
+                          >
+                            {day.getDate()}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     );
                   })}
                 </View>
-              </ScrollView>
+              </View>
             </View>
 
             <View className="mb-5">
@@ -487,14 +614,20 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                 {AVAILABLE_TIMES.map((time) => {
                   const isSelected = selectedTime === time;
                   const isBooked = bookedTimes.has(time);
+                  const isPast =
+                    selectedDate &&
+                    getDateTimeFromDateAndTime(selectedDate, time) <=
+                      new Date();
+                  const isUnavailable =
+                    isBooked || isPast || isProfessionalAppointmentsLoading;
 
                   return (
                     <Pressable
                       key={time}
                       onPress={() => setSelectedTime(time)}
-                      disabled={isBooked || isProfessionalAppointmentsLoading}
+                      disabled={isUnavailable}
                       className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
-                        isBooked || isProfessionalAppointmentsLoading
+                        isUnavailable
                           ? "border-[#E2E8F0] bg-[#F1F5F9] opacity-60"
                           : isSelected
                           ? "border-[#008096] bg-[#008096]"
@@ -504,7 +637,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                       <Clock3
                         size={16}
                         color={
-                          isBooked || isProfessionalAppointmentsLoading
+                          isUnavailable
                             ? "#94A3B8"
                             : isSelected
                               ? "#FFFFFF"
@@ -513,7 +646,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                       />
                       <Text
                         className={`text-sm ${
-                          isBooked || isProfessionalAppointmentsLoading
+                          isUnavailable
                             ? "text-[#94A3B8]"
                             : isSelected
                               ? "text-white"
@@ -522,9 +655,9 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                       >
                         {time}
                       </Text>
-                      {isBooked && (
+                      {(isBooked || isPast) && (
                         <Text className="text-xs font-medium text-[#94A3B8]">
-                          Ocupado
+                          {isBooked ? "Ocupado" : "Indisponível"}
                         </Text>
                       )}
                     </Pressable>
