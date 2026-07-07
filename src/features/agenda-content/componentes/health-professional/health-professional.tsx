@@ -55,6 +55,9 @@ export default function HealthProfessionalsSection({
                     <Text className="text-base font-semibold text-[#0F172A]">
                       {professional.specialty}
                     </Text>
+                    <Text className="text-base font-semibold text-[#008096]">
+                      {professional.name}
+                    </Text>
                     <Text className="text-sm text-[#64748B]">
                       {selectedUnit?.name || "Unidade selecionada"}
                     </Text>
