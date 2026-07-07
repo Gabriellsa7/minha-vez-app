@@ -57,7 +57,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
       >
         <View className="w-full gap-3 p-5">
           <HomeHeader user={user!} />
-          <QueueDetails patientId={patientId!} />
+          {appointment && <QueueDetails patientId={patientId!} />}
         </View>
       </LinearGradient>
       <View className="relative w-full mb-6">
@@ -70,7 +70,8 @@ export default function MainContent({ user, patient }: MainContentProps) {
         {!patient && (
           <View className="w-full rounded-[16px] border border-[#FDE68A] bg-[#FEF3C7] p-3">
             <Text className="text-sm font-medium text-[#92400E]">
-              Complete seu cadastro para agendar consultas e acessar todos os recursos.
+              Complete seu cadastro para agendar consultas e acessar todos os
+              recursos.
             </Text>
           </View>
         )}
