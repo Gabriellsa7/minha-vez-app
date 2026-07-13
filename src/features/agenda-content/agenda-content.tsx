@@ -1,5 +1,6 @@
 import { useCreateAppointment } from "@/src/api/create-appointment";
 import { useCreatePatient } from "@/src/api/create-patient";
+import { useCreateQueue } from "@/src/api/create-queue";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
 import {
     GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY,
@@ -29,11 +30,13 @@ import { CalendarDays, CheckCircle2, Sparkles } from "lucide-react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
+    Keyboard,
     Modal,
     Pressable,
     ScrollView,
     Text,
     TextInput,
+    TouchableWithoutFeedback,
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
@@ -229,6 +232,8 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     );
   };
 
+  const { mutate: createQueue } = useCreateQueue();
+
   const handleCreateAppointment = () => {
     if (!patient || !selectedProfessional || !selectedDate || !selectedTime) {
       Toast.show({
@@ -280,6 +285,29 @@ export default function AgendaContent({ user }: AgendaContentProps) {
           });
           queryClient.invalidateQueries({
             queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
+          });
+          setShowConfirmModal(false);
+        },
+        onError: (error: any) => {
+          Toast.show({
+            type: "error",
+            text1: "Não foi possível salvar",
+            text2: error?.message || "Tente novamente em instantes.",
+          });
+        },
+      },
+    );
+    createQueue(
+      {
+        professionalId: selectedProfessional._id,
+        healthUnitId: selectedUnitId ?? selectedProfessional.healthUnitId,
+      },
+      {
+        onSuccess: () => {
+          Toast.show({
+            type: "success",
+            text1: "Agendamento confirmado",
+            text2: "Seu atendimento foi salvo com sucesso.",
           });
           setShowConfirmModal(false);
         },
@@ -401,46 +429,50 @@ export default function AgendaContent({ user }: AgendaContentProps) {
               </Text>
             </View>
 
-            <View className="gap-3">
-              <View>
-                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
-                  CPF
-                </Text>
-                <TextInput
-                  value={cpf}
-                  onChangeText={(value) => setCpf(formatCpf(value))}
-                  placeholder="000.000.000-00"
-                  keyboardType="numeric"
-                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
-                />
-              </View>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View className="gap-3">
+                <View>
+                  <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                    CPF
+                  </Text>
+                  <TextInput
+                    value={cpf}
+                    onChangeText={(value) => setCpf(formatCpf(value))}
+                    placeholder="000.000.000-00"
+                    keyboardType="numeric"
+                    className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                  />
+                </View>
 
-              <View>
-                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
-                  Data de nascimento
-                </Text>
-                <TextInput
-                  value={birthDate}
-                  onChangeText={(value) => setBirthDate(formatBirthDate(value))}
-                  placeholder="DD/MM/YYYY"
-                  keyboardType="numeric"
-                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
-                />
-              </View>
+                <View>
+                  <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                    Data de nascimento
+                  </Text>
+                  <TextInput
+                    value={birthDate}
+                    onChangeText={(value) =>
+                      setBirthDate(formatBirthDate(value))
+                    }
+                    placeholder="DD/MM/YYYY"
+                    keyboardType="numeric"
+                    className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                  />
+                </View>
 
-              <View>
-                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
-                  Telefone
-                </Text>
-                <TextInput
-                  value={phone}
-                  onChangeText={(value) => setPhone(formatPhone(value))}
-                  placeholder="(11) 99999-9999"
-                  keyboardType="numeric"
-                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
-                />
+                <View>
+                  <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                    Telefone
+                  </Text>
+                  <TextInput
+                    value={phone}
+                    onChangeText={(value) => setPhone(formatPhone(value))}
+                    placeholder="(11) 99999-9999"
+                    keyboardType="numeric"
+                    className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                  />
+                </View>
               </View>
-            </View>
+            </TouchableWithoutFeedback>
 
             <View className="mt-5 flex-row gap-3">
               <Pressable
@@ -518,6 +550,8 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                   Cancelar
                 </Text>
               </Pressable>
+              {/* When selected all options and press the button create appointment 
+              add a logic to open a queue at the same time.*/}
               <Pressable
                 onPress={handleCreateAppointment}
                 disabled={isCreatingAppointment}
