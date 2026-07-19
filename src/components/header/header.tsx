@@ -4,7 +4,7 @@ import { ArrowLeft, User } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 interface HeaderProps {
   text: string;
-  user: IUser;
+  user?: IUser;
 }
 
 export default function Header({ text, user }: HeaderProps) {
