@@ -63,7 +63,8 @@ export default function HealthProfessionalsSection({
                         {selectedUnit?.name || "Unidade selecionada"}
                       </Text>
                       <Text className="text-sm text-[#64748B]">
-                        {selectedUnit?.address.street || "Unidade selecionada"}
+                        {selectedUnit?.address.street || "Unidade selecionada"}{" "}
+                        - {selectedUnit?.address.number}
                       </Text>
                     </View>
                     <Text className="text-sm text-[#64748B]">
