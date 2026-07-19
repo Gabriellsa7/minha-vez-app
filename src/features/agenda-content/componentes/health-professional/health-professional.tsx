@@ -58,19 +58,19 @@ export default function HealthProfessionalsSection({
                     <Text className="text-base font-semibold text-[#008096]">
                       {professional.name}
                     </Text>
+                    <Text className="text-sm text-[#64748B]">
+                      {selectedUnit?.name || "Unidade selecionada"}
+                    </Text>
                     <View className="flex-row items-center justify-between">
-                      <Text className="text-sm text-[#64748B]">
-                        {selectedUnit?.name || "Unidade selecionada"}
-                      </Text>
                       <Text className="text-sm text-[#64748B]">
                         {selectedUnit?.address.street || "Unidade selecionada"}{" "}
                         - {selectedUnit?.address.number}
                       </Text>
+                      <Text className="text-sm text-[#64748B]">
+                        {selectedUnit?.address.city || "Unidade selecionada"} -{" "}
+                        {selectedUnit?.address.state || "Unidade selecionada"}
+                      </Text>
                     </View>
-                    <Text className="text-sm text-[#64748B]">
-                      {selectedUnit?.address.city || "Unidade selecionada"} -{" "}
-                      {selectedUnit?.address.state || "Unidade selecionada"}
-                    </Text>
                   </View>
                 </View>
               </Pressable>
