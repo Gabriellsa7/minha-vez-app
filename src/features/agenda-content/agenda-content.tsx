@@ -500,6 +500,25 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                 </Text>
               </View>
               <View className="rounded-[16px] bg-[#F4FBFC] p-3">
+                <Text className="text-sm text-[#64748B]">Cidade</Text>
+                <Text className="text-base font-semibold text-[#0F172A]">
+                  {selectedUnit?.address.city || "Selecionada"} -{" "}
+                  {selectedUnit?.address.state}
+                </Text>
+              </View>
+              <View className="rounded-[16px] bg-[#F4FBFC] p-3">
+                <Text className="text-sm text-[#64748B]">Endereço</Text>
+                <Text className="text-base font-semibold text-[#0F172A]">
+                  {selectedUnit?.address.street}
+                </Text>
+              </View>
+              <View className="rounded-[16px] bg-[#F4FBFC] p-3">
+                <Text className="text-sm text-[#64748B]">Complemento</Text>
+                <Text className="text-base font-semibold text-[#0F172A]">
+                  {selectedUnit?.address.complement}
+                </Text>
+              </View>
+              <View className="rounded-[16px] bg-[#F4FBFC] p-3">
                 <Text className="text-sm text-[#64748B]">Profissional</Text>
                 <Text className="text-base font-semibold text-[#0F172A]">
                   {selectedProfessional?.specialty || "Selecione"}

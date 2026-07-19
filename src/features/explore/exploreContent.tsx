@@ -6,7 +6,9 @@ export function ExploreContent() {
     <View>
       <Header text="Explorar" />
       <View className="p-6">
-        <Text className="text-textSecondary text-lg">Explore</Text>
+        <Text className="text-textSecondary text-lg">
+          Encontre o cuidado que você merece.
+        </Text>
       </View>
     </View>
   );

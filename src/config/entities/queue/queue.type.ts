@@ -3,6 +3,7 @@ export interface IQueue {
   professionalId: string;
   healthUnitId: string;
   status: EQueueStatus;
+  queueDate: string;
   openedAt?: Date | null;
   closedAt?: Date | null;
   createdAt: Date;
@@ -19,5 +20,6 @@ export interface IQueueWithDetails {
   _id: string;
   healthUnitName: string;
   queueSize: number;
+  queueDate: string;
   code: string;
 }

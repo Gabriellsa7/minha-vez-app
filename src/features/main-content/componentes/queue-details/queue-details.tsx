@@ -3,6 +3,7 @@ import { Dimensions, ScrollView, Text, View } from "react-native";
 
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
+import { formatDateTime } from "@/src/utils/format-date-time";
 import { useState } from "react";
 
 interface QueueDetailsProps {
@@ -33,6 +34,21 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
       enabled: !!patientId,
     },
   );
+
+  if (!queueDetails || !queueItem) {
+    return;
+  }
+
+  const activeQueues = queueDetails
+    .filter((queue) => {
+      const appointmentDate = new Date(queue.queueDate);
+
+      return appointmentDate >= new Date();
+    })
+    .sort((a, b) => {
+      return new Date(a.queueDate).getTime() - new Date(b.queueDate).getTime();
+    });
+
   return (
     <View className="gap-2">
       <Text className="text-textThird text-sm">Filas Ativas</Text>
@@ -50,8 +66,8 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
           scrollEventThrottle={16}
           snapToInterval={CARD_WIDTH}
         >
-          {queueDetails &&
-            queueDetails.map((item) => {
+          {activeQueues &&
+            activeQueues.map((item) => {
               const patientQueueItem = queueItem?.find(
                 (queue) => queue.queueId === item._id,
               );
@@ -70,6 +86,9 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
                         <Text className="text-textPrimary text-sm opacity-50">
                           Atual Fila {patientQueueItem?.position || "N/A"} de{" "}
                           {item.queueSize}
+                        </Text>
+                        <Text className="text-textPrimary text-sm opacity-50">
+                          Dia da consulta: {formatDateTime(item.queueDate)}
                         </Text>
                       </View>
                     </View>
