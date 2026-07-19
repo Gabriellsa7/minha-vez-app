@@ -24,6 +24,7 @@ import {
     getDateTimeFromDateAndTime,
     normalizeBirthDate,
 } from "@/src/utils/util";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQueryClient } from "@tanstack/react-query";
 import { CalendarDays, CheckCircle2, Sparkles } from "lucide-react-native";
 import React, { useEffect, useMemo, useState } from "react";
@@ -296,11 +297,13 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     );
   };
 
+  const tabBarHeight = useBottomTabBarHeight();
+
   const isLoading =
     isPatientLoading || isHealthUnitsLoading || isHealthProfessionalsLoading;
 
   return (
-    <View className="bg-[#F8F9FA]">
+    <View className="bg-[#F8F9FA] flex-1 ">
       <Header text="Agendar" user={user} />
 
       {isLoading ? (
@@ -308,7 +311,11 @@ export default function AgendaContent({ user }: AgendaContentProps) {
           <ActivityIndicator size="large" color="#008096" />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: tabBarHeight + 8,
+          }}
+        >
           <View className="px-5 pb-4">
             <View className="mb-5 rounded-[24px] border border-[#D7EEF2] bg-white p-4 shadow-sm">
               <View className="mb-3 flex-row items-center gap-2">
