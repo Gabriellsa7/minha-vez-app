@@ -62,3 +62,19 @@ export const isSameMonth = (firstDate: Date, secondDate: Date) =>
 
 export const startOfDay = (date: Date) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+export function getUserInitials(name: string): string {
+  if (!name.trim()) return "";
+
+  const names = name.trim().split(/\s+/);
+
+  const firstInitial = names[0][0].toUpperCase();
+
+  if (names.length === 1) {
+    return firstInitial;
+  }
+
+  const lastInitial = names[names.length - 1][0].toUpperCase();
+
+  return `${firstInitial}${lastInitial}`;
+}
