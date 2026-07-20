@@ -9,16 +9,15 @@ interface HeaderProps {
 
 export default function Header({ text, user }: HeaderProps) {
   return (
-    <View className="flex-row justify-between items-center gap-4 p-4">
-      <View className="flex-row items-center gap-4 p-6">
+    <View className="flex-row justify-between items-center gap-4 p-6">
+      <View className="flex-row items-center gap-4">
         <Pressable onPress={() => router.back()}>
-          <ArrowLeft size={20} color="#006673" />
+          <ArrowLeft size={26} color="#006673" />
         </Pressable>
-        <Text className="text-textSecondary text-lg">{text}</Text>
+        <Text className="text-textSecondary text-lg font-bold">{text}</Text>
       </View>
-
       {/* User Profile Image */}
-      <User size={32} color="#006673" />
+      <User size={26} color="#006673" />
     </View>
   );
 }
