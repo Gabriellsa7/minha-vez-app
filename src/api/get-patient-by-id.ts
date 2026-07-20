@@ -15,7 +15,8 @@ const getPatientById = async (
 
   try {
     const response = await httpClient.get(path, {
-      validateStatus: (status) => status === 404 || (status >= 200 && status < 300),
+      validateStatus: (status) =>
+        status === 404 || (status >= 200 && status < 300),
     });
 
     if (response.status === 404) {
