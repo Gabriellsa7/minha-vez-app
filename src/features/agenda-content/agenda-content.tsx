@@ -303,7 +303,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     isPatientLoading || isHealthUnitsLoading || isHealthProfessionalsLoading;
 
   return (
-    <View className="bg-[#F8F9FA] flex-1 ">
+    <View className="bg-bgPrimary flex-1 gap-4">
       <Header text="Agendar" user={user} />
 
       {isLoading ? (
