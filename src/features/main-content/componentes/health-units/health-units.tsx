@@ -1,6 +1,7 @@
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { Image } from "expo-image";
 import { router } from "expo-router";
+import { MapPin } from "lucide-react-native/icons";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 interface HealthUnitsProps {
@@ -20,13 +21,13 @@ export default function HealthUnits({ healthUnits }: HealthUnitsProps) {
             <Pressable
               key={unit._id}
               onPress={() => router.push(`/health-unit-info/${unit._id}`)}
-              className="w-64 h-40 bg-[#F4F4F4] rounded-lg mr-4 p-3"
+              className="w-64 h-64 bg-[#F4F4F4] rounded-lg mr-4 p-3"
             >
               <View
                 key={unit._id}
-                className="w-64 h-40 bg-[#F4F4F4] rounded-lg mr-4 p-3"
+                className="w-64 h-64 bg-[#F4F4F4] rounded-lg mr-4 p-3"
               >
-                <View className="mb-3 h-20 w-full overflow-hidden rounded-md bg-[#E2E8F0]">
+                <View className="mb-3 h-32 w-full overflow-hidden rounded-md bg-[#E2E8F0]">
                   {unit.img ? (
                     <Image
                       source={{ uri: unit.img }}
@@ -40,9 +41,12 @@ export default function HealthUnits({ healthUnits }: HealthUnitsProps) {
                   )}
                 </View>
                 <Text className="font-bold text-lg">{unit.name}</Text>
-                <Text className="text-sm text-textThird">
-                  {unit.address.street}, {unit.address.number}
-                </Text>
+                <View className="flex-row items-center gap-2">
+                  <MapPin size={12} color="#A8A8A8" />
+                  <Text className="text-sm text-textFourth">
+                    {unit.address.street}, {unit.address.number}
+                  </Text>
+                </View>
               </View>
             </Pressable>
           ))}
