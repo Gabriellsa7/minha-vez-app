@@ -2,6 +2,7 @@ import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
 import { logout } from "@/src/services/auth/auth.api";
+import { getUserInitials } from "@/src/utils/util";
 import { ArrowRight, Edit, IdCard, Lock, LogOut } from "lucide-react-native";
 import { useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
@@ -16,14 +17,18 @@ export const ProfileContent = () => {
     setOpenLogoutModal(true);
   };
 
+  const userInitials = getUserInitials(user?.name ?? "");
+
   return (
     <View className=" bg-bgPrimary">
       <Header text="Perfil do Paciente" />
       <View className="p-6 gap-6">
         <View className="flex items-center gap-4">
-          <View>
+          <View className="w-24 h-24 rounded-full bg-bgSecondary flex items-center justify-center">
             {/*User image profile, add a button to edit the image too*/}
-            <Text>Profile</Text>
+            <Text className="text-textPrimary text-2xl font-bold">
+              {userInitials}
+            </Text>
           </View>
           <View>
             <Text>{user?.name}</Text>

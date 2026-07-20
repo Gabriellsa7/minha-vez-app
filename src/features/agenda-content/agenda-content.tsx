@@ -304,7 +304,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
 
   return (
     <View className="bg-bgPrimary flex-1 gap-4">
-      <Header text="Agendar" user={user} />
+      <Header text="Agendar" />
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
