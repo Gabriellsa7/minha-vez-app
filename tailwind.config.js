@@ -9,6 +9,7 @@ module.exports = {
         textSecondary: "#006673",
         textThird: "#1EC2D8",
         textFourth: "#A8A8A8",
+        textFifth: "#3E494B",
         textBlack: "#191C1D",
         textDanger: "#BA1A1A",
         button: {
@@ -19,6 +20,7 @@ module.exports = {
         bgPrimary: "#F3F4F5",
         bgSecondary: "#007C8F",
         bgThird: "#FFFFFF",
+        bgFourth: "#006673",
       },
     },
   },
