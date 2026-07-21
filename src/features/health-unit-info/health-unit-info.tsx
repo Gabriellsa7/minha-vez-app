@@ -1,7 +1,7 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { Clock, MapPin } from "lucide-react-native";
+import { Bone, Clock, MapPin } from "lucide-react-native";
 import { ScrollView, Text, View } from "react-native";
 
 export default function HealthUnitInfo() {
@@ -76,9 +76,19 @@ export default function HealthUnitInfo() {
           <Text className="text-lg font-bold">Serviços Oferecidos</Text>
           <Text className="text-textSecondary font-medium">Ver todos</Text>
         </View>
-        <View>
-          {/* Think how kan jeg add a logic to show her the health unit service, back and front */}
-          <Text>Serviços</Text>
+        <View className="gap-4">
+          {healthUnit?.services.map((health) => (
+            <View key={health._id} className="bg-bgThird p-8 rounded-xl gap-2">
+              {/* Define a util to add an icon based on the health unit service type */}
+              <View className="bg-[#C1E6EE] w-12 p-3 items-center rounded-xl">
+                <Bone size={24} color="#006673" />
+              </View>
+              <View className="gap-2">
+                <Text className="font-bold text-lg">{health.name}</Text>
+                <Text>{health.description}</Text>
+              </View>
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
