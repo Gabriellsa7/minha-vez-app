@@ -9,28 +9,28 @@ export function QuickServices() {
       <View className="flex-row justify-between">
         <View className="items-center gap-4">
           <Pressable onPress={() => router.push("/agenda")}>
-            <View className="rounded-lg p-6 bg-[#F4F4F4]">
+            <View className="rounded-lg p-6 bg-bgThird">
               <Calendar size={20} color="#008493" />
             </View>
           </Pressable>
           <Text>Agendar</Text>
         </View>
         <View className="items-center gap-4">
-          <View className="rounded-lg p-6 bg-[#F4F4F4]">
+          <View className="rounded-lg p-6 bg-bgThird">
             <History size={20} color="#008493" />
           </View>
           <Text>Histórico</Text>
         </View>
         <View className="items-center gap-4">
           <Pressable onPress={() => router.push("/explore")}>
-            <View className="rounded-lg p-6 bg-[#F4F4F4]">
+            <View className="rounded-lg p-6 bg-bgThird">
               <Compass size={20} color="#008493" />
             </View>
           </Pressable>
           <Text>Explorar</Text>
         </View>
         <View className="items-center gap-4">
-          <View className="rounded-lg p-6 bg-[#F4F4F4]">
+          <View className="rounded-lg p-6 bg-bgThird">
             <FileText size={20} color="#008493" />
           </View>
           <Text>Exames</Text>

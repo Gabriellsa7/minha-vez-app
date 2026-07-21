@@ -59,7 +59,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
         paddingBottom: tabBarHeight + 20,
       }}
     >
-      <View className="items-center justify-center">
+      <View className="items-center justify-center bg-bgPrimary">
         <LinearGradient
           colors={["#006579", "#008096"]}
           style={{ width: "100%", gap: 12, paddingBottom: 20 }}
