@@ -6,7 +6,6 @@ import { LOGIN_FORM_SCHEMA } from "./entities/login-form.constants";
 import { LoginFormSchema } from "./entities/login-form.types";
 
 import { useLogin } from "@/src/hooks/useLogin";
-import { Checkbox } from "expo-checkbox";
 import { useState } from "react";
 
 export function LoginForm() {
@@ -67,6 +66,7 @@ export function LoginForm() {
           </Text>
           <Text className="text-textSecondary text-xs">Esqueceu a senha</Text>
         </View>
+        {/* Add logic to show user password when he is writing */}
         <View className="gap-5">
           <Controller
             control={control}
@@ -84,15 +84,6 @@ export function LoginForm() {
           {errors.password && (
             <Text className="text-red-500">{errors.password.message}</Text>
           )}
-          <View className="flex-row items-center gap-2">
-            <Checkbox
-              value={isChecked}
-              onValueChange={setChecked}
-              disabled={!email || !password}
-              className={`${isChecked ? "to-button-primary" : undefined}`}
-            />
-            <Text>Lembrar senha</Text>
-          </View>
         </View>
       </View>
       <View className="w-[80%] gap-2">
