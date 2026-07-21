@@ -550,8 +550,6 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                   Cancelar
                 </Text>
               </Pressable>
-              {/* When selected all options and press the button create appointment 
-              add a logic to open a queue at the same time.*/}
               <Pressable
                 onPress={handleCreateAppointment}
                 disabled={isCreatingAppointment}

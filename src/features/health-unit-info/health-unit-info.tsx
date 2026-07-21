@@ -34,12 +34,7 @@ export default function HealthUnitInfo() {
               {healthUnit?.name}
             </Text>
             <Text>
-              {/*Add a logic to get the health unit description back and front and show Here*/}
-              <Text className="text-textFifth">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sint
-                optio cum eos fugit pariatur incidunt, iste id delectus dicta,
-                odit saepe?
-              </Text>
+              <Text className="text-textFifth">{healthUnit?.description}</Text>
             </Text>
           </View>
           <View className="flex-row gap-2 items-center">

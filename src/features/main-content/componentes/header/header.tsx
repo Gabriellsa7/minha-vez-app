@@ -13,7 +13,7 @@ export default function HomeHeader({ user }: HomeHeaderProps) {
     <View className="flex-row items-center justify-between pb-2">
       <View className="gap-3 flex-row items-center">
         <View className="w-10 h-10 rounded-full bg-bgSecondary flex items-center justify-center">
-          {/*User image profile, add a button to edit the image too*/}
+          {/*User image profile*/}
           <Text className="text-textPrimary text-lg font-bold">
             {userInitials}
           </Text>
