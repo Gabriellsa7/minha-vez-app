@@ -66,7 +66,9 @@ export default function MainContent({ user, patient }: MainContentProps) {
         >
           <View className="w-full gap-3 p-5">
             <HomeHeader user={user!} />
-            {appointment && <QueueDetails patientId={patientId!} />}
+            {appointment && !appointment.finishedAt && (
+              <QueueDetails patientId={patientId!} />
+            )}
           </View>
         </LinearGradient>
         <View className="relative w-full mb-6">
@@ -84,7 +86,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
               </Text>
             </View>
           )}
-          {appointment && (
+          {appointment && !appointment.finishedAt && (
             <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
               <View className="flex-row gap-2 items-center">
                 <Bell size={20} color="#FFFFFF" />
