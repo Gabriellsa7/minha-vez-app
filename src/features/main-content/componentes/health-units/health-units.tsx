@@ -13,11 +13,16 @@ export default function HealthUnits({ healthUnits }: HealthUnitsProps) {
     <View className="mt-5 gap-3">
       <View className="flex-row items-center justify-between">
         <Text>UBS & Clinicas</Text>
+        {/* Add page to see all health units */}
         <Text className="text-sm text-textThird">See All</Text>
       </View>
       <View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {healthUnits?.map((unit) => (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 16 }}
+        >
+          {healthUnits?.slice(0, 4).map((unit) => (
             <Pressable
               key={unit._id}
               onPress={() => router.push(`/health-unit-info/${unit._id}`)}
