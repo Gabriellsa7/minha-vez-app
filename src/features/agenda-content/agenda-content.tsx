@@ -2,8 +2,8 @@ import { useCreateAppointment } from "@/src/api/create-appointment";
 import { useCreatePatient } from "@/src/api/create-patient";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
 import {
-    GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY,
-    useGetAppointmentsByProfessionalId,
+  GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY,
+  useGetAppointmentsByProfessionalId,
 } from "@/src/api/get-appointments-by-professional-id";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
@@ -17,27 +17,27 @@ import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import {
-    formatBirthDate,
-    formatCpf,
-    formatPhone,
-    getDateKey,
-    getDateTimeFromDateAndTime,
-    normalizeBirthDate,
+  formatBirthDate,
+  formatCpf,
+  formatPhone,
+  getDateKey,
+  getDateTimeFromDateAndTime,
+  normalizeBirthDate,
 } from "@/src/utils/util";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQueryClient } from "@tanstack/react-query";
 import { CalendarDays, CheckCircle2, Sparkles } from "lucide-react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Keyboard,
-    Modal,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableWithoutFeedback,
-    View,
+  ActivityIndicator,
+  Keyboard,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import AvaliableDays from "./componentes/avaliable-days/avaliable-days";
@@ -362,15 +362,18 @@ export default function AgendaContent({ user }: AgendaContentProps) {
               setSelectedDate={setSelectedDate}
             />
 
-            <AvaliableTimes
-              selectedDate={selectedDate}
-              selectedTime={selectedTime}
-              setSelectedTime={setSelectedTime}
-              bookedTimes={bookedTimes}
-              isProfessionalAppointmentsLoading={
-                isProfessionalAppointmentsLoading
-              }
-            />
+            {selectedProfessional && (
+              <AvaliableTimes
+                selectedDate={selectedDate}
+                selectedTime={selectedTime}
+                setSelectedTime={setSelectedTime}
+                bookedTimes={bookedTimes}
+                isProfessionalAppointmentsLoading={
+                  isProfessionalAppointmentsLoading
+                }
+                professional={selectedProfessional}
+              />
+            )}
 
             <Pressable
               onPress={handleConfirmPress}

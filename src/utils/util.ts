@@ -78,3 +78,32 @@ export function getUserInitials(name: string): string {
 
   return `${firstInitial}${lastInitial}`;
 }
+
+export function generateTimes(
+  start: string,
+  end: string,
+  duration: number,
+): string[] {
+  const times: string[] = [];
+
+  const [startHour, startMinute] = start.split(":").map(Number);
+  const [endHour, endMinute] = end.split(":").map(Number);
+
+  let current = startHour * 60 + startMinute;
+  const finish = endHour * 60 + endMinute;
+
+  while (current + duration <= finish) {
+    const hour = Math.floor(current / 60);
+    const minute = current % 60;
+
+    times.push(
+      `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`,
+    );
+
+    current += duration;
+  }
+
+  return times;
+}
