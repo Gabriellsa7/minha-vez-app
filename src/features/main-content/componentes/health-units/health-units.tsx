@@ -20,17 +20,17 @@ export default function HealthUnits({ healthUnits }: HealthUnitsProps) {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 16 }}
+          contentContainerStyle={{ gap: 42 }}
         >
           {healthUnits?.slice(0, 4).map((unit) => (
             <Pressable
               key={unit._id}
               onPress={() => router.push(`/health-unit-info/${unit._id}`)}
-              className="w-64 h-auto bg-bgThird rounded-xl"
+              className="w-56 h-auto bg-bgThird rounded-xl"
             >
               <View
                 key={unit._id}
-                className="w-64 h-64 bg-bgThird rounded-xl p-4"
+                className="w-64 h-56 bg-bgThird rounded-xl p-4"
               >
                 {/* add a default image, this image is on figma */}
                 <View className="mb-3 h-32 w-full overflow-hidden rounded-xl bg-[#E2E8F0]">
