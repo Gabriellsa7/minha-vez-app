@@ -22,9 +22,11 @@ export default function HealthUnitInfo() {
                 contentFit="cover"
               />
             ) : (
-              <View className="flex-1 items-center justify-center">
-                <Text className="text-sm text-textThird">Sem imagem</Text>
-              </View>
+              <Image
+                source={require("../../../assets/images/Hospital.png")}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+              />
             )}
           </View>
         </View>
@@ -39,12 +41,10 @@ export default function HealthUnitInfo() {
           </View>
           <View className="flex-row gap-2 items-center">
             <MapPin size={24} color="#006673" />
-            <Text>
+            <Text className="flex-1">
               {healthUnit?.address.street}, {healthUnit?.address.number} -{" "}
-              {healthUnit?.address.neighborhood} ,
-            </Text>
-            <Text>
-              {healthUnit?.address.city} - {healthUnit?.address.state}
+              {healthUnit?.address.neighborhood}, {healthUnit?.address.city} -{" "}
+              {healthUnit?.address.state}
             </Text>
           </View>
           <View className="flex-row gap-2 items-center">
