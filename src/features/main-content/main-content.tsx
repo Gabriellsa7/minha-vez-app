@@ -1,4 +1,5 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
+import { useGetHealthProfessionalByAppointmentId } from "@/src/api/get-health-professional-by-appointment-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import SearchInput from "@/src/components/search-input/search-input";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
@@ -52,6 +53,27 @@ export default function MainContent({ user, patient }: MainContentProps) {
     console.log("Carregando appointments...");
   }
 
+  const {
+    data: professional,
+    error,
+    isError,
+    isLoading,
+  } = useGetHealthProfessionalByAppointmentId(
+    {
+      appointmentId: appointment?._id || "",
+    },
+    {
+      enabled: !!appointment?._id,
+    },
+  );
+
+  console.log({
+    professional,
+    isLoading,
+    isError,
+    error,
+  });
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -67,7 +89,10 @@ export default function MainContent({ user, patient }: MainContentProps) {
           <View className="w-full gap-3 p-5">
             <HomeHeader user={user!} />
             {appointment && !appointment.finishedAt && (
-              <QueueDetails patientId={patientId!} />
+              <QueueDetails
+                patientId={patientId!}
+                professionalRoom={professional?.room}
+              />
             )}
           </View>
         </LinearGradient>

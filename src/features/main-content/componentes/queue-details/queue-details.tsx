@@ -8,9 +8,13 @@ import { useState } from "react";
 
 interface QueueDetailsProps {
   patientId: string;
+  professionalRoom?: string | undefined;
 }
 
-export default function QueueDetails({ patientId }: QueueDetailsProps) {
+export default function QueueDetails({
+  patientId,
+  professionalRoom,
+}: QueueDetailsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const { width } = Dimensions.get("window");
@@ -89,6 +93,9 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
                         </Text>
                         <Text className="text-textPrimary text-sm opacity-50">
                           Dia da consulta: {formatDateTime(item.queueDate)}
+                        </Text>
+                        <Text className="text-textPrimary text-sm opacity-50">
+                          {professionalRoom || "N/A"}
                         </Text>
                       </View>
                     </View>
