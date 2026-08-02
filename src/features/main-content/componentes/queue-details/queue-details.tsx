@@ -9,11 +9,13 @@ import { useState } from "react";
 interface QueueDetailsProps {
   patientId: string;
   professionalRoom?: string | undefined;
+  appointmentDateTime?: string | undefined;
 }
 
 export default function QueueDetails({
   patientId,
   professionalRoom,
+  appointmentDateTime,
 }: QueueDetailsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -92,7 +94,7 @@ export default function QueueDetails({
                           {item.queueSize}
                         </Text>
                         <Text className="text-textPrimary text-sm opacity-50">
-                          Dia da consulta: {formatDateTime(item.queueDate)}
+                          Dia da consulta: {formatDateTime(appointmentDateTime)}
                         </Text>
                         <Text className="text-textPrimary text-sm opacity-50">
                           {professionalRoom || "N/A"}

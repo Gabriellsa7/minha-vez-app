@@ -4,7 +4,7 @@ export interface IAppointment {
   professionalId: string;
   healthUnitId: string;
   queueItemId?: string;
-  dateTime: Date;
+  dateTime: string;
   status: EAppointmentStatus;
   notes?: string;
   checkInAt?: Date | null;

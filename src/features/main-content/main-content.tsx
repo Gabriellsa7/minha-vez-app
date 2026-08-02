@@ -80,6 +80,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
               <QueueDetails
                 patientId={patientId!}
                 professionalRoom={professional?.room}
+                appointmentDateTime={appointment.dateTime}
               />
             )}
           </View>
