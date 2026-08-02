@@ -51,7 +51,7 @@ export default function HealthUnitInfo() {
               </Text>
 
               <Text className="text-textFifth mt-1 leading-5">
-                {healthUnit?.address.street}, {healthUnit?.address.number}
+                {healthUnit?.address.street}, {healthUnit?.address.number} -{" "}
                 {healthUnit?.address.neighborhood}
                 {healthUnit?.address.city} - {healthUnit?.address.state}
               </Text>
