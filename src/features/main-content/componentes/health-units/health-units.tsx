@@ -41,9 +41,11 @@ export default function HealthUnits({ healthUnits }: HealthUnitsProps) {
                       contentFit="cover"
                     />
                   ) : (
-                    <View className="flex-1 items-center justify-center">
-                      <Text className="text-sm text-textThird">Sem imagem</Text>
-                    </View>
+                    <Image
+                      source={require("../../../../../assets/images/Hospital.png")}
+                      style={{ width: "100%", height: "100%" }}
+                      contentFit="cover"
+                    />
                   )}
                 </View>
                 <Text className="font-bold text-lg">{unit.name}</Text>
