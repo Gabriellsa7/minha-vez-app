@@ -46,7 +46,7 @@ export default function HealthUnitInfo() {
             </View>
 
             <View className="flex-1">
-              <Text className="text-textSecondary text-xl font-medium">
+              <Text className="text-text-textBlack text-xl font-medium">
                 Endereço
               </Text>
 
@@ -62,7 +62,7 @@ export default function HealthUnitInfo() {
               <View className="bg-[#DDF4F7] p-2 rounded-xl">
                 <Clock size={22} color="#006673" />
               </View>
-              <Text className="text-textSecondary text-xl font-medium">
+              <Text className="text-text-textBlack text-xl font-medium">
                 Horários de funcionamento
               </Text>
             </View>
