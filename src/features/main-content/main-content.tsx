@@ -53,12 +53,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
     console.log("Carregando appointments...");
   }
 
-  const {
-    data: professional,
-    error,
-    isError,
-    isLoading,
-  } = useGetHealthProfessionalByAppointmentId(
+  const { data: professional } = useGetHealthProfessionalByAppointmentId(
     {
       appointmentId: appointment?._id || "",
     },
@@ -66,13 +61,6 @@ export default function MainContent({ user, patient }: MainContentProps) {
       enabled: !!appointment?._id,
     },
   );
-
-  console.log({
-    professional,
-    isLoading,
-    isError,
-    error,
-  });
 
   return (
     <ScrollView
