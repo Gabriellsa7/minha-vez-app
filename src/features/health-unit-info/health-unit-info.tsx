@@ -1,4 +1,5 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
+import { isToday, weekDayLabel } from "@/src/utils/util";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { Bone, Clock, MapPin } from "lucide-react-native";
@@ -31,26 +32,77 @@ export default function HealthUnitInfo() {
           </View>
         </View>
         <View className="bg-bgThird gap-4 p-4 rounded-xl">
-          <View>
-            <Text className="text-textSecondary text-xl font-bold">
+          <View className="gap-1">
+            <Text className="text-3xl font-bold text-textBlack">
               {healthUnit?.name}
             </Text>
-            <Text>
-              <Text className="text-textFifth">{healthUnit?.description}</Text>
+            <Text className="leading-6 text-textFifth">
+              {healthUnit?.description}
             </Text>
           </View>
-          <View className="flex-row gap-2 items-center">
-            <MapPin size={24} color="#006673" />
-            <Text className="flex-1">
-              {healthUnit?.address.street}, {healthUnit?.address.number} -{" "}
-              {healthUnit?.address.neighborhood}, {healthUnit?.address.city} -{" "}
-              {healthUnit?.address.state}
-            </Text>
+          <View className="flex-row items-center gap-3">
+            <View className="bg-[#DDF4F7] p-2 rounded-xl">
+              <MapPin size={20} color="#006673" />
+            </View>
+
+            <View className="flex-1">
+              <Text className="text-textSecondary text-xl font-medium">
+                Endereço
+              </Text>
+
+              <Text className="text-textFifth mt-1 leading-5">
+                {healthUnit?.address.street}, {healthUnit?.address.number}
+                {healthUnit?.address.neighborhood}
+                {healthUnit?.address.city} - {healthUnit?.address.state}
+              </Text>
+            </View>
           </View>
-          <View className="flex-row gap-2 items-center">
-            {/* add logic to get the health unit opening hour in the back and front and show here */}
-            <Clock size={24} color="#006673" />
-            <Text> 08:00 - 18:00 (Seg-Sex)</Text>
+          <View className="flex gap-2">
+            <View className="flex-row items-center gap-2">
+              <View className="bg-[#DDF4F7] p-2 rounded-xl">
+                <Clock size={22} color="#006673" />
+              </View>
+              <Text className="text-textSecondary text-xl font-medium">
+                Horários de funcionamento
+              </Text>
+            </View>
+            <View className="gap-2">
+              {healthUnit?.openingHours.map((openingHour) => (
+                <View
+                  key={openingHour.day}
+                  className={`flex-row items-center justify-between rounded-2xl px-4 py-4 border ${
+                    isToday(openingHour.day)
+                      ? "bg-[#EAF9FB] border-[#0B7A87]"
+                      : "bg-bgPrimary border-[#E6ECEE]"
+                  }`}
+                >
+                  <View>
+                    <Text className="font-semibold text-base text-textBlack">
+                      {weekDayLabel[openingHour.day]}
+                    </Text>
+
+                    {isToday(openingHour.day) && (
+                      <Text className="text-xs text-[#0B7A87] font-medium">
+                        Hoje
+                      </Text>
+                    )}
+                  </View>
+                  {openingHour.isClosed ? (
+                    <View className="bg-red-100 px-3 py-1 rounded-full">
+                      <Text className="text-red-600 font-semibold text-xs">
+                        Fechado
+                      </Text>
+                    </View>
+                  ) : (
+                    <View className="bg-[#DDF4F7] px-3 py-2 rounded-full">
+                      <Text className="font-bold text-[#0B7A87]">
+                        {openingHour.open} - {openingHour.close}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
           </View>
         </View>
         <View className="bg-[#EEF9FB] border border-[#D2E8EC] rounded-2xl p-5 gap-3">
@@ -61,7 +113,6 @@ export default function HealthUnitInfo() {
             </Text>
           </View>
 
-          {/* Think how can I get the waiting time in back and front */}
           <Text className="text-base text-textBlack">
             Tempo médio de espera:{" "}
             <Text className="font-bold text-[#0B7A87]">15 min</Text>
@@ -73,14 +124,24 @@ export default function HealthUnitInfo() {
         </View>
         <View className="gap-4">
           {healthUnit?.services.map((health) => (
-            <View key={health._id} className="bg-bgThird p-8 rounded-xl gap-2">
-              {/* Define a util to add an icon based on the health unit service type */}
-              <View className="bg-[#C1E6EE] w-12 p-3 items-center rounded-xl">
-                <Bone size={24} color="#006673" />
-              </View>
-              <View className="gap-2">
-                <Text className="font-bold text-lg">{health.name}</Text>
-                <Text>{health.description}</Text>
+            <View
+              className="bg-bgThird rounded-2xl p-5 gap-4 border border-[#E7ECEF]"
+              key={health._id}
+            >
+              <View className="flex-row gap-4 items-start">
+                <View className="bg-[#DDF4F7] p-3 rounded-xl">
+                  <Bone size={24} color="#0B7A87" />
+                </View>
+
+                <View className="flex-1 gap-1">
+                  <Text className="font-bold text-lg text-textBlack">
+                    {health.name}
+                  </Text>
+
+                  <Text className="text-textFifth leading-5">
+                    {health.description}
+                  </Text>
+                </View>
               </View>
             </View>
           ))}

@@ -107,3 +107,27 @@ export function generateTimes(
 
   return times;
 }
+
+export const weekDayLabel = {
+  MONDAY: "Segunda",
+  TUESDAY: "Terça",
+  WEDNESDAY: "Quarta",
+  THURSDAY: "Quinta",
+  FRIDAY: "Sexta",
+  SATURDAY: "Sábado",
+  SUNDAY: "Domingo",
+};
+
+export const isToday = (day: string) => {
+  const weekDays = [
+    "SUNDAY",
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+  ];
+
+  return weekDays[new Date().getDay()] === day;
+};
