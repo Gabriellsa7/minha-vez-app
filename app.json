@@ -35,9 +35,7 @@
           }
         }
       ],
-      [
-        "expo-notifications"
-      ],
+      "expo-notifications",
       "expo-secure-store",
       "expo-font",
       "expo-web-browser"
