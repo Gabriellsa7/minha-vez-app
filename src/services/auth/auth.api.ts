@@ -8,12 +8,8 @@ export interface IAuthLogin {
 }
 
 export const login = async (data: IAuthLogin) => {
-  try {
-    const response = await httpClient.post("/auth/login", data);
-    return response.data;
-  } catch (error: any) {
-    throw error;
-  }
+  const response = await httpClient.post("/auth/login", data);
+  return response.data;
 };
 
 export const logout = async () => {

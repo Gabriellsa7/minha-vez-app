@@ -46,7 +46,7 @@ export const generateReactQueryMutation = <TReturnData = void, TFilter = void>(
 export const generateReactQueryInfinityScroll = <
   TReturnData = void,
   TFilter = void,
-  TReactQueryPageParam = any,
+  TReactQueryPageParam = unknown,
 >(
   queryKey: string,
   fn: (

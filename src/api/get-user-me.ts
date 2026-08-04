@@ -9,12 +9,8 @@ export type GetUserParamsResponse = IUser;
 export const getUser = async (): Promise<GetUserParamsResponse> => {
   const path: string = "/users/me";
 
-  try {
-    const response: GetUserParamsResponse = (await httpClient.get(path)).data;
-    return response;
-  } catch (error: any) {
-    throw error;
-  }
+  const response = await httpClient.get<GetUserParamsResponse>(path);
+  return response.data;
 };
 
 export const useGetUser = generateReactQuery<GetUserParamsResponse, void>(

@@ -2,6 +2,10 @@ import { removeToken } from "@/src/services/auth/auth.storage";
 import { AxiosError, AxiosResponse } from "axios";
 import Toast from "react-native-toast-message";
 
+type ApiErrorResponse = {
+  message?: string;
+};
+
 export const handleSuccessResponse = async (response: AxiosResponse) => {
   const { data } = response;
 
@@ -19,10 +23,10 @@ export const handleSuccessResponse = async (response: AxiosResponse) => {
   return response;
 };
 
-export const handleErrorResponse = async (error: AxiosError) => {
+export const handleErrorResponse = async (error: AxiosError<ApiErrorResponse>) => {
   if (error.response) {
     const status = error.response.status;
-    const data: any = error.response.data;
+    const data = error.response.data;
 
     Toast.show({
       type: "error",

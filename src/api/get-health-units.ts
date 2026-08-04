@@ -7,13 +7,8 @@ export const GET_HEALTH_UNITS_KEY = "GET_HEALTH_UNITS_KEY";
 export const getHealthUnits = async (): Promise<IHealthUnit[]> => {
   const path = "/health-units";
 
-  try {
-    const response: IHealthUnit[] = (await httpClient.get(path)).data;
-
-    return response;
-  } catch (error: any) {
-    throw error;
-  }
+  const response = await httpClient.get<IHealthUnit[]>(path);
+  return response.data;
 };
 
 export const useGetHealthUnits = generateReactQuery<IHealthUnit[], void>(

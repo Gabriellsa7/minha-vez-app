@@ -3,12 +3,21 @@ import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
 import { logout } from "@/src/services/auth/auth.api";
 import { getUserInitials } from "@/src/utils/util";
-import { ArrowRight, Edit, IdCard, Lock, LogOut } from "lucide-react-native";
+import { Href, useRouter } from "expo-router";
+import {
+  ArrowRight,
+  Bell,
+  Edit,
+  IdCard,
+  Lock,
+  LogOut,
+} from "lucide-react-native";
 import { useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
 
 export const ProfileContent = () => {
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
+  const router = useRouter();
   const { data: user } = useGetUser();
 
   const { data: patient } = useGetPatientById({ userId: user?._id ?? "" });
@@ -72,6 +81,12 @@ export const ProfileContent = () => {
           </View>
           <ArrowRight size={24} color="#BDC9CB" />
         </View>
+        <Pressable onPress={() => router.push("/notifications" as Href)}>
+          <View className="flex-row items-center gap-4 justify-center">
+            <Bell size={24} color="#006673" />
+            <Text className="text-textPrimary font-bold">VER NOTIFICAÇÕES</Text>
+          </View>
+        </Pressable>
         <Pressable onPress={handleOpenLogoutModal}>
           <View className="flex-row items-center gap-4 justify-center">
             <LogOut size={24} color="#BA1A1A" />
