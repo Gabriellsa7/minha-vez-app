@@ -33,6 +33,8 @@ export class NotificationService {
 
     const token = (await Notifications.getExpoPushTokenAsync()).data;
 
+    console.log("Expo token:", token);
+
     if (!token) {
       return null;
     }
@@ -41,6 +43,8 @@ export class NotificationService {
       token,
       platform: Platform.OS,
     });
+
+    console.log("Token enviado para o backend");
 
     return token;
   }
@@ -84,7 +88,7 @@ export class NotificationService {
 
   static connectToNotificationsSocket(callback: (payload: unknown) => void) {
     const socket = new WebSocket(
-      process.env.EXPO_PUBLIC_WS_URL || "ws://localhost:3002",
+      process.env.EXPO_PUBLIC_WS_URL || "ws://localhost:3001",
     );
 
     socket.addEventListener("message", (event) => {
@@ -100,6 +104,18 @@ export class NotificationService {
       setTimeout(() => {
         this.connectToNotificationsSocket(callback);
       }, 1000);
+    });
+
+    socket.addEventListener("open", () => {
+      console.log("✅ WebSocket conectado");
+    });
+
+    socket.addEventListener("error", (e) => {
+      console.log("❌ WebSocket erro", e);
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("⚠️ WebSocket fechado");
     });
 
     return socket;
