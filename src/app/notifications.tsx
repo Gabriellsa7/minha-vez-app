@@ -3,7 +3,7 @@ import {
   NotificationService,
 } from "@/src/services/notifications/notification.service";
 import { BellRing, CheckCheck } from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -13,7 +13,6 @@ import {
 } from "react-native";
 
 export default function NotificationsScreen() {
-  const socketRef = useRef<WebSocket | null>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -33,13 +32,13 @@ export default function NotificationsScreen() {
       loadNotifications();
     });
 
-    socketRef.current = NotificationService.connectToNotificationsSocket(() => {
+    const unsubscribeSocket = NotificationService.subscribeToSocket(() => {
       loadNotifications();
     });
 
     return () => {
       unsubscribe();
-      socketRef.current?.close();
+      unsubscribeSocket();
     };
   }, [loadNotifications]);
 

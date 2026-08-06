@@ -1,4 +1,5 @@
 import { httpClient } from "@/src/services/api";
+import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { AppState, Platform } from "react-native";
@@ -12,41 +13,58 @@ export interface NotificationItem {
   type: string;
 }
 
+type SocketSubscriber = (payload: Record<string, unknown>) => void;
+
 export class NotificationService {
+  private static socket: WebSocket | null = null;
+  private static reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private static shouldReconnect = false;
+  private static subscribers = new Set<SocketSubscriber>();
+
   static async registerForPushNotifications() {
     if (!Device.isDevice) {
+      console.warn("[push] registration skipped: physical device required");
       return null;
     }
 
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
+    try {
+      if (Platform.OS === "android") {
+        await Notifications.setNotificationChannelAsync("queue-updates", {
+          name: "Atualizações da fila",
+          importance: Notifications.AndroidImportance.HIGH,
+          vibrationPattern: [0, 250, 250, 250],
+          sound: "default",
+        });
+      }
 
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      console.log("[push] permission status", { existingStatus, finalStatus });
+      if (finalStatus !== "granted") return null;
 
-    if (finalStatus !== "granted") {
+      const projectId =
+        Constants.expoConfig?.extra?.eas?.projectId ??
+        Constants.easConfig?.projectId;
+      if (!projectId) throw new Error("EAS projectId is not configured");
+
+      const token = (await Notifications.getExpoPushTokenAsync({ projectId }))
+        .data;
+      console.log("[push] Expo token obtained", { token, projectId });
+      await httpClient.post("/notifications/register-token", {
+        token,
+        platform: Platform.OS,
+      });
+      console.log("[push] Expo token registered in backend", { token });
+      return token;
+    } catch (error) {
+      console.error("[push] registration failed", { error });
       return null;
     }
-
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
-
-    console.log("Expo token:", token);
-
-    if (!token) {
-      return null;
-    }
-
-    await httpClient.post("/notifications/register-token", {
-      token,
-      platform: Platform.OS,
-    });
-
-    console.log("Token enviado para o backend");
-
-    return token;
   }
 
   static async listNotifications() {
@@ -72,52 +90,79 @@ export class NotificationService {
   }
 
   static async syncPendingNotifications() {
-    const response = await httpClient.get<NotificationItem[]>("/notifications");
-    return response.data;
+    return this.listNotifications();
   }
 
   static listenForAppStateChanges(callback: () => void) {
     const subscription = AppState.addEventListener("change", (state) => {
-      if (state === "active") {
-        callback();
-      }
+      if (state === "active") callback();
     });
-
     return () => subscription.remove();
   }
 
-  static connectToNotificationsSocket(callback: (payload: unknown) => void) {
-    const socket = new WebSocket(
-      process.env.EXPO_PUBLIC_WS_URL || "ws://localhost:3001",
-    );
+  static subscribeToSocket(callback: SocketSubscriber) {
+    this.subscribers.add(callback);
+    return () => this.subscribers.delete(callback);
+  }
 
+  static startNotificationsSocket() {
+    this.shouldReconnect = true;
+    this.connect();
+    return () => this.stopNotificationsSocket();
+  }
+
+  static stopNotificationsSocket() {
+    this.shouldReconnect = false;
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = null;
+    this.socket?.close();
+    this.socket = null;
+  }
+
+  private static connect() {
+    if (!this.shouldReconnect || this.socket) return;
+    const url = process.env.EXPO_PUBLIC_WS_URL;
+    if (!url) {
+      console.error("[socket] missing EXPO_PUBLIC_WS_URL");
+      return;
+    }
+    console.log("[socket] connecting", { url });
+    const socket = new WebSocket(url);
+    this.socket = socket;
+
+    socket.addEventListener("open", () =>
+      console.log("[socket] connected", { url }),
+    );
+    socket.addEventListener("error", (error) =>
+      console.error("[socket] error", { error, url }),
+    );
     socket.addEventListener("message", (event) => {
       try {
-        const payload = JSON.parse(event.data);
-        callback(payload);
-      } catch {
-        // ignore invalid payloads
+        const payload = JSON.parse(event.data) as Record<string, unknown>;
+        console.log("[socket] message received", { payload });
+        this.subscribers.forEach((subscriber) => subscriber(payload));
+      } catch (error) {
+        console.error("[socket] invalid message", { error, raw: event.data });
       }
     });
+    socket.addEventListener("close", (event) => {
+      console.warn("[socket] closed", {
+        code: event.code,
+        reason: event.reason,
+        reconnect: this.shouldReconnect,
+      });
 
-    socket.addEventListener("close", () => {
-      setTimeout(() => {
-        this.connectToNotificationsSocket(callback);
+      if (this.socket === socket) {
+        this.socket = null;
+      }
+
+      if (!this.shouldReconnect) {
+        return;
+      }
+
+      this.reconnectTimer = setTimeout(() => {
+        this.connect();
       }, 1000);
     });
-
-    socket.addEventListener("open", () => {
-      console.log("✅ WebSocket conectado");
-    });
-
-    socket.addEventListener("error", (e) => {
-      console.log("❌ WebSocket erro", e);
-    });
-
-    socket.addEventListener("close", () => {
-      console.log("⚠️ WebSocket fechado");
-    });
-
-    return socket;
   }
 }
