@@ -1,6 +1,7 @@
 import { IPatient } from "../config/entities/patients/patients.type";
 import { generateReactQuery } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { isAxiosError } from "axios";
 
 export const GET_PATIENT_BY_ID_KEY = "GET_PATIENT_BY_ID_KEY";
 
@@ -24,8 +25,8 @@ const getPatientById = async (
     }
 
     return response.data ?? null;
-  } catch (error: any) {
-    if (error?.response?.status === 404) {
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response?.status === 404) {
       return null;
     }
 

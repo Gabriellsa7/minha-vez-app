@@ -221,7 +221,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
             text2: "Agora você pode confirmar o agendamento.",
           });
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           Toast.show({
             type: "error",
             text1: "Não foi possível salvar seu cadastro",
@@ -286,7 +286,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
           });
           setShowConfirmModal(false);
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           Toast.show({
             type: "error",
             text1: "Não foi possível salvar",

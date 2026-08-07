@@ -6,22 +6,15 @@ import { LOGIN_FORM_SCHEMA } from "./entities/login-form.constants";
 import { LoginFormSchema } from "./entities/login-form.types";
 
 import { useLogin } from "@/src/hooks/useLogin";
-import { useState } from "react";
 
 export function LoginForm() {
   const {
     control,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(LOGIN_FORM_SCHEMA),
   });
-
-  const email = watch("email");
-  const password = watch("password");
-
-  const [isChecked, setChecked] = useState(false);
 
   const { mutate: loginUser } = useLogin();
 
