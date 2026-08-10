@@ -67,13 +67,16 @@ export const ProfileContent = () => {
             <Text>{patient?.birthDate}</Text>
           </View>
         </View>
-        <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
+        <Pressable
+          onPress={() => router.push("/edit-profile" as Href)}
+          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
+        >
           <View className="flex-row items-center gap-4">
             <Edit size={24} color="#006673" />
             <Text>Editar Perfil</Text>
           </View>
           <ArrowRight size={24} color="#BDC9CB" />
-        </View>
+        </Pressable>
         <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
           <View className="flex-row items-center gap-4">
             <Lock size={24} color="#006673" />
