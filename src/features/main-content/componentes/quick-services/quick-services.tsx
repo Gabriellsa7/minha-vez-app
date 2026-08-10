@@ -16,9 +16,11 @@ export function QuickServices() {
           <Text>Agendar</Text>
         </View>
         <View className="w-1/3 items-center gap-4">
-          <View className="rounded-lg p-6 bg-bgThird">
-            <History size={20} color="#008493" />
-          </View>
+          <Pressable onPress={() => router.push("/history")}>
+            <View className="rounded-lg p-6 bg-bgThird">
+              <History size={20} color="#008493" />
+            </View>
+          </Pressable>
           <Text>Histórico</Text>
         </View>
         <View className="w-1/3 items-center gap-4">
