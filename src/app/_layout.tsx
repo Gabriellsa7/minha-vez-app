@@ -15,6 +15,7 @@ import { queryClient } from "../lib/react-query";
 import { NotificationService } from "../services/notifications/notification.service";
 import { notificationQueryKeys } from "../hooks/use-notifications";
 import { GET_QUEUE_ITEMS_KEY } from "../api/get-queue-item-by-patient-id";
+import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "../api/get-queue-item-by-queue-id";
 import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "../api/get-appointment-by-patient-id";
 
@@ -107,6 +108,9 @@ export default function RootLayout() {
       void queryClient.invalidateQueries({
         queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
       });
+      void queryClient.invalidateQueries({
+        queryKey: [GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY],
+      });
       // A patient being called/finished/marked absent changes their
       // appointment's status too (e.g. to COMPLETED once attended), and the
       // home screen decides whether to keep showing the queue card based on
@@ -158,6 +162,7 @@ export default function RootLayout() {
           <Stack.Screen name="login" />
           <Stack.Screen name="notifications" />
           <Stack.Screen name="notifications/[id]" />
+          <Stack.Screen name="queue-info/[id]" />
           <Stack.Screen name="(tabs)" />
         </Stack>
         <NotificationPermissionModal

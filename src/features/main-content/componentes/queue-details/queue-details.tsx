@@ -1,5 +1,6 @@
 import { ArrowRight, Smile } from "lucide-react-native";
-import { Dimensions, ScrollView, Text, View } from "react-native";
+import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import { router } from "expo-router";
 
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
@@ -79,7 +80,17 @@ export default function QueueDetails({
               );
               return (
                 <View style={{ width }} key={item._id}>
-                  <View className="w-[90%] flex-row items-center justify-between bg-[#0092AA] p-3 rounded-t-xl">
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Ver informações da fila"
+                    onPress={() =>
+                      router.push({
+                        pathname: "/queue-info/[id]",
+                        params: { id: item._id },
+                      })
+                    }
+                    className="w-[90%] flex-row items-center justify-between bg-[#0092AA] p-3 rounded-t-xl"
+                  >
                     <View className="flex-row items-center gap-2">
                       <View className="rounded-full bg-bgSecondary p-2">
                         {/* Clinic Image */}
@@ -102,7 +113,7 @@ export default function QueueDetails({
                       </View>
                     </View>
                     <ArrowRight size={28} color="#FFFFFF" />
-                  </View>
+                  </Pressable>
                   <View className="bg-bgPrimary rounded-b-xl p-3 w-[90%]">
                     <View className="border border-[#D8D8D8] gap-1 p-3 rounded-xl">
                       <Text className="font-bold text-xl">
