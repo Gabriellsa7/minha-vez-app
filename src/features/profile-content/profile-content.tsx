@@ -1,8 +1,11 @@
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
-import { useGetUser } from "@/src/api/get-user-me";
+import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
+import { useUploadUserImage } from "@/src/api/upload-user-image";
+import { Avatar } from "@/src/components/avatar/avatar";
 import Header from "@/src/components/header/header";
 import { logout } from "@/src/services/auth/auth.api";
-import { getUserInitials } from "@/src/utils/util";
+import { useQueryClient } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import { Href, useRouter } from "expo-router";
 import {
   ArrowRight,
@@ -11,33 +14,96 @@ import {
   IdCard,
   Lock,
   LogOut,
+  Pencil,
 } from "lucide-react-native";
 import { useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 export const ProfileContent = () => {
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: user } = useGetUser();
 
   const { data: patient } = useGetPatientById({ userId: user?._id ?? "" });
+
+  const { mutate: uploadUserImage, isPending: isUploadingImage } =
+    useUploadUserImage();
 
   const handleOpenLogoutModal = () => {
     setOpenLogoutModal(true);
   };
 
-  const userInitials = getUserInitials(user?.name ?? "");
+  const handlePickAvatar = async () => {
+    if (!user?._id) return;
+
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Toast.show({
+        type: "error",
+        text1: "Permissão necessária",
+        text2: "Permita o acesso às fotos para alterar sua imagem de perfil.",
+      });
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (result.canceled || !result.assets[0]?.base64) return;
+
+    const asset = result.assets[0];
+
+    uploadUserImage(
+      {
+        userId: user._id,
+        imageBase64: asset.base64!,
+        fileName: asset.fileName ?? undefined,
+        mimeType: asset.mimeType,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [GET_USER_ME_KEY] });
+          Toast.show({
+            type: "success",
+            text1: "Foto de perfil atualizada",
+          });
+        },
+        onError: (error) => {
+          Toast.show({
+            type: "error",
+            text1: "Não foi possível atualizar a foto",
+            text2: error?.message || "Tente novamente em instantes.",
+          });
+        },
+      },
+    );
+  };
 
   return (
     <View className=" bg-bgPrimary">
       <Header text="Perfil do Paciente" />
       <View className="p-6 gap-6">
         <View className="flex items-center gap-4 bg-bgThird p-4 rounded-xl">
-          <View className="w-24 h-24 rounded-full bg-bgSecondary flex items-center justify-center">
-            {/*User image profile, add a button to edit the image too*/}
-            <Text className="text-textPrimary text-2xl font-bold">
-              {userInitials}
-            </Text>
+          <View className="relative">
+            <Avatar uri={user?.avatar} name={user?.name} variant="lg" />
+            <Pressable
+              onPress={handlePickAvatar}
+              disabled={isUploadingImage}
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white items-center justify-center border border-bgSecondary"
+            >
+              {isUploadingImage ? (
+                <ActivityIndicator size="small" color="#006673" />
+              ) : (
+                <Pencil size={16} color="#006673" />
+              )}
+            </Pressable>
           </View>
           <View>
             <Text className="text-textSecondary text-2xl font-bold">

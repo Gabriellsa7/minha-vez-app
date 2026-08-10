@@ -23,8 +23,20 @@ export class NotificationService {
   private static reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private static shouldReconnect = false;
   private static subscribers = new Set<SocketSubscriber>();
+  private static isFetchingPushToken = false;
+  private static lastRegisteredToken: string | null = null;
 
   static async registerForPushNotifications() {
+    if (this.isFetchingPushToken) return null;
+    this.isFetchingPushToken = true;
+    try {
+      return await this.fetchAndRegisterPushToken();
+    } finally {
+      this.isFetchingPushToken = false;
+    }
+  }
+
+  private static async fetchAndRegisterPushToken() {
     if (!Device.isDevice) {
       console.warn("[push] registration skipped: physical device required");
       return null;
@@ -58,7 +70,10 @@ export class NotificationService {
       const token = (await Notifications.getExpoPushTokenAsync({ projectId }))
         .data;
       console.log("[push] Expo token obtained", { token, projectId });
-      await this.registerTokenWithBackend(token);
+      if (token !== this.lastRegisteredToken) {
+        this.lastRegisteredToken = token;
+        await this.registerTokenWithBackend(token);
+      }
       return token;
     } catch (error) {
       console.error("[push] registration failed", { error });
@@ -86,9 +101,9 @@ export class NotificationService {
   }
 
   static registerTokenRotationListener() {
-    const subscription = Notifications.addPushTokenListener((event) => {
-      console.log("[push] token rotated", { token: event.data });
-      void this.registerTokenWithBackend(event.data);
+    const subscription = Notifications.addPushTokenListener(() => {
+      console.log("[push] native device token rotated, refreshing Expo token");
+      void this.registerForPushNotifications();
     });
     return () => subscription.remove();
   }
