@@ -16,6 +16,7 @@ import { NotificationService } from "../services/notifications/notification.serv
 import { notificationQueryKeys } from "../hooks/use-notifications";
 import { GET_QUEUE_ITEMS_KEY } from "../api/get-queue-item-by-patient-id";
 import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
+import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "../api/get-appointment-by-patient-id";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -105,6 +106,13 @@ export default function RootLayout() {
       void queryClient.invalidateQueries({ queryKey: [GET_QUEUE_ITEMS_KEY] });
       void queryClient.invalidateQueries({
         queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
+      });
+      // A patient being called/finished/marked absent changes their
+      // appointment's status too (e.g. to COMPLETED once attended), and the
+      // home screen decides whether to keep showing the queue card based on
+      // that appointment, not just the queue/queue-item data.
+      void queryClient.invalidateQueries({
+        queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
       });
     });
     const stopSocket = NotificationService.startNotificationsSocket();
