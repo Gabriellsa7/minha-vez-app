@@ -1,13 +1,16 @@
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../../global.css";
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import Constants from "expo-constants";
+import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AppState, Linking } from "react-native";
 import Toast from "react-native-toast-message";
 import "../config/axios";
+import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
 import { queryClient } from "../lib/react-query";
 import { NotificationService } from "../services/notifications/notification.service";
 import { notificationQueryKeys } from "../hooks/use-notifications";
@@ -24,12 +27,34 @@ Notifications.setNotificationHandler({
   }),
 });
 
+function navigateToNotification(data?: Record<string, unknown> | null) {
+  const notificationId = data?.notificationId;
+  if (typeof notificationId === "string" && notificationId.length > 0) {
+    router.push({ pathname: "/notifications/[id]", params: { id: notificationId } });
+  }
+}
+
 export default function RootLayout() {
+  const [permissionModal, setPermissionModal] = useState({
+    visible: false,
+    canAskAgain: true,
+  });
+
   useEffect(() => {
+    const evaluateNotificationPermission = async () => {
+      if (!Device.isDevice) return;
+      const { status, canAskAgain } = await Notifications.getPermissionsAsync();
+      if (status === "granted") {
+        void NotificationService.registerForPushNotifications();
+        return;
+      }
+      setPermissionModal({ visible: true, canAskAgain });
+    };
+
     if (Constants.appOwnership === "expo") {
       console.warn("[push] remote push is unavailable in Expo Go; use the development build");
     } else {
-      void NotificationService.registerForPushNotifications();
+      void evaluateNotificationPermission();
     }
 
     const invalidateNotifications = () => {
@@ -39,6 +64,13 @@ export default function RootLayout() {
     const unsubscribeAppState = NotificationService.listenForAppStateChanges(
       invalidateNotifications,
     );
+
+    const appStateSubscription = AppState.addEventListener("change", (state) => {
+      if (state !== "active" || Constants.appOwnership === "expo") return;
+      void evaluateNotificationPermission();
+    });
+
+    const tokenRotationUnsubscribe = NotificationService.registerTokenRotationListener();
 
     const receivedSubscription = Notifications.addNotificationReceivedListener(
       (notification) => {
@@ -53,10 +85,14 @@ export default function RootLayout() {
     );
     const responseSubscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
+        const payload = response.notification.request.content.data as
+          | Record<string, unknown>
+          | undefined;
         console.log("[push] user clicked notification", {
           actionIdentifier: response.actionIdentifier,
-          payload: response.notification.request.content.data,
+          payload,
         });
+        navigateToNotification(payload);
       });
     const droppedSubscription = Notifications.addNotificationsDroppedListener(() => {
       console.warn("[push] notifications dropped by the OS/provider");
@@ -75,13 +111,17 @@ export default function RootLayout() {
 
     const lastResponse = Notifications.getLastNotificationResponse();
     if (lastResponse) {
-      console.log("[push] app opened from notification", {
-        payload: lastResponse.notification.request.content.data,
-      });
+      const payload = lastResponse.notification.request.content.data as
+        | Record<string, unknown>
+        | undefined;
+      console.log("[push] app opened from notification", { payload });
+      navigateToNotification(payload);
     }
 
     return () => {
       unsubscribeAppState();
+      appStateSubscription.remove();
+      tokenRotationUnsubscribe();
       receivedSubscription.remove();
       responseSubscription.remove();
       droppedSubscription.remove();
@@ -89,6 +129,19 @@ export default function RootLayout() {
       stopSocket();
     };
   }, []);
+
+  const handleAllowNotifications = () => {
+    setPermissionModal((prev) => ({ ...prev, visible: false }));
+    if (!permissionModal.canAskAgain) {
+      void Linking.openSettings();
+      return;
+    }
+    void NotificationService.registerForPushNotifications();
+  };
+
+  const handleDismissNotifications = () => {
+    setPermissionModal((prev) => ({ ...prev, visible: false }));
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -99,6 +152,12 @@ export default function RootLayout() {
           <Stack.Screen name="notifications/[id]" />
           <Stack.Screen name="(tabs)" />
         </Stack>
+        <NotificationPermissionModal
+          visible={permissionModal.visible}
+          canAskAgain={permissionModal.canAskAgain}
+          onAllow={handleAllowNotifications}
+          onDismiss={handleDismissNotifications}
+        />
         <Toast />
       </SafeAreaProvider>
     </QueryClientProvider>

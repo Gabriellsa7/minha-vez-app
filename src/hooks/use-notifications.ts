@@ -109,6 +109,22 @@ export function useMarkNotificationAsRead() {
   });
 }
 
+export function useClearNotifications() {
+  const queryClient = useQueryClient();
+  const { patientId } = useCurrentPatient();
+
+  return useMutation({
+    mutationFn: () => NotificationService.clearNotifications(),
+    onSuccess: () => {
+      queryClient.setQueryData<NotificationItem[]>(
+        notificationQueryKeys.list(patientId ?? "unknown"),
+        [],
+      );
+      queryClient.invalidateQueries({ queryKey: notificationQueryKeys.all });
+    },
+  });
+}
+
 export function invalidateNotificationQueries(queryClient: ReturnType<typeof useQueryClient>) {
   return queryClient.invalidateQueries({ queryKey: notificationQueryKeys.all });
 }

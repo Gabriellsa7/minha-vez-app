@@ -1,3 +1,4 @@
+import { getToken } from "@/src/services/auth/auth.storage";
 import { httpClient } from "@/src/services/api";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
@@ -57,16 +58,39 @@ export class NotificationService {
       const token = (await Notifications.getExpoPushTokenAsync({ projectId }))
         .data;
       console.log("[push] Expo token obtained", { token, projectId });
-      await httpClient.post("/notifications/register-token", {
-        token,
-        platform: Platform.OS,
-      });
-      console.log("[push] Expo token registered in backend", { token });
+      await this.registerTokenWithBackend(token);
       return token;
     } catch (error) {
       console.error("[push] registration failed", { error });
       return null;
     }
+  }
+
+  static async registerTokenWithBackend(token: string) {
+    const authToken = await getToken();
+    if (!authToken) {
+      console.log(
+        "[push] token registration deferred: user not authenticated yet",
+      );
+      return;
+    }
+    try {
+      await httpClient.post("/notifications/register-token", {
+        token,
+        platform: Platform.OS,
+      });
+      console.log("[push] Expo token registered in backend", { token });
+    } catch (error) {
+      console.error("[push] token registration failed", { error });
+    }
+  }
+
+  static registerTokenRotationListener() {
+    const subscription = Notifications.addPushTokenListener((event) => {
+      console.log("[push] token rotated", { token: event.data });
+      void this.registerTokenWithBackend(event.data);
+    });
+    return () => subscription.remove();
   }
 
   static async listNotifications() {
@@ -88,6 +112,11 @@ export class NotificationService {
 
   static async markAllAsRead() {
     const response = await httpClient.patch("/notifications/read-all");
+    return response.data;
+  }
+
+  static async clearNotifications() {
+    const response = await httpClient.delete("/notifications");
     return response.data;
   }
 

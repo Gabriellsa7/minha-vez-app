@@ -6,6 +6,7 @@ import { LOGIN_FORM_SCHEMA } from "./entities/login-form.constants";
 import { LoginFormSchema } from "./entities/login-form.types";
 
 import { useLogin } from "@/src/hooks/useLogin";
+import { NotificationService } from "@/src/services/notifications/notification.service";
 
 export function LoginForm() {
   const {
@@ -24,6 +25,7 @@ export function LoginForm() {
       {
         onSuccess: () => {
           router.replace("/home");
+          void NotificationService.registerForPushNotifications();
         },
       },
     );

@@ -1,13 +1,15 @@
 import {
+  useClearNotifications,
   useMarkNotificationAsRead,
   useNotifications,
   useUnreadNotifications,
 } from "@/src/hooks/use-notifications";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { router } from "expo-router";
-import { ArrowLeft, BellRing, CheckCheck, RefreshCw } from "lucide-react-native";
+import { ArrowLeft, BellRing, CheckCheck, RefreshCw, Trash2 } from "lucide-react-native";
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -21,7 +23,23 @@ export default function NotificationsScreen() {
     useNotifications();
   const { data: unreadNotifications } = useUnreadNotifications();
   const markAsRead = useMarkNotificationAsRead();
+  const clearNotifications = useClearNotifications();
   const unreadCount = unreadNotifications?.length ?? 0;
+
+  const handleClearNotifications = () => {
+    Alert.alert(
+      "Limpar notificações",
+      "Tem certeza que deseja apagar todas as suas notificações? Essa ação não pode ser desfeita.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Limpar",
+          style: "destructive",
+          onPress: () => clearNotifications.mutate(),
+        },
+      ],
+    );
+  };
 
   const openNotification = async (id: string) => {
     try {
@@ -111,6 +129,21 @@ export default function NotificationsScreen() {
             ))
           )}
         </ScrollView>
+      )}
+
+      {!!notifications?.length && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Limpar todas as notificações"
+          disabled={clearNotifications.isPending}
+          onPress={handleClearNotifications}
+          className="mb-4 mt-3 flex-row items-center justify-center gap-2 rounded-xl border border-borderPrimary py-3"
+        >
+          <Trash2 size={16} color="#B91C1C" />
+          <Text className="font-semibold text-textDanger">
+            {clearNotifications.isPending ? "Limpando..." : "Limpar notificações"}
+          </Text>
+        </Pressable>
       )}
     </SafeAreaView>
   );
