@@ -32,7 +32,7 @@ export const ProfileContent = () => {
     <View className=" bg-bgPrimary">
       <Header text="Perfil do Paciente" />
       <View className="p-6 gap-6">
-        <View className="flex items-center gap-4">
+        <View className="flex items-center gap-4 bg-bgThird p-4 rounded-xl">
           <View className="w-24 h-24 rounded-full bg-bgSecondary flex items-center justify-center">
             {/*User image profile, add a button to edit the image too*/}
             <Text className="text-textPrimary text-2xl font-bold">
@@ -40,7 +40,9 @@ export const ProfileContent = () => {
             </Text>
           </View>
           <View>
-            <Text>{user?.name}</Text>
+            <Text className="text-textSecondary text-2xl font-bold">
+              {user?.name}
+            </Text>
           </View>
         </View>
         <View className="gap-4 bg-bgThird p-4 rounded-xl">
@@ -84,20 +86,23 @@ export const ProfileContent = () => {
           </View>
           <ArrowRight size={24} color="#BDC9CB" />
         </View>
-        <Pressable onPress={() => router.push("/notifications" as Href)}>
-          <View className="flex-row items-center gap-4 justify-center">
-            <Bell size={24} color="#006673" />
-            <Text className="text-textSecondary font-bold">
-              VER NOTIFICAÇÕES
-            </Text>
-          </View>
-        </Pressable>
-        <Pressable onPress={handleOpenLogoutModal}>
-          <View className="flex-row items-center gap-4 justify-center">
-            <LogOut size={24} color="#BA1A1A" />
-            <Text className="text-textDanger font-bold">SAIR DA CONTA</Text>
-          </View>
-        </Pressable>
+        <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
+          <Pressable onPress={() => router.push("/notifications" as Href)}>
+            <View className="flex-row items-center gap-4 justify-center">
+              <Bell size={24} color="#006673" />
+              <Text className="text-textSecondary font-bold">
+                VER NOTIFICAÇÕES
+              </Text>
+            </View>
+          </Pressable>
+          <View className="h-8 border-l border-gray-300" />
+          <Pressable onPress={handleOpenLogoutModal}>
+            <View className="flex-row items-center gap-4 justify-center">
+              <LogOut size={24} color="#BA1A1A" />
+              <Text className="text-textDanger font-bold">SAIR DA CONTA</Text>
+            </View>
+          </Pressable>
+        </View>
       </View>
       <Modal
         transparent
