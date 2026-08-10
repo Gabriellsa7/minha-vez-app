@@ -5,11 +5,13 @@ import { AppState, Platform } from "react-native";
 
 export interface NotificationItem {
   _id: string;
+  patientId: string;
   title: string;
   message: string;
   read: boolean;
   createdAt: string;
   type: string;
+  data?: Record<string, unknown>;
 }
 
 export class NotificationService {
@@ -87,37 +89,38 @@ export class NotificationService {
   }
 
   static connectToNotificationsSocket(callback: (payload: unknown) => void) {
-    const socket = new WebSocket(
-      process.env.EXPO_PUBLIC_WS_URL || "ws://localhost:3001",
-    );
+    let socket: WebSocket | null = null;
+    let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+    let isStopped = false;
 
-    socket.addEventListener("message", (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        callback(payload);
-      } catch {
-        // ignore invalid payloads
-      }
-    });
+    const connect = () => {
+      if (isStopped) return;
 
-    socket.addEventListener("close", () => {
-      setTimeout(() => {
-        this.connectToNotificationsSocket(callback);
-      }, 1000);
-    });
+      socket = new WebSocket(
+        process.env.EXPO_PUBLIC_WS_URL || "ws://localhost:3001",
+      );
 
-    socket.addEventListener("open", () => {
-      console.log("✅ WebSocket conectado");
-    });
+      socket.addEventListener("message", (event) => {
+        try {
+          callback(JSON.parse(event.data));
+        } catch {
+          // Ignore invalid socket payloads.
+        }
+      });
 
-    socket.addEventListener("error", (e) => {
-      console.log("❌ WebSocket erro", e);
-    });
+      socket.addEventListener("close", () => {
+        if (!isStopped) {
+          reconnectTimeout = setTimeout(connect, 1000);
+        }
+      });
+    };
 
-    socket.addEventListener("close", () => {
-      console.log("⚠️ WebSocket fechado");
-    });
+    connect();
 
-    return socket;
+    return () => {
+      isStopped = true;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      socket?.close();
+    };
   }
 }

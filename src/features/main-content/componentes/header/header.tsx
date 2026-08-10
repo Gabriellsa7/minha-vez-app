@@ -1,6 +1,7 @@
 import { IUser } from "@/src/config/entities/user/user.types";
+import { NotificationBell } from "@/src/components/notifications/notification-bell";
 import { getUserInitials } from "@/src/utils/util";
-import { Bell } from "lucide-react-native";
+import { router } from "expo-router";
 import { Text, View } from "react-native";
 
 interface HomeHeaderProps {
@@ -26,9 +27,7 @@ export default function HomeHeader({ user }: HomeHeaderProps) {
         </View>
       </View>
       <View className="gap-3 flex-row">
-        <View className="rounded-full bg-bgSecondary p-2">
-          <Bell size={24} color="#FFFFFF" />
-        </View>
+        <NotificationBell onPress={() => router.push("/notifications")} />
       </View>
     </View>
   );

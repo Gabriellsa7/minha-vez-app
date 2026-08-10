@@ -1,100 +1,117 @@
 import {
-  NotificationItem,
-  NotificationService,
-} from "@/src/services/notifications/notification.service";
-import { BellRing, CheckCheck } from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+  useMarkNotificationAsRead,
+  useNotifications,
+  useUnreadNotifications,
+} from "@/src/hooks/use-notifications";
+import { formatDateTime } from "@/src/utils/format-date-time";
+import { router } from "expo-router";
+import { ArrowLeft, BellRing, CheckCheck, RefreshCw } from "lucide-react-native";
 import {
+  ActivityIndicator,
+  Pressable,
   RefreshControl,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NotificationsScreen() {
-  const socketRef = useRef<WebSocket | null>(null);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: notifications, isLoading, isError, refetch, isRefetching } =
+    useNotifications();
+  const { data: unreadNotifications } = useUnreadNotifications();
+  const markAsRead = useMarkNotificationAsRead();
+  const unreadCount = unreadNotifications?.length ?? 0;
 
-  const loadNotifications = useCallback(async () => {
-    setLoading(true);
+  const openNotification = async (id: string) => {
     try {
-      const data = await NotificationService.syncPendingNotifications();
-      setNotifications(data);
+      await markAsRead.mutateAsync(id);
     } finally {
-      setLoading(false);
+      router.push({ pathname: "/notifications/[id]", params: { id } });
     }
-  }, []);
-
-  useEffect(() => {
-    loadNotifications();
-    const unsubscribe = NotificationService.listenForAppStateChanges(() => {
-      loadNotifications();
-    });
-
-    socketRef.current = NotificationService.connectToNotificationsSocket(() => {
-      loadNotifications();
-    });
-
-    return () => {
-      unsubscribe();
-      socketRef.current?.close();
-    };
-  }, [loadNotifications]);
-
-  const unreadCount = notifications.filter((item) => !item.read).length;
+  };
 
   return (
-    <View className="flex-1 bg-slate-50 px-4 pt-12">
+    <SafeAreaView className="flex-1 bg-bgPrimary px-4 pt-4">
       <View className="mb-4 flex-row items-center justify-between">
-        <Text className="text-xl font-semibold text-slate-900">
-          Notificações
-        </Text>
-        <Text className="text-sm text-slate-500">{unreadCount} não lidas</Text>
+        <View className="flex-row items-center gap-3">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
+            hitSlop={8}
+            onPress={() => router.back()}
+          >
+            <ArrowLeft size={24} color="#006673" />
+          </Pressable>
+          <Text className="text-xl font-semibold text-textBlack">Notificações</Text>
+        </View>
+        <Text className="text-sm text-textFifth">{unreadCount} não lidas</Text>
       </View>
 
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={loadNotifications} />
-        }
-        className="flex-1"
-      >
-        {notifications.length === 0 ? (
-          <View className="items-center justify-center rounded-2xl bg-white p-8 shadow-sm">
-            <BellRing size={28} color="#0F766E" />
-            <Text className="mt-3 text-center text-slate-600">
-              Você ainda não possui notificações.
-            </Text>
-          </View>
-        ) : (
-          notifications.map((item) => (
-            <TouchableOpacity
-              key={item._id}
-              onPress={async () => {
-                await NotificationService.markAsRead(item._id);
-                await loadNotifications();
-              }}
-              className={`mb-3 rounded-2xl border p-4 ${item.read ? "border-slate-200 bg-white" : "border-teal-200 bg-teal-50"}`}
-            >
-              <View className="flex-row items-start justify-between">
-                <View className="flex-1">
-                  <Text className="text-base font-semibold text-slate-900">
-                    {item.title}
-                  </Text>
-                  <Text className="mt-1 text-sm text-slate-600">
-                    {item.message}
-                  </Text>
-                </View>
-                {!item.read && <CheckCheck size={18} color="#0F766E" />}
-              </View>
-              <Text className="mt-3 text-xs text-slate-400">
-                {new Date(item.createdAt).toLocaleString()}
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center gap-3">
+          <ActivityIndicator size="large" color="#008096" />
+          <Text className="text-textFifth">Carregando notificações...</Text>
+        </View>
+      ) : isError ? (
+        <View className="flex-1 items-center justify-center gap-3">
+          <Text className="text-center text-textFifth">
+            Não foi possível carregar suas notificações.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => refetch()}
+            className="flex-row items-center gap-2 rounded-lg bg-bgSecondary px-4 py-3"
+          >
+            <RefreshCw size={16} color="#FFFFFF" />
+            <Text className="font-bold text-textPrimary">Tentar novamente</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <ScrollView
+          className="flex-1"
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          }
+        >
+          {notifications?.length === 0 ? (
+            <View className="items-center justify-center rounded-2xl bg-bgThird p-8">
+              <BellRing size={28} color="#0F766E" />
+              <Text className="mt-3 text-center text-textFifth">
+                Você não possui notificações.
               </Text>
-            </TouchableOpacity>
-          ))
-        )}
-      </ScrollView>
-    </View>
+            </View>
+          ) : (
+            notifications?.map((item) => (
+              <Pressable
+                key={item._id}
+                accessibilityRole="button"
+                accessibilityLabel={`${item.read ? "Lida" : "Não lida"}: ${item.title}`}
+                onPress={() => void openNotification(item._id)}
+                className={`mb-3 rounded-2xl border p-4 ${item.read ? "border-borderPrimary bg-bgThird" : "border-teal-200 bg-teal-50"}`}
+              >
+                <View className="flex-row items-start justify-between gap-3">
+                  <View className="flex-1">
+                    <View className="flex-row items-center justify-between gap-2">
+                      <Text className="flex-1 text-base font-semibold text-textBlack">
+                        {item.title}
+                      </Text>
+                      <Text className="text-xs text-textFifth">
+                        {item.read ? "Lida" : "Não lida"}
+                      </Text>
+                    </View>
+                    <Text className="mt-1 text-sm text-textFifth">{item.message}</Text>
+                  </View>
+                  {!item.read && <CheckCheck size={18} color="#0F766E" />}
+                </View>
+                <Text className="mt-3 text-xs text-textFourth">
+                  {formatDateTime(item.createdAt)}
+                </Text>
+              </Pressable>
+            ))
+          )}
+        </ScrollView>
+      )}
+    </SafeAreaView>
   );
 }

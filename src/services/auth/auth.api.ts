@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { queryClient } from "../../lib/react-query";
 import { httpClient } from "../api";
 import { removeToken } from "./auth.storage";
 
@@ -14,6 +15,7 @@ export const login = async (data: IAuthLogin) => {
 
 export const logout = async () => {
   await removeToken();
+  queryClient.clear();
 
   router.replace("/login");
 };

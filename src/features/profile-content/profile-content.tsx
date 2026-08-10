@@ -84,7 +84,9 @@ export const ProfileContent = () => {
         <Pressable onPress={() => router.push("/notifications" as Href)}>
           <View className="flex-row items-center gap-4 justify-center">
             <Bell size={24} color="#006673" />
-            <Text className="text-textPrimary font-bold">VER NOTIFICAÇÕES</Text>
+            <Text className="text-textSecondary font-bold">
+              VER NOTIFICAÇÕES
+            </Text>
           </View>
         </Pressable>
         <Pressable onPress={handleOpenLogoutModal}>
