@@ -15,7 +15,7 @@ export default function HealthUnitInfo() {
     <ScrollView showsVerticalScrollIndicator={false}>
       <View className="p-4 gap-6">
         <View>
-          <View className=" h-64 w-full overflow-hidden rounded-xl bg-bgThird">
+          <View className=" h-64 w-full overflow-hidden rounded-xl bg-bgThird border-solid border-[6px] border-[#006673]">
             {healthUnit?.img ? (
               <Image
                 source={{ uri: healthUnit.img }}
