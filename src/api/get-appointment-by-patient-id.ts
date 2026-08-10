@@ -14,13 +14,8 @@ const getAppointmentsByPatientId = async (
 ): Promise<IAppointment[]> => {
   const path = `/patients/${params.patientId}/appointments`;
 
-  try {
-    const response = await httpClient.get(path);
-
-    return response.data;
-  } catch (error: any) {
-    throw error;
-  }
+  const response = await httpClient.get<IAppointment[]>(path);
+  return response.data;
 };
 
 export const useGetAppointmentsByPatientId = generateReactQuery<

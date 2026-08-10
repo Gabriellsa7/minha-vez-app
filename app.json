@@ -8,13 +8,15 @@
     "scheme": "minhavezapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.otsutsuki-boruto.minhavezapp"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.otsutsuki_boruto.minhavezapp"
     },
     "web": {
       "bundler": "metro"
@@ -33,11 +35,25 @@
           }
         }
       ],
-      "expo-secure-store"
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "queue-updates"
+        }
+      ],
+      "expo-secure-store",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e216bedd-a65d-4dca-a417-31311a55f04c"
+      }
     }
   }
 }

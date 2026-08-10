@@ -5,6 +5,7 @@ export interface IQueueItem {
   code: string;
   position: number;
   priority: EQueueItemPriority;
+  missedCalls: number;
   status: EQueueItemStatus;
   checkInTime?: Date;
   calledAt?: Date;
@@ -23,4 +24,5 @@ export enum EQueueItemStatus {
   WAITING = "WAITING",
   IN_SERVICE = "IN_SERVICE",
   FINISHED = "FINISHED",
+  ABSENT = "ABSENT",
 }

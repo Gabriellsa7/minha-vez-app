@@ -13,8 +13,9 @@ export default function HealthUnits({ healthUnits }: HealthUnitsProps) {
     <View className="mt-5 gap-3">
       <View className="flex-row items-center justify-between">
         <Text>UBS & Clinicas</Text>
-        {/* Add page to see all health units */}
-        <Text className="text-sm text-textThird">See All</Text>
+        <Pressable onPress={() => router.push("/health-units")}>
+          <Text className="text-sm text-textThird">Ver todas</Text>
+        </Pressable>
       </View>
       <View>
         <ScrollView
