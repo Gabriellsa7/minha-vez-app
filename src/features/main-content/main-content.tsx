@@ -7,9 +7,10 @@ import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
-import { Bell, Clock } from "lucide-react-native";
+import { router } from "expo-router";
+import { Bell, Clock, ListChecks } from "lucide-react-native";
 import React, { useMemo } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import HomeHeader from "./componentes/header/header";
 import HealthUnits from "./componentes/health-units/health-units";
 import QueueDetails from "./componentes/queue-details/queue-details";
@@ -76,16 +77,42 @@ export default function MainContent({ user, patient }: MainContentProps) {
         >
           <View className="w-full gap-3 p-5">
             <HomeHeader user={user!} />
-            {appointment && !appointment.finishedAt && (
+            {appointment && !appointment.finishedAt ? (
               <QueueDetails
                 patientId={patientId!}
                 professionalRoom={professional?.room}
                 appointmentDateTime={appointment.dateTime}
               />
+            ) : (
+              patientId &&
+              !isAppointmentsLoading && (
+                <View className="w-full items-center gap-3 rounded-2xl border border-white/15 bg-white/10 p-5">
+                  <View className="items-center justify-center rounded-full bg-white/15 p-3">
+                    <ListChecks size={22} color="#FFFFFF" />
+                  </View>
+                  <View className="items-center gap-1">
+                    <Text className="text-textPrimary font-semibold text-base">
+                      Nenhuma fila ativa
+                    </Text>
+                    <Text className="text-textPrimary text-center text-sm opacity-70">
+                      Agende uma consulta para acompanhar sua posição na fila
+                      por aqui.
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={() => router.push("/explore")}
+                    className="mt-1 rounded-full bg-white px-5 py-2"
+                  >
+                    <Text className="text-bgSecondary font-semibold text-sm">
+                      Buscar atendimento
+                    </Text>
+                  </Pressable>
+                </View>
+              )
             )}
           </View>
         </LinearGradient>
-        <View className="relative w-full mb-6">
+        <View className="relative w-full mb-6 mt-6">
           <View className="absolute -bottom-6 left-5 right-5">
             <SearchInput placeholder="Search doctor or clinic" />
           </View>

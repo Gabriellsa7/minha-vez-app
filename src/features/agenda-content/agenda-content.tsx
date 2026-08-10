@@ -26,6 +26,7 @@ import {
 } from "@/src/utils/util";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocalSearchParams } from "expo-router";
 import { CalendarDays, CheckCircle2, Sparkles } from "lucide-react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -51,10 +52,16 @@ interface AgendaContentProps {
 
 export default function AgendaContent({ user }: AgendaContentProps) {
   const queryClient = useQueryClient();
-  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const params = useLocalSearchParams<{
+    professionalId?: string;
+    unitId?: string;
+  }>();
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(
+    params.unitId ?? null,
+  );
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<
     string | null
-  >(null);
+  >(params.professionalId ?? null);
   const [selectedDate, setSelectedDate] = useState<string>("");
 
   const [selectedTime, setSelectedTime] = useState<string>("");
@@ -93,6 +100,15 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     useCreateAppointment();
   const { mutate: createPatient, isPending: isCreatingPatient } =
     useCreatePatient();
+
+  useEffect(() => {
+    if (params.unitId) {
+      setSelectedUnitId(params.unitId);
+    }
+    if (params.professionalId) {
+      setSelectedProfessionalId(params.professionalId);
+    }
+  }, [params.unitId, params.professionalId]);
 
   useEffect(() => {
     if (healthUnits?.length && !selectedUnitId) {
