@@ -7,6 +7,7 @@ import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import { useClearAppointmentHistory } from "@/src/api/clear-appointment-history";
+import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,7 +21,6 @@ import {
 } from "lucide-react-native";
 import { useMemo } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Pressable,
   ScrollView,
@@ -133,10 +133,7 @@ export default function HistoryScreen() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center gap-3">
-          <ActivityIndicator size="large" color="#008096" />
-          <Text className="text-textFifth">Carregando histórico...</Text>
-        </View>
+        <HistorySkeleton />
       ) : isError ? (
         <View className="flex-1 items-center justify-center gap-3">
           <Text className="text-center text-textFifth">

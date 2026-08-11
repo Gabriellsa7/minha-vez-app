@@ -5,6 +5,7 @@ import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-
 import { useGetQueueItemByQueueId } from "@/src/api/get-queue-item-by-queue-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
 import { useGetUser } from "@/src/api/get-user-me";
+import { QueueInfoSkeleton } from "@/src/components/skeletons/queue-info-skeleton";
 import { EQueueShift, EQueueStatus } from "@/src/config/entities/queue/queue.type";
 import { EQueueItemStatus } from "@/src/config/entities/queue-items/queue-items.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
@@ -21,7 +22,7 @@ import {
   Stethoscope,
   Users,
 } from "lucide-react-native";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const QUEUE_STATUS_LABEL: Record<EQueueStatus, string> = {
@@ -131,10 +132,7 @@ export default function QueueInfoScreen() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center gap-3">
-          <ActivityIndicator size="large" color="#008096" />
-          <Text className="text-textFifth">Carregando informações da fila...</Text>
-        </View>
+        <QueueInfoSkeleton />
       ) : isError || !queue ? (
         <View className="flex-1 items-center justify-center gap-3 px-6">
           <Text className="text-center text-textFifth">
