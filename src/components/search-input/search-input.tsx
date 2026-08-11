@@ -15,7 +15,7 @@ export default function SearchInput({
   onPress,
 }: SearchInputProps) {
   const content = (
-    <View className="flex-row items-center gap-2 bg-bgThird py-3 px-5 rounded-2xl">
+    <View className="flex-row items-center gap-2 bg-bgThird px-5 rounded-2xl h-14">
       <Search size={18} color="#888" />
       <TextInput
         placeholder={placeholder}
@@ -24,6 +24,8 @@ export default function SearchInput({
         onChangeText={onChangeText}
         editable={!onPress}
         pointerEvents={onPress ? "none" : "auto"}
+        textAlignVertical="center"
+        style={{ includeFontPadding: false, paddingVertical: 0 }}
         className="flex-1 text-black"
       />
     </View>

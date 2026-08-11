@@ -112,7 +112,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
             )}
           </View>
         </LinearGradient>
-        <View className="relative w-full mb-6 mt-6">
+        <View className="relative w-full mb-6">
           <View className="absolute -bottom-6 left-5 right-5">
             <SearchInput
               placeholder="Buscar clínica ou especialidade"
