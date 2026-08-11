@@ -5,6 +5,7 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LOGIN_FORM_SCHEMA } from "./entities/login-form.constants";
 import { LoginFormSchema } from "./entities/login-form.types";
 
+import { PasswordInput } from "@/src/components/password-input/password-input";
 import { useLogin } from "@/src/hooks/useLogin";
 import { NotificationService } from "@/src/services/notifications/notification.service";
 
@@ -61,19 +62,12 @@ export function LoginForm() {
           </Text>
           <Text className="text-textSecondary text-xs">Esqueceu a senha</Text>
         </View>
-        {/* Add logic to show user password when he is writing */}
         <View className="gap-5">
           <Controller
             control={control}
             name="password"
             render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder="Digite sua senha..."
-                value={value}
-                onChangeText={onChange}
-                secureTextEntry={true}
-                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
-              />
+              <PasswordInput value={value} onChangeText={onChange} />
             )}
           />
           {errors.password && (
