@@ -1,15 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LOGIN_FORM_SCHEMA } from "./entities/login-form.constants";
 import { LoginFormSchema } from "./entities/login-form.types";
 
 import { PasswordInput } from "@/src/components/password-input/password-input";
+import { ForgotPasswordModal } from "@/src/features/forgot-password/forgot-password-modal";
 import { useLogin } from "@/src/hooks/useLogin";
 import { NotificationService } from "@/src/services/notifications/notification.service";
 
 export function LoginForm() {
+  const [isForgotPasswordVisible, setIsForgotPasswordVisible] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -60,7 +64,12 @@ export function LoginForm() {
           <Text>
             Senha <Text className="text-textDanger">*</Text>
           </Text>
-          <Text className="text-textSecondary text-xs">Esqueceu a senha</Text>
+          <Text
+            className="text-textSecondary text-xs"
+            onPress={() => setIsForgotPasswordVisible(true)}
+          >
+            Esqueceu a senha
+          </Text>
         </View>
         <View className="gap-5">
           <Controller
@@ -89,6 +98,10 @@ export function LoginForm() {
           </Text>
         </View>
       </View>
+      <ForgotPasswordModal
+        visible={isForgotPasswordVisible}
+        onClose={() => setIsForgotPasswordVisible(false)}
+      />
     </View>
   );
 }
