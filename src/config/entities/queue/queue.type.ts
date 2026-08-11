@@ -26,4 +26,5 @@ export interface IQueueWithDetails extends IQueue {
   healthUnitName: string;
   queueSize: number;
   patientCode?: string;
+  estimatedWaitMinutes?: number | null;
 }

@@ -114,13 +114,7 @@ export default function QueueInfoScreen() {
       .length ?? 0;
 
   const isMyTurn = patientQueueItem?.status === EQueueItemStatus.IN_SERVICE;
-  const appointmentDuration = professional?.schedule?.appointmentDuration ?? 0;
-  const estimatedWaitMinutes =
-    !isMyTurn &&
-    patientQueueItem?.status === EQueueItemStatus.WAITING &&
-    patientQueueItem.position > 0
-      ? (patientQueueItem.position - 1) * appointmentDuration
-      : null;
+  const estimatedWaitMinutes = queue?.estimatedWaitMinutes ?? null;
 
   return (
     <SafeAreaView className="flex-1 bg-bgPrimary" edges={["top"]}>
