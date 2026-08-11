@@ -8,7 +8,7 @@ import { ScrollView, Text, View } from "react-native";
 import {
   ALL_SPECIALTIES_OPTION,
   CategoriesSection,
-} from "./components/categories-section";
+} from "@/src/components/specialty-filter/specialty-filter";
 import { ClinicsSection } from "./components/clinics-section";
 import { ProfessionalsSection } from "./components/professionals-section";
 

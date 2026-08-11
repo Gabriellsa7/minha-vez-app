@@ -1,9 +1,9 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { isToday, weekDayLabel } from "@/src/utils/util";
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
-import { Bone, Clock, MapPin } from "lucide-react-native";
-import { ScrollView, Text, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { Bone, CalendarDays, Clock, MapPin, Stethoscope } from "lucide-react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 export default function HealthUnitInfo() {
   const { id } = useLocalSearchParams();
@@ -145,6 +145,40 @@ export default function HealthUnitInfo() {
               </View>
             </View>
           ))}
+        </View>
+        <View className="gap-3">
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/agenda",
+                params: { unitId: healthUnit?._id },
+              })
+            }
+            className="rounded-[20px] bg-[#008096] p-4"
+          >
+            <View className="flex-row items-center justify-center gap-2">
+              <CalendarDays size={18} color="#FFFFFF" />
+              <Text className="text-base font-semibold text-white">
+                Marcar Consulta
+              </Text>
+            </View>
+          </Pressable>
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/health-unit-schedule/[id]",
+                params: { id: healthUnit?._id ?? "" },
+              })
+            }
+            className="rounded-[20px] border border-[#008096] bg-white p-4"
+          >
+            <View className="flex-row items-center justify-center gap-2">
+              <Stethoscope size={18} color="#008096" />
+              <Text className="text-base font-semibold text-[#008096]">
+                Agendar por Especialidade
+              </Text>
+            </View>
+          </Pressable>
         </View>
       </View>
     </ScrollView>

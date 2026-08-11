@@ -1,45 +1,44 @@
 import { useGetAppointmentsByProfessionalId } from "@/src/api/get-appointments-by-professional-id";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
-import { useGetHealthUnits } from "@/src/api/get-health-units";
-import Header from "@/src/components/header/header";
+import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
+import {
+  ALL_SPECIALTIES_OPTION,
+  CategoriesSection,
+} from "@/src/components/specialty-filter/specialty-filter";
 import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IUser } from "@/src/config/entities/user/user.types";
-import { getDateKey, getDateTimeFromDateAndTime } from "@/src/utils/util";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useLocalSearchParams } from "expo-router";
-import { CalendarDays, Sparkles } from "lucide-react-native";
+import { getDateKey } from "@/src/utils/util";
+import { MapPin, CalendarDays } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
-import AppointmentConfirmModal from "./componentes/appointment-confirm-modal/appointment-confirm-modal";
-import AvaliableDays from "./componentes/avaliable-days/avaliable-days";
-import AvaliableTimes from "./componentes/avaliable-time/avaliable-time";
-import HealthProfessionalsSection from "./componentes/health-professional/health-professional";
-import HealthUnitsSection from "./componentes/health-units-section/healt-units-section";
-import PatientRegistrationModal from "./componentes/patient-registration-modal/patient-registration-modal";
-import { useAppointmentBooking } from "./hooks/use-appointment-booking";
+import AppointmentConfirmModal from "../agenda-content/componentes/appointment-confirm-modal/appointment-confirm-modal";
+import AvaliableDays from "../agenda-content/componentes/avaliable-days/avaliable-days";
+import AvaliableTimes from "../agenda-content/componentes/avaliable-time/avaliable-time";
+import HealthProfessionalsSection from "../agenda-content/componentes/health-professional/health-professional";
+import PatientRegistrationModal from "../agenda-content/componentes/patient-registration-modal/patient-registration-modal";
+import { useAppointmentBooking } from "../agenda-content/hooks/use-appointment-booking";
 
-interface AgendaContentProps {
+interface HealthUnitScheduleProps {
   user: IUser;
+  healthUnitId: string;
 }
 
-export default function AgendaContent({ user }: AgendaContentProps) {
-  const params = useLocalSearchParams<{
-    professionalId?: string;
-    unitId?: string;
-  }>();
-  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(
-    params.unitId ?? null,
+export default function HealthUnitSchedule({
+  user,
+  healthUnitId,
+}: HealthUnitScheduleProps) {
+  const [selectedSpecialty, setSelectedSpecialty] = useState(
+    ALL_SPECIALTIES_OPTION,
   );
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<
     string | null
-  >(params.professionalId ?? null);
+  >(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
-
   const [selectedTime, setSelectedTime] = useState<string>("");
 
-  const { data: healthUnits, isLoading: isHealthUnitsLoading } =
-    useGetHealthUnits();
+  const { data: healthUnit, isLoading: isHealthUnitLoading } =
+    useGetHealthUnitById({ healthUnitId });
 
   const { data: healthProfessionals, isLoading: isHealthProfessionalsLoading } =
     useGetHealthProfessionals();
@@ -51,21 +50,6 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     { professionalId: selectedProfessionalId ?? "" },
     { enabled: Boolean(selectedProfessionalId) },
   );
-
-  useEffect(() => {
-    if (params.unitId) {
-      setSelectedUnitId(params.unitId);
-    }
-    if (params.professionalId) {
-      setSelectedProfessionalId(params.professionalId);
-    }
-  }, [params.unitId, params.professionalId]);
-
-  useEffect(() => {
-    if (healthUnits?.length && !selectedUnitId) {
-      setSelectedUnitId(healthUnits[0]._id);
-    }
-  }, [healthUnits, selectedUnitId]);
 
   useEffect(() => {
     if (!selectedDate) {
@@ -80,15 +64,29 @@ export default function AgendaContent({ user }: AgendaContentProps) {
 
     return healthProfessionals.filter(
       (professional: IHealthProfessional) =>
-        !selectedUnitId || professional.healthUnitId === selectedUnitId,
+        professional.healthUnitId === healthUnitId,
     );
-  }, [healthProfessionals, selectedUnitId]);
+  }, [healthProfessionals, healthUnitId]);
 
-  const selectedProfessional = professionalsForUnit.find(
+  const specialties = useMemo(() => {
+    return Array.from(
+      new Set(professionalsForUnit.map((professional) => professional.specialty)),
+    ).sort();
+  }, [professionalsForUnit]);
+
+  const filteredProfessionals = useMemo(() => {
+    if (selectedSpecialty === ALL_SPECIALTIES_OPTION) {
+      return professionalsForUnit;
+    }
+
+    return professionalsForUnit.filter(
+      (professional) => professional.specialty === selectedSpecialty,
+    );
+  }, [professionalsForUnit, selectedSpecialty]);
+
+  const selectedProfessional = filteredProfessionals.find(
     (professional) => professional._id === selectedProfessionalId,
   );
-
-  const selectedUnit = healthUnits?.find((unit) => unit._id === selectedUnitId);
 
   const bookedTimes = useMemo(() => {
     if (!professionalAppointments || !selectedDate) {
@@ -119,41 +117,22 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     }, new Set<string>());
   }, [professionalAppointments, selectedDate]);
 
-  useEffect(() => {
-    if (!selectedTime || !selectedDate) {
-      return;
-    }
-
-    const selectedDateTime = getDateTimeFromDateAndTime(
-      selectedDate,
-      selectedTime,
-    );
-
-    if (bookedTimes.has(selectedTime) || selectedDateTime <= new Date()) {
-      setSelectedTime("");
-    }
-  }, [bookedTimes, selectedDate, selectedTime]);
-
   const booking = useAppointmentBooking({
     user,
     selectedProfessional,
-    selectedUnitId,
+    selectedUnitId: healthUnitId,
     selectedDate,
     selectedTime,
     setSelectedTime,
   });
 
-  const tabBarHeight = useBottomTabBarHeight();
-
   const isLoading =
     booking.isPatientLoading ||
-    isHealthUnitsLoading ||
+    isHealthUnitLoading ||
     isHealthProfessionalsLoading;
 
   return (
     <View className="bg-bgPrimary flex-1 gap-4">
-      <Header text="Agendar" />
-
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#008096" />
@@ -161,21 +140,23 @@ export default function AgendaContent({ user }: AgendaContentProps) {
       ) : (
         <ScrollView
           contentContainerStyle={{
-            paddingBottom: tabBarHeight + 8,
+            paddingBottom: 32,
           }}
         >
           <View className="px-5 pb-4">
-            <View className="mb-5 rounded-[24px] border border-[#D7EEF2] bg-white p-4 shadow-sm">
-              <View className="mb-3 flex-row items-center gap-2">
-                <Sparkles size={18} color="#008096" />
+            <View className="mb-5 flex-row items-center gap-3 rounded-[24px] border border-[#D7EEF2] bg-white p-4 shadow-sm">
+              <View className="rounded-xl bg-[#DDF4F7] p-2">
+                <MapPin size={20} color="#006673" />
+              </View>
+              <View className="flex-1">
                 <Text className="text-base font-semibold text-[#0F172A]">
-                  Agende sua consulta em poucos passos
+                  {healthUnit?.name}
+                </Text>
+                <Text className="text-sm text-[#64748B]">
+                  {healthUnit?.address.street}, {healthUnit?.address.number} -{" "}
+                  {healthUnit?.address.neighborhood}
                 </Text>
               </View>
-              <Text className="text-sm text-[#64748B]">
-                Selecione uma unidade, o profissional, o dia e o horário ideal
-                para você.
-              </Text>
             </View>
 
             {!booking.patient && !booking.isPatientLoading && (
@@ -188,20 +169,24 @@ export default function AgendaContent({ user }: AgendaContentProps) {
               </View>
             )}
 
-            <HealthUnitsSection
-              healthUnits={healthUnits}
-              selectedUnitId={selectedUnitId ?? ""}
-              setSelectedUnitId={setSelectedUnitId}
-              setSelectedProfessionalId={setSelectedProfessionalId}
-              setSelectedTime={setSelectedTime}
-            />
+            <View className="mb-5">
+              <CategoriesSection
+                specialties={specialties}
+                selected={selectedSpecialty}
+                onSelect={(specialty) => {
+                  setSelectedSpecialty(specialty);
+                  setSelectedProfessionalId(null);
+                  setSelectedTime("");
+                }}
+              />
+            </View>
 
             <HealthProfessionalsSection
-              professionalsForUnit={professionalsForUnit}
+              professionalsForUnit={filteredProfessionals}
               selectedProfessionalId={selectedProfessionalId || ""}
               setSelectedProfessionalId={setSelectedProfessionalId}
               setSelectedTime={setSelectedTime}
-              selectedUnit={selectedUnit}
+              selectedUnit={healthUnit}
             />
 
             <AvaliableDays
@@ -259,7 +244,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
       <AppointmentConfirmModal
         visible={booking.showConfirmModal}
         onClose={() => booking.setShowConfirmModal(false)}
-        selectedUnit={selectedUnit}
+        selectedUnit={healthUnit}
         selectedProfessional={selectedProfessional}
         selectedDate={selectedDate}
         selectedTime={selectedTime}

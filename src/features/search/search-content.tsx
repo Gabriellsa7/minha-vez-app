@@ -49,12 +49,12 @@ export function SearchContent() {
 
   const goToHealthUnit = (unitId: string) => {
     void addSearch(debouncedQuery);
-    router.push(`/health-unit-info/${unitId}`);
+    router.dismissTo(`/health-unit-info/${unitId}`);
   };
 
   const goToProfessional = (professionalId: string, healthUnitId: string) => {
     void addSearch(debouncedQuery);
-    router.push({
+    router.dismissTo({
       pathname: "/agenda",
       params: { professionalId, unitId: healthUnitId },
     });
