@@ -6,8 +6,8 @@ export function QuickServices() {
   return (
     <View className="gap-5">
       <Text>Serviços Rapidos</Text>
-      <View className="flex-row flex-wrap">
-        <View className="w-1/3 items-center gap-4">
+      <View className="flex-row gap-3">
+        <View className="flex-1 items-center gap-4">
           <Pressable onPress={() => router.push("/agenda")}>
             <View className="rounded-lg p-6 bg-bgThird">
               <Calendar size={20} color="#008493" />
@@ -15,7 +15,7 @@ export function QuickServices() {
           </Pressable>
           <Text>Agendar</Text>
         </View>
-        <View className="w-1/3 items-center gap-4">
+        <View className="flex-1 items-center gap-4">
           <Pressable onPress={() => router.push("/history")}>
             <View className="rounded-lg p-6 bg-bgThird">
               <History size={20} color="#008493" />
@@ -23,7 +23,7 @@ export function QuickServices() {
           </Pressable>
           <Text>Histórico</Text>
         </View>
-        <View className="w-1/3 items-center gap-4">
+        <View className="flex-1 items-center gap-4">
           <Pressable onPress={() => router.push("/explore")}>
             <View className="rounded-lg p-6 bg-bgThird">
               <Compass size={20} color="#008493" />
@@ -31,7 +31,7 @@ export function QuickServices() {
           </Pressable>
           <Text>Explorar</Text>
         </View>
-        <View className="w-1/3 items-center gap-4">
+        <View className="flex-1 items-center gap-4">
           <Pressable onPress={() => router.push("/exams")}>
             <View className="rounded-lg p-6 bg-bgThird">
               <FileText size={20} color="#008493" />
