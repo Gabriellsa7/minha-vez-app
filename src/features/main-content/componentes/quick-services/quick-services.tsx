@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Calendar, Compass, History } from "lucide-react-native";
+import { Calendar, Compass, FileText, History } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
 export function QuickServices() {
@@ -30,6 +30,14 @@ export function QuickServices() {
             </View>
           </Pressable>
           <Text>Explorar</Text>
+        </View>
+        <View className="w-1/3 items-center gap-4">
+          <Pressable onPress={() => router.push("/exams")}>
+            <View className="rounded-lg p-6 bg-bgThird">
+              <FileText size={20} color="#008493" />
+            </View>
+          </Pressable>
+          <Text>Meus Exames</Text>
         </View>
       </View>
     </View>
