@@ -2,6 +2,7 @@ import { useGetAppointmentsByProfessionalId } from "@/src/api/get-appointments-b
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import Header from "@/src/components/header/header";
+import { AgendaSkeleton } from "@/src/components/skeletons/agenda-skeleton";
 import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IUser } from "@/src/config/entities/user/user.types";
@@ -10,7 +11,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useLocalSearchParams } from "expo-router";
 import { CalendarDays, Sparkles } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import AppointmentConfirmModal from "./componentes/appointment-confirm-modal/appointment-confirm-modal";
 import AvaliableDays from "./componentes/avaliable-days/avaliable-days";
 import AvaliableTimes from "./componentes/avaliable-time/avaliable-time";
@@ -155,9 +156,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
       <Header text="Agendar" />
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#008096" />
-        </View>
+        <AgendaSkeleton />
       ) : (
         <ScrollView
           contentContainerStyle={{

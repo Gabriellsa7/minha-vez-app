@@ -1,3 +1,4 @@
+import { PasswordInput } from "@/src/components/password-input/password-input";
 import { useSignup } from "@/src/hooks/useSignup";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
@@ -81,13 +82,7 @@ export function SignupForm() {
             control={control}
             name="password"
             render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder="Digite sua senha..."
-                onChangeText={onChange}
-                value={value}
-                secureTextEntry={true}
-                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
-              />
+              <PasswordInput value={value} onChangeText={onChange} />
             )}
           />
           {errors.password && (

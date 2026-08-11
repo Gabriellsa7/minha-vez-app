@@ -122,6 +122,14 @@ export default function QueueDetails({
                       <Text className="text-textFourth text-sm">
                         Código #{patientQueueItem?.code || null}
                       </Text>
+                      {typeof item.estimatedWaitMinutes === "number" && (
+                        <Text className="text-textFourth text-sm">
+                          Espera estimada:{" "}
+                          {item.estimatedWaitMinutes === 0
+                            ? "Agora"
+                            : `${item.estimatedWaitMinutes} min`}
+                        </Text>
+                      )}
                     </View>
                   </View>
                 </View>
