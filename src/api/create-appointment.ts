@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { IAppointment } from "../config/entities/appointments/appointments.types";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
@@ -23,6 +24,11 @@ const createAppointment = async (
     return response.data;
   } catch (error) {
     console.error("Error creating appointment:", error);
+
+    if (isAxiosError<{ message?: string }>(error) && error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+
     throw error;
   }
 };
