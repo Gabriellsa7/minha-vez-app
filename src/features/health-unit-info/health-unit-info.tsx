@@ -1,8 +1,9 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
+import { getServiceIcon } from "@/src/utils/service-icon.util";
 import { isToday, weekDayLabel } from "@/src/utils/util";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { Bone, CalendarDays, Clock, MapPin, Stethoscope } from "lucide-react-native";
+import { CalendarDays, Clock, MapPin, Stethoscope } from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 export default function HealthUnitInfo() {
@@ -123,28 +124,32 @@ export default function HealthUnitInfo() {
           <Text className="text-textSecondary font-medium">Ver todos</Text>
         </View>
         <View className="gap-4">
-          {healthUnit?.services.map((health) => (
-            <View
-              className="bg-bgThird rounded-2xl p-5 gap-4 border border-[#E7ECEF]"
-              key={health._id}
-            >
-              <View className="flex-row gap-4 items-start">
-                <View className="bg-[#DDF4F7] p-3 rounded-xl">
-                  <Bone size={24} color="#0B7A87" />
-                </View>
+          {healthUnit?.services.map((health) => {
+            const ServiceIcon = getServiceIcon(health.name);
 
-                <View className="flex-1 gap-1">
-                  <Text className="font-bold text-lg text-textBlack">
-                    {health.name}
-                  </Text>
+            return (
+              <View
+                className="bg-bgThird rounded-2xl p-5 gap-4 border border-[#E7ECEF]"
+                key={health._id}
+              >
+                <View className="flex-row gap-4 items-start">
+                  <View className="bg-[#DDF4F7] p-3 rounded-xl">
+                    <ServiceIcon size={24} color="#0B7A87" />
+                  </View>
 
-                  <Text className="text-textFifth leading-5">
-                    {health.description}
-                  </Text>
+                  <View className="flex-1 gap-1">
+                    <Text className="font-bold text-lg text-textBlack">
+                      {health.name}
+                    </Text>
+
+                    <Text className="text-textFifth leading-5">
+                      {health.description}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
         <View className="gap-3">
           <Pressable
