@@ -145,13 +145,16 @@ export const ProfileContent = () => {
           </View>
           <ArrowRight size={24} color="#BDC9CB" />
         </Pressable>
-        <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
+        <Pressable
+          onPress={() => router.push("/security-settings" as Href)}
+          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
+        >
           <View className="flex-row items-center gap-4">
             <Lock size={24} color="#006673" />
             <Text>Configurações de Segurança</Text>
           </View>
           <ArrowRight size={24} color="#BDC9CB" />
-        </View>
+        </Pressable>
         <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
           <Pressable onPress={() => router.push("/notifications" as Href)}>
             <View className="flex-row items-center gap-4 justify-center">
