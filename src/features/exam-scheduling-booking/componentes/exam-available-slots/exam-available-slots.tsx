@@ -1,6 +1,14 @@
 import { useGetExamSlots } from "@/src/api/get-exam-slots";
 import { Clock3 } from "lucide-react-native";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+
+const TIME_SLOTS_GRID_HEIGHT = 136;
 
 interface ExamAvailableSlotsProps {
   healthUnitId: string;
@@ -37,45 +45,50 @@ export default function ExamAvailableSlots({
           </Text>
         </View>
       ) : (
-        <View className="flex-row flex-wrap gap-2">
-          {slots.map((slot) => {
-            const isSelected = selectedTime === slot.time;
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View
+            className="flex-col flex-wrap gap-2"
+            style={{ height: TIME_SLOTS_GRID_HEIGHT }}
+          >
+            {slots.map((slot) => {
+              const isSelected = selectedTime === slot.time;
 
-            return (
-              <Pressable
-                key={slot.time}
-                onPress={() => setSelectedTime(slot.time)}
-                className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
-                  isSelected
-                    ? "border-[#008096] bg-[#008096]"
-                    : "border-[#D7EEF2] bg-white"
-                }`}
-              >
-                <Clock3
-                  size={16}
-                  color={isSelected ? "#FFFFFF" : "#008096"}
-                />
-                <Text
-                  className={`text-sm ${
-                    isSelected ? "text-white" : "text-[#0F172A]"
+              return (
+                <Pressable
+                  key={slot.time}
+                  onPress={() => setSelectedTime(slot.time)}
+                  className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
+                    isSelected
+                      ? "border-[#008096] bg-[#008096]"
+                      : "border-[#D7EEF2] bg-white"
                   }`}
                 >
-                  {slot.time}
-                </Text>
-                {slot.remainingCapacity <= 2 && (
+                  <Clock3
+                    size={16}
+                    color={isSelected ? "#FFFFFF" : "#008096"}
+                  />
                   <Text
-                    className={`text-xs font-medium ${
-                      isSelected ? "text-white" : "text-[#94A3B8]"
+                    className={`text-sm ${
+                      isSelected ? "text-white" : "text-[#0F172A]"
                     }`}
                   >
-                    {slot.remainingCapacity} vaga
-                    {slot.remainingCapacity === 1 ? "" : "s"}
+                    {slot.time}
                   </Text>
-                )}
-              </Pressable>
-            );
-          })}
-        </View>
+                  {slot.remainingCapacity <= 2 && (
+                    <Text
+                      className={`text-xs font-medium ${
+                        isSelected ? "text-white" : "text-[#94A3B8]"
+                      }`}
+                    >
+                      {slot.remainingCapacity} vaga
+                      {slot.remainingCapacity === 1 ? "" : "s"}
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        </ScrollView>
       )}
     </View>
   );
