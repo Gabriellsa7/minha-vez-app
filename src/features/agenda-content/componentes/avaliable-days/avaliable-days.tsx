@@ -7,12 +7,15 @@ interface AvaliableDaysProps {
   selectedDate: string;
   setSelectedTime: (time: string) => void;
   setSelectedDate: (date: string) => void;
+  /** JS day-of-week indexes (0=Sunday..6=Saturday) with no availability at all, greyed out like past days. Omit to allow every weekday (default, used by the consulta flow). */
+  disabledWeekdays?: Set<number>;
 }
 
 export default function AvaliableDays({
   selectedDate,
   setSelectedTime,
   setSelectedDate,
+  disabledWeekdays,
 }: AvaliableDaysProps) {
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const today = new Date();
@@ -46,6 +49,18 @@ export default function AvaliableDays({
       return date;
     });
   }, [calendarMonth]);
+
+  // Chunked into explicit 7-day rows instead of relying on flex-wrap with a
+  // "100/7%" cell width — on React Native Web that percentage rounds just
+  // enough to only fit 6 cells per line, silently dropping the 7th (Saturday)
+  // column and shifting every following day left by one position.
+  const calendarWeeks = useMemo(() => {
+    const weeks: Date[][] = [];
+    for (let index = 0; index < calendarDays.length; index += 7) {
+      weeks.push(calendarDays.slice(index, index + 7));
+    }
+    return weeks;
+  }, [calendarDays]);
 
   const canGoToPreviousMonth = useMemo(() => {
     const today = new Date();
@@ -108,54 +123,68 @@ export default function AvaliableDays({
           ))}
         </View>
 
-        <View className="flex-row flex-wrap">
-          {calendarDays.map((day) => {
-            const dateKey = getDateKey(day);
-            const isCurrentMonth = isSameMonth(day, calendarMonth);
-            const isSelected = selectedDate === dateKey;
-            const isPastDay = startOfDay(day) < startOfDay(new Date());
-            const isDisabled = !isCurrentMonth || isPastDay;
+        <View>
+          {calendarWeeks.map((week) => (
+            <View
+              key={getDateKey(week[0])}
+              className="flex-row"
+              style={{ width: "100%" }}
+            >
+              {week.map((day) => {
+                const dateKey = getDateKey(day);
+                const isCurrentMonth = isSameMonth(day, calendarMonth);
+                const isSelected = selectedDate === dateKey;
+                const isPastDay = startOfDay(day) < startOfDay(new Date());
+                const isUnavailableWeekday = disabledWeekdays?.has(
+                  day.getDay(),
+                );
+                const isDisabled =
+                  !isCurrentMonth || isPastDay || isUnavailableWeekday;
 
-            return (
-              <View
-                key={dateKey}
-                style={{
-                  width: `${100 / 7}%`,
-                  alignItems: "center",
-                  paddingVertical: 4,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectedDate(dateKey);
-                    setSelectedTime("");
-                  }}
-                  disabled={isDisabled}
-                  activeOpacity={0.75}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: isSelected ? "#008096" : "transparent",
-                  }}
-                >
-                  <Text
-                    className={`text-sm ${
-                      isSelected
-                        ? "font-semibold text-white"
-                        : isDisabled
-                          ? "text-[#CBD5E1]"
-                          : "text-[#0F172A]"
-                    }`}
+                return (
+                  <View
+                    key={dateKey}
+                    style={{
+                      flex: 1,
+                      alignItems: "center",
+                      paddingVertical: 4,
+                    }}
                   >
-                    {day.getDate()}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSelectedDate(dateKey);
+                        setSelectedTime("");
+                      }}
+                      disabled={isDisabled}
+                      activeOpacity={0.75}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: isSelected
+                          ? "#008096"
+                          : "transparent",
+                      }}
+                    >
+                      <Text
+                        className={`text-sm ${
+                          isSelected
+                            ? "font-semibold text-white"
+                            : isDisabled
+                              ? "text-[#CBD5E1]"
+                              : "text-[#0F172A]"
+                        }`}
+                      >
+                        {day.getDate()}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+          ))}
         </View>
       </View>
     </View>

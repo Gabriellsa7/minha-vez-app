@@ -1,45 +1,76 @@
 import { router } from "expo-router";
-import { Calendar, Compass, FileText, History } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import {
+  Calendar,
+  Compass,
+  FileText,
+  History,
+  TestTube,
+} from "lucide-react-native";
+import type { ComponentType } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+
+interface QuickServiceItem {
+  key: string;
+  label: string;
+  icon: ComponentType<{ size?: number; color?: string }>;
+  onPress: () => void;
+}
+
+const QUICK_SERVICES: QuickServiceItem[] = [
+  {
+    key: "agendar",
+    label: "Agendar",
+    icon: Calendar,
+    onPress: () => router.push("/agenda"),
+  },
+  {
+    key: "agendar-exame",
+    label: "Agendar Exame",
+    icon: TestTube,
+    onPress: () => router.push("/exam-scheduling"),
+  },
+  {
+    key: "historico",
+    label: "Histórico",
+    icon: History,
+    onPress: () => router.push("/history"),
+  },
+  {
+    key: "explorar",
+    label: "Explorar",
+    icon: Compass,
+    onPress: () => router.push("/explore"),
+  },
+  {
+    key: "meus-exames",
+    label: "Meus Exames",
+    icon: FileText,
+    onPress: () => router.push("/exams"),
+  },
+];
 
 export function QuickServices() {
   return (
     <View className="gap-5">
       <Text>Serviços Rapidos</Text>
-      <View className="flex-row gap-3">
-        <View className="flex-1 items-center gap-4">
-          <Pressable onPress={() => router.push("/agenda")}>
-            <View className="rounded-lg p-6 bg-bgThird">
-              <Calendar size={20} color="#008493" />
-            </View>
-          </Pressable>
-          <Text>Agendar</Text>
-        </View>
-        <View className="flex-1 items-center gap-4">
-          <Pressable onPress={() => router.push("/history")}>
-            <View className="rounded-lg p-6 bg-bgThird">
-              <History size={20} color="#008493" />
-            </View>
-          </Pressable>
-          <Text>Histórico</Text>
-        </View>
-        <View className="flex-1 items-center gap-4">
-          <Pressable onPress={() => router.push("/explore")}>
-            <View className="rounded-lg p-6 bg-bgThird">
-              <Compass size={20} color="#008493" />
-            </View>
-          </Pressable>
-          <Text>Explorar</Text>
-        </View>
-        <View className="flex-1 items-center gap-4">
-          <Pressable onPress={() => router.push("/exams")}>
-            <View className="rounded-lg p-6 bg-bgThird">
-              <FileText size={20} color="#008493" />
-            </View>
-          </Pressable>
-          <Text>Meus Exames</Text>
-        </View>
-      </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 16, paddingRight: 8 }}
+      >
+        {QUICK_SERVICES.map(({ key, label, icon: Icon, onPress }) => (
+          <View key={key} className="w-20 items-center gap-2">
+            <Pressable onPress={onPress}>
+              <View className="rounded-lg p-6 bg-bgThird">
+                <Icon size={20} color="#008493" />
+              </View>
+            </Pressable>
+            <Text className="text-center text-xs" numberOfLines={2}>
+              {label}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
