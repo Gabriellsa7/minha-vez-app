@@ -1,14 +1,20 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
+import { useGetExamBookingsByPatientId } from "@/src/api/get-exam-bookings-by-patient-id";
 import { useGetHealthProfessionalByAppointmentId } from "@/src/api/get-health-professional-by-appointment-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import SearchInput from "@/src/components/search-input/search-input";
+import {
+  EExamBookingStatus,
+  IExamBooking,
+} from "@/src/config/entities/exam-bookings/exam-bookings.type";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
+import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Bell, Clock, ListChecks } from "lucide-react-native";
+import { Bell, Clock, ListChecks, TestTube } from "lucide-react-native";
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import HomeHeader from "./componentes/header/header";
@@ -62,6 +68,65 @@ export default function MainContent({ user, patient }: MainContentProps) {
       enabled: !!appointment?._id,
     },
   );
+
+  const { data: examBookings } = useGetExamBookingsByPatientId(
+    { patientId: patientId || "" },
+    { enabled: !!patientId },
+  );
+
+  const nextExamBooking = useMemo(() => {
+    const now = new Date();
+
+    return examBookings
+      ?.filter(
+        (booking) =>
+          (booking.status === EExamBookingStatus.SCHEDULED ||
+            booking.status === EExamBookingStatus.CONFIRMED) &&
+          new Date(booking.scheduledAt) > now,
+      )
+      .sort(
+        (first, second) =>
+          new Date(first.scheduledAt).getTime() -
+          new Date(second.scheduledAt).getTime(),
+      )[0];
+  }, [examBookings]);
+
+  // The home screen surfaces whichever is soonest — a consulta or an exame
+  // agendado — since a patient can have either (or both) coming up, and the
+  // banner must say which one it is instead of always calling it a "exame".
+  const nextUpcomingVisit = useMemo(() => {
+    const appointmentDate =
+      appointment && !appointment.finishedAt
+        ? new Date(appointment.dateTime)
+        : null;
+    const examDate = nextExamBooking
+      ? new Date(nextExamBooking.scheduledAt)
+      : null;
+
+    if (appointmentDate && examDate) {
+      return appointmentDate <= examDate
+        ? { type: "appointment" as const, date: appointmentDate }
+        : {
+            type: "exam" as const,
+            date: examDate,
+            examBooking: nextExamBooking as IExamBooking,
+          };
+    }
+
+    if (appointmentDate) {
+      return { type: "appointment" as const, date: appointmentDate };
+    }
+
+    if (examDate) {
+      return {
+        type: "exam" as const,
+        date: examDate,
+        examBooking: nextExamBooking as IExamBooking,
+      };
+    }
+
+    return null;
+  }, [appointment, nextExamBooking]);
 
   return (
     <ScrollView
@@ -130,17 +195,25 @@ export default function MainContent({ user, patient }: MainContentProps) {
               </Text>
             </View>
           )}
-          {appointment && !appointment.finishedAt && (
+          {nextUpcomingVisit && (
             <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
               <View className="flex-row gap-2 items-center">
-                <Bell size={20} color="#FFFFFF" />
+                {nextUpcomingVisit.type === "exam" ? (
+                  <TestTube size={20} color="#FFFFFF" />
+                ) : (
+                  <Bell size={20} color="#FFFFFF" />
+                )}
                 <Text className=" text-textPrimary">
-                  Seu proximo exame medico
+                  {nextUpcomingVisit.type === "exam"
+                    ? `Próximo exame: ${nextUpcomingVisit.examBooking.examOfferingName}`
+                    : "Sua próxima consulta"}
                 </Text>
               </View>
               <View className="flex-row gap-2 items-center">
                 <Text className="text-textPrimary">
-                  {formatDateTime(appointment?.dateTime)}
+                  {nextUpcomingVisit.type === "exam"
+                    ? formatExamDateTime(nextUpcomingVisit.examBooking.scheduledAt)
+                    : formatDateTime(appointment?.dateTime)}
                 </Text>
                 <Clock size={20} color="#FFFFFF" />
               </View>

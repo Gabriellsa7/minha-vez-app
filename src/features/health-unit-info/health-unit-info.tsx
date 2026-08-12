@@ -10,6 +10,7 @@ import {
   MapPin,
   Star,
   Stethoscope,
+  TestTube,
 } from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
@@ -203,6 +204,19 @@ export default function HealthUnitInfo() {
               <Stethoscope size={18} color="#008096" />
               <Text className="text-base font-semibold text-[#008096]">
                 Agendar por Especialidade
+              </Text>
+            </View>
+          </Pressable>
+          <Pressable
+            onPress={() =>
+              router.push(`/exam-scheduling/${healthUnit?._id ?? ""}`)
+            }
+            className="rounded-[20px] border border-[#008096] bg-white p-4"
+          >
+            <View className="flex-row items-center justify-center gap-2">
+              <TestTube size={18} color="#008096" />
+              <Text className="text-base font-semibold text-[#008096]">
+                Agendar Exame
               </Text>
             </View>
           </Pressable>

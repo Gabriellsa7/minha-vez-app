@@ -13,6 +13,7 @@ export interface IExam {
   patientName: string;
   patientCpf: string;
   healthUnitName: string;
+  examBookingId?: string | null;
   createdAt: string;
   updatedAt: string;
 }

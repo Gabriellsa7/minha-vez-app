@@ -18,6 +18,8 @@ import { GET_QUEUE_ITEMS_KEY } from "../api/get-queue-item-by-patient-id";
 import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "../api/get-queue-item-by-queue-id";
 import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "../api/get-appointment-by-patient-id";
+import { GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY } from "../api/get-exam-bookings-by-patient-id";
+import { GET_EXAMS_BY_PATIENT_ID_KEY } from "../api/get-exams-by-patient-id";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -117,6 +119,15 @@ export default function RootLayout() {
       // that appointment, not just the queue/queue-item data.
       void queryClient.invalidateQueries({
         queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
+      });
+      // Exam-booking status changes (staff marking in-progress/completed,
+      // linking a result) and new result uploads both need to refresh the
+      // "Meus Exames" screen, whichever tab the patient is on.
+      void queryClient.invalidateQueries({
+        queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [GET_EXAMS_BY_PATIENT_ID_KEY],
       });
     });
     const stopSocket = NotificationService.startNotificationsSocket();
