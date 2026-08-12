@@ -2,13 +2,17 @@ import {
   GET_APPOINTMENTS_BY_PATIENT_ID_KEY,
   useGetAppointmentsByPatientId,
 } from "@/src/api/get-appointment-by-patient-id";
+import { useGetAppointmentRatingEligibility } from "@/src/api/get-appointment-rating-eligibility";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import { useClearAppointmentHistory } from "@/src/api/clear-appointment-history";
+import { RatingModal } from "@/src/components/rating/rating-modal";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
-import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
+import { IAppointment, EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
+import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
+import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -17,9 +21,10 @@ import {
   CalendarClock,
   History as HistoryIcon,
   MapPin,
+  Star,
   Trash2,
 } from "lucide-react-native";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Alert,
   Pressable,
@@ -46,6 +51,7 @@ const STATUS_TEXT: Record<string, string> = {
 
 export default function HistoryScreen() {
   const queryClient = useQueryClient();
+  const [ratingAppointmentId, setRatingAppointmentId] = useState<string | null>(null);
 
   const { data: user } = useGetUser();
   const { data: patient } = useGetPatientById(
@@ -168,52 +174,13 @@ export default function HistoryScreen() {
               );
 
               return (
-                <View
+                <HistoryAppointmentCard
                   key={appointment._id}
-                  className="mb-3 rounded-2xl border border-borderPrimary bg-bgThird p-4"
-                >
-                  <View className="flex-row items-start justify-between gap-3">
-                    <View className="flex-1">
-                      <Text className="text-base font-semibold text-textBlack">
-                        {professional?.specialty || "Consulta"}
-                      </Text>
-                      {professional?.name && (
-                        <Text className="text-sm text-textFifth">
-                          {professional.name}
-                        </Text>
-                      )}
-                    </View>
-                    <View
-                      className={`rounded-full px-3 py-1 ${
-                        STATUS_BG[appointment.status] ?? "bg-bgPrimary"
-                      }`}
-                    >
-                      <Text
-                        className={`text-xs font-semibold ${
-                          STATUS_TEXT[appointment.status] ?? "text-textFifth"
-                        }`}
-                      >
-                        {STATUS_LABEL[appointment.status] ?? appointment.status}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View className="mt-3 flex-row items-center gap-2">
-                    <CalendarClock size={14} color="#A8A8A8" />
-                    <Text className="text-xs text-textFourth">
-                      {formatDateTime(appointment.dateTime)}
-                    </Text>
-                  </View>
-
-                  {unit?.name && (
-                    <View className="mt-1 flex-row items-center gap-2">
-                      <MapPin size={14} color="#A8A8A8" />
-                      <Text className="text-xs text-textFourth" numberOfLines={1}>
-                        {unit.name}
-                      </Text>
-                    </View>
-                  )}
-                </View>
+                  appointment={appointment}
+                  professional={professional}
+                  unit={unit}
+                  onRate={() => setRatingAppointmentId(appointment._id)}
+                />
               );
             })
           )}
@@ -234,6 +201,90 @@ export default function HistoryScreen() {
           </Text>
         </Pressable>
       )}
+
+      <RatingModal
+        appointmentId={ratingAppointmentId}
+        visible={Boolean(ratingAppointmentId)}
+        onClose={() => setRatingAppointmentId(null)}
+      />
     </SafeAreaView>
+  );
+}
+
+interface HistoryAppointmentCardProps {
+  appointment: IAppointment;
+  professional?: IHealthProfessional;
+  unit?: IHealthUnit;
+  onRate: () => void;
+}
+
+function HistoryAppointmentCard({
+  appointment,
+  professional,
+  unit,
+  onRate,
+}: HistoryAppointmentCardProps) {
+  const { data: eligibility } = useGetAppointmentRatingEligibility(
+    { appointmentId: appointment._id },
+    { enabled: appointment.status === EAppointmentStatus.COMPLETED },
+  );
+
+  const canRate = Boolean(eligibility?.canRateProfessional || eligibility?.canRateClinic);
+
+  return (
+    <View className="mb-3 rounded-2xl border border-borderPrimary bg-bgThird p-4">
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="flex-1">
+          <Text className="text-base font-semibold text-textBlack">
+            {professional?.specialty || "Consulta"}
+          </Text>
+          {professional?.name && (
+            <Text className="text-sm text-textFifth">{professional.name}</Text>
+          )}
+        </View>
+        <View
+          className={`rounded-full px-3 py-1 ${
+            STATUS_BG[appointment.status] ?? "bg-bgPrimary"
+          }`}
+        >
+          <Text
+            className={`text-xs font-semibold ${
+              STATUS_TEXT[appointment.status] ?? "text-textFifth"
+            }`}
+          >
+            {STATUS_LABEL[appointment.status] ?? appointment.status}
+          </Text>
+        </View>
+      </View>
+
+      <View className="mt-3 flex-row items-center gap-2">
+        <CalendarClock size={14} color="#A8A8A8" />
+        <Text className="text-xs text-textFourth">
+          {formatDateTime(appointment.dateTime)}
+        </Text>
+      </View>
+
+      {unit?.name && (
+        <View className="mt-1 flex-row items-center gap-2">
+          <MapPin size={14} color="#A8A8A8" />
+          <Text className="text-xs text-textFourth" numberOfLines={1}>
+            {unit.name}
+          </Text>
+        </View>
+      )}
+
+      {canRate && (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onRate}
+          className="mt-3 flex-row items-center justify-center gap-2 self-start rounded-full bg-bgSecondary px-4 py-2"
+        >
+          <Star size={14} color="#FFFFFF" fill="#FFFFFF" />
+          <Text className="text-xs font-semibold text-textPrimary">
+            Avaliar atendimento
+          </Text>
+        </Pressable>
+      )}
+    </View>
   );
 }

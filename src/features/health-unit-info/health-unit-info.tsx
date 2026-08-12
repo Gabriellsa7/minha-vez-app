@@ -1,15 +1,26 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
+import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import { getServiceIcon } from "@/src/utils/service-icon.util";
 import { isToday, weekDayLabel } from "@/src/utils/util";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { CalendarDays, Clock, MapPin, Stethoscope } from "lucide-react-native";
+import {
+  CalendarDays,
+  Clock,
+  MapPin,
+  Star,
+  Stethoscope,
+} from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 export default function HealthUnitInfo() {
   const { id } = useLocalSearchParams();
 
   const { data: healthUnit } = useGetHealthUnitById({
+    healthUnitId: id as string,
+  });
+
+  const { data: rating } = useGetHealthUnitRatingSummary({
     healthUnitId: id as string,
   });
   return (
@@ -37,6 +48,17 @@ export default function HealthUnitInfo() {
             <Text className="text-3xl font-bold text-textBlack">
               {healthUnit?.name}
             </Text>
+            {rating && rating.count > 0 && (
+              <View className="flex-row items-center gap-1">
+                <Star size={16} color="#F5B301" fill="#F5B301" />
+                <Text className="text-sm font-semibold text-textBlack">
+                  {rating.average?.toFixed(1)}
+                </Text>
+                <Text className="text-sm text-textFifth">
+                  ({rating.count} avaliaç{rating.count > 1 ? "ões" : "ão"})
+                </Text>
+              </View>
+            )}
             <Text className="leading-6 text-textFifth">
               {healthUnit?.description}
             </Text>

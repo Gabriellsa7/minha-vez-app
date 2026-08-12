@@ -1,3 +1,4 @@
+import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
 import { useGetHealthProfessionalById } from "@/src/api/get-health-professional-by-id";
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
@@ -6,6 +7,8 @@ import { useGetQueueItemByQueueId } from "@/src/api/get-queue-item-by-queue-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import { QueueInfoSkeleton } from "@/src/components/skeletons/queue-info-skeleton";
+import { RatingModal } from "@/src/components/rating/rating-modal";
+import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { EQueueShift, EQueueStatus } from "@/src/config/entities/queue/queue.type";
 import { EQueueItemStatus } from "@/src/config/entities/queue-items/queue-items.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
@@ -22,6 +25,7 @@ import {
   Stethoscope,
   Users,
 } from "lucide-react-native";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -64,6 +68,11 @@ export default function QueueInfoScreen() {
   );
 
   const { data: patientQueueItems } = useGetQueueItemByPatientId(
+    { patientId: patientId ?? "" },
+    { enabled: Boolean(patientId), refetchInterval: 5000 },
+  );
+
+  const { data: patientAppointments } = useGetAppointmentsByPatientId(
     { patientId: patientId ?? "" },
     { enabled: Boolean(patientId) },
   );
@@ -116,6 +125,32 @@ export default function QueueInfoScreen() {
 
   const isMyTurn = patientQueueItem?.status === EQueueItemStatus.IN_SERVICE;
   const estimatedWaitMinutes = queue?.estimatedWaitMinutes ?? null;
+
+  const [ratingAppointmentId, setRatingAppointmentId] = useState<string | null>(null);
+  const previousQueueItemStatusRef = useRef<EQueueItemStatus | undefined>(undefined);
+
+  useEffect(() => {
+    const currentStatus = patientQueueItem?.status;
+    const previousStatus = previousQueueItemStatusRef.current;
+
+    if (
+      currentStatus === EQueueItemStatus.FINISHED &&
+      previousStatus !== undefined &&
+      previousStatus !== EQueueItemStatus.FINISHED
+    ) {
+      const completedAppointment = patientAppointments?.find(
+        (appointment) =>
+          appointment.queueItemId === patientQueueItem?._id &&
+          appointment.status === EAppointmentStatus.COMPLETED,
+      );
+
+      if (completedAppointment) {
+        setRatingAppointmentId(completedAppointment._id);
+      }
+    }
+
+    previousQueueItemStatusRef.current = currentStatus;
+  }, [patientQueueItem?.status, patientQueueItem?._id, patientAppointments]);
 
   return (
     <SafeAreaView className="flex-1 bg-bgPrimary" edges={["top"]}>
@@ -358,6 +393,12 @@ export default function QueueInfoScreen() {
           </View>
         </ScrollView>
       )}
+
+      <RatingModal
+        appointmentId={ratingAppointmentId}
+        visible={Boolean(ratingAppointmentId)}
+        onClose={() => setRatingAppointmentId(null)}
+      />
     </SafeAreaView>
   );
 }

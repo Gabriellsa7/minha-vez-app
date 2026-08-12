@@ -1,9 +1,11 @@
 import { useGetHealthUnits } from "@/src/api/get-health-units";
+import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import SearchInput from "@/src/components/search-input/search-input";
+import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { getMockClinicStats } from "@/src/features/explore/utils/mock-clinic-stats";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { MapPin, Timer, Users } from "lucide-react-native";
+import { MapPin, Star, Timer, Users } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
@@ -49,69 +51,89 @@ export function HealthUnitsList() {
           </View>
         ) : (
           <View className="gap-4">
-            {filteredHealthUnits.map((unit) => {
-              const stats = getMockClinicStats(unit._id);
-
-              return (
-                <Pressable
-                  key={unit._id}
-                  onPress={() => router.push(`/health-unit-info/${unit._id}`)}
-                  className="flex-row gap-3 rounded-2xl border border-[#E7ECEF] bg-bgThird p-3"
-                >
-                  <View className="h-20 w-20 overflow-hidden rounded-xl bg-[#E2E8F0]">
-                    {unit.img ? (
-                      <Image
-                        source={{ uri: unit.img }}
-                        style={{ width: "100%", height: "100%" }}
-                        contentFit="cover"
-                      />
-                    ) : (
-                      <Image
-                        source={require("../../../assets/images/Hospital.png")}
-                        style={{ width: "100%", height: "100%" }}
-                        contentFit="cover"
-                      />
-                    )}
-                  </View>
-
-                  <View className="flex-1 gap-1">
-                    <Text
-                      className="text-base font-bold text-textBlack"
-                      numberOfLines={1}
-                    >
-                      {unit.name}
-                    </Text>
-                    <View className="flex-row items-center gap-1">
-                      <MapPin size={12} color="#A8A8A8" />
-                      <Text
-                        className="flex-1 text-xs text-textFourth"
-                        numberOfLines={1}
-                      >
-                        {unit.address.street}, {unit.address.number} -{" "}
-                        {unit.address.neighborhood}
-                      </Text>
-                    </View>
-                    <View className="flex-row items-center gap-3 mt-1">
-                      <View className="flex-row items-center gap-1">
-                        <Timer size={13} color="#006673" />
-                        <Text className="text-xs text-textSecondary">
-                          {stats.waitMinutes} min
-                        </Text>
-                      </View>
-                      <View className="flex-row items-center gap-1">
-                        <Users size={13} color="#006673" />
-                        <Text className="text-xs text-textSecondary">
-                          {stats.activeQueueSize} na fila
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </Pressable>
-              );
-            })}
+            {filteredHealthUnits.map((unit) => (
+              <HealthUnitListItem key={unit._id} unit={unit} />
+            ))}
           </View>
         )}
       </View>
     </ScrollView>
+  );
+}
+
+interface HealthUnitListItemProps {
+  unit: IHealthUnit;
+}
+
+function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
+  const stats = getMockClinicStats(unit._id);
+  const { data: rating } = useGetHealthUnitRatingSummary({
+    healthUnitId: unit._id,
+  });
+
+  return (
+    <Pressable
+      onPress={() => router.push(`/health-unit-info/${unit._id}`)}
+      className="flex-row gap-3 rounded-2xl border border-[#E7ECEF] bg-bgThird p-3"
+    >
+      <View className="h-20 w-20 overflow-hidden rounded-xl bg-[#E2E8F0]">
+        {unit.img ? (
+          <Image
+            source={{ uri: unit.img }}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+          />
+        ) : (
+          <Image
+            source={require("../../../assets/images/Hospital.png")}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+          />
+        )}
+      </View>
+
+      <View className="flex-1 gap-1">
+        <View className="flex-row items-start justify-between gap-2">
+          <Text
+            className="flex-1 text-base font-bold text-textBlack"
+            numberOfLines={1}
+          >
+            {unit.name}
+          </Text>
+          {rating && rating.count > 0 && (
+            <View className="flex-row items-center gap-1">
+              <Star size={12} color="#F5B301" fill="#F5B301" />
+              <Text className="text-xs font-semibold text-textFifth">
+                {rating.average?.toFixed(1)}
+              </Text>
+            </View>
+          )}
+        </View>
+        <View className="flex-row items-center gap-1">
+          <MapPin size={12} color="#A8A8A8" />
+          <Text
+            className="flex-1 text-xs text-textFourth"
+            numberOfLines={1}
+          >
+            {unit.address.street}, {unit.address.number} -{" "}
+            {unit.address.neighborhood}
+          </Text>
+        </View>
+        <View className="flex-row items-center gap-3 mt-1">
+          <View className="flex-row items-center gap-1">
+            <Timer size={13} color="#006673" />
+            <Text className="text-xs text-textSecondary">
+              {stats.waitMinutes} min
+            </Text>
+          </View>
+          <View className="flex-row items-center gap-1">
+            <Users size={13} color="#006673" />
+            <Text className="text-xs text-textSecondary">
+              {stats.activeQueueSize} na fila
+            </Text>
+          </View>
+        </View>
+      </View>
+    </Pressable>
   );
 }

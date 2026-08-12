@@ -1,7 +1,8 @@
+import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { MapPin } from "lucide-react-native/icons";
+import { MapPin, Star } from "lucide-react-native/icons";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 interface HealthUnitsProps {
@@ -24,43 +25,62 @@ export default function HealthUnits({ healthUnits }: HealthUnitsProps) {
           contentContainerStyle={{ gap: 42 }}
         >
           {healthUnits?.slice(0, 4).map((unit) => (
-            <Pressable
-              key={unit._id}
-              onPress={() => router.push(`/health-unit-info/${unit._id}`)}
-              className="w-56 h-auto bg-bgThird rounded-xl"
-            >
-              <View
-                key={unit._id}
-                className="w-64 h-56 bg-bgThird rounded-xl p-4"
-              >
-                {/* add a default image, this image is on figma */}
-                <View className="mb-3 h-32 w-full overflow-hidden rounded-xl bg-[#E2E8F0]">
-                  {unit.img ? (
-                    <Image
-                      source={{ uri: unit.img }}
-                      style={{ width: "100%", height: "100%" }}
-                      contentFit="cover"
-                    />
-                  ) : (
-                    <Image
-                      source={require("../../../../../assets/images/Hospital.png")}
-                      style={{ width: "100%", height: "100%" }}
-                      contentFit="cover"
-                    />
-                  )}
-                </View>
-                <Text className="font-bold text-lg">{unit.name}</Text>
-                <View className="flex-row items-center gap-2">
-                  <MapPin size={12} color="#A8A8A8" />
-                  <Text className="text-sm text-textFourth">
-                    {unit.address.street}, {unit.address.number}
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
+            <HealthUnitHomeCard key={unit._id} unit={unit} />
           ))}
         </ScrollView>
       </View>
     </View>
+  );
+}
+
+interface HealthUnitHomeCardProps {
+  unit: IHealthUnit;
+}
+
+function HealthUnitHomeCard({ unit }: HealthUnitHomeCardProps) {
+  const { data: rating } = useGetHealthUnitRatingSummary({
+    healthUnitId: unit._id,
+  });
+
+  return (
+    <Pressable
+      onPress={() => router.push(`/health-unit-info/${unit._id}`)}
+      className="w-56 h-auto bg-bgThird rounded-xl"
+    >
+      <View className="w-64 h-56 bg-bgThird rounded-xl p-4">
+        {/* add a default image, this image is on figma */}
+        <View className="mb-3 h-32 w-full overflow-hidden rounded-xl bg-[#E2E8F0]">
+          {unit.img ? (
+            <Image
+              source={{ uri: unit.img }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+            />
+          ) : (
+            <Image
+              source={require("../../../../../assets/images/Hospital.png")}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+            />
+          )}
+
+          {rating && rating.count > 0 && (
+            <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-white px-2 py-1">
+              <Star size={12} color="#F5B301" fill="#F5B301" />
+              <Text className="text-xs font-semibold text-textBlack">
+                {rating.average?.toFixed(1)}
+              </Text>
+            </View>
+          )}
+        </View>
+        <Text className="font-bold text-lg">{unit.name}</Text>
+        <View className="flex-row items-center gap-2">
+          <MapPin size={12} color="#A8A8A8" />
+          <Text className="text-sm text-textFourth">
+            {unit.address.street}, {unit.address.number}
+          </Text>
+        </View>
+      </View>
+    </Pressable>
   );
 }
