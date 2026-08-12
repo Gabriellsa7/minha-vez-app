@@ -10,12 +10,12 @@ Relatório gerado em 2026-08-12 com base no estado atual dos 3 projetos:
 
 ## 1. Resumo executivo
 
-| Pergunta | Resposta curta |
-|---|---|
-| Dá pra publicar o app de graça numa loja? | **Não 100% grátis.** Google Play cobra **US$25 uma única vez**. Apple cobra **US$99/ano**. |
-| Então só dá pra testar via build do Expo? | Sim, e essa é **a melhor opção pra testes agora**: gerar um `.apk` com EAS Build e instalar direto no Android, sem loja, sem custo. |
-| Os usuários instalam e usam normal? | Sim — não é o app "Expo Go", é um instalável de verdade (standalone). Instala, abre e funciona como qualquer app do Android. |
-| E o backend/painel web? | Precisam de hospedagem separada (Render/Railway/Fly.io para a API, Vercel/Netlify para o painel), porque não existe "loja" para eles. |
+| Pergunta                                  | Resposta curta                                                                                                                        |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Dá pra publicar o app de graça numa loja? | **Não 100% grátis.** Google Play cobra **US$25 uma única vez**. Apple cobra **US$99/ano**.                                            |
+| Então só dá pra testar via build do Expo? | Sim, e essa é**a melhor opção pra testes agora**: gerar um `.apk` com EAS Build e instalar direto no Android, sem loja, sem custo.    |
+| Os usuários instalam e usam normal?       | Sim — não é o app "Expo Go", é um instalável de verdade (standalone). Instala, abre e funciona como qualquer app do Android.          |
+| E o backend/painel web?                   | Precisam de hospedagem separada (Render/Railway/Fly.io para a API, Vercel/Netlify para o painel), porque não existe "loja" para eles. |
 
 ---
 
@@ -30,11 +30,11 @@ O backend já tem `Dockerfile` e `docker-compose.yml` prontos, usando:
 
 ### 2.1 Onde hospedar (grátis ou quase grátis)
 
-| Serviço | Por quê | Free tier |
-|---|---|---|
-| **Render** | Sobe direto do seu `Dockerfile`, deploy automático via GitHub | Free web service (dorme após inatividade) |
-| **Railway** | Também builda o `Dockerfile`, plano hobby barato ($5 crédito/mês) | Trial/hobby limitado |
-| **Fly.io** | Suporta múltiplas portas/serviços no mesmo app (importante pelo WS, ver abaixo) | Free allowance pequeno |
+| Serviço     | Por quê                                                                         | Free tier                                 |
+| ----------- | ------------------------------------------------------------------------------- | ----------------------------------------- |
+| **Render**  | Sobe direto do seu`Dockerfile`, deploy automático via GitHub                    | Free web service (dorme após inatividade) |
+| **Railway** | Também builda o`Dockerfile`, plano hobby barato ($5 crédito/mês)                | Trial/hobby limitado                      |
+| **Fly.io**  | Suporta múltiplas portas/serviços no mesmo app (importante pelo WS, ver abaixo) | Free allowance pequeno                    |
 
 Recomendo **Render** para começar (mais simples de configurar com Docker) ou **Fly.io** se o WebSocket em porta separada der problema (ver 2.3).
 
@@ -92,10 +92,10 @@ Sem custo nenhum nesse passo.
 
 **Não.**
 
-| Loja | Custo | Observação |
-|---|---|---|
-| Google Play | **US$25, pagamento único** (não recorrente) | Depois de pago, você pode publicar quantos apps quiser, inclusive em faixas de teste interno/fechado gratuitas |
-| Apple App Store | **US$99/ano** | Recorrente, e exige Mac para builds iOS nativos (o EAS Build resolve isso na nuvem, mas a taxa da Apple continua) |
+| Loja            | Custo                                       | Observação                                                                                                        |
+| --------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Google Play     | **US$25, pagamento único** (não recorrente) | Depois de pago, você pode publicar quantos apps quiser, inclusive em faixas de teste interno/fechado gratuitas    |
+| Apple App Store | **US$99/ano**                               | Recorrente, e exige Mac para builds iOS nativos (o EAS Build resolve isso na nuvem, mas a taxa da Apple continua) |
 
 Como seu público inicial parece ser Android (`android()`, `10.0.1.56` no `api.ts` sugerem testes locais em Android), faz sentido focar em Android primeiro.
 
@@ -153,6 +153,7 @@ EXPO_PUBLIC_WS_URL=wss://sua-api.onrender.com   # ajustar conforme solução do 
 Hoje o `httpClient` em `src/services/api.ts` cai para um IP local (`10.0.1.56` / `192.168.0.19`) se essa env não estiver setada — isso é ótimo pra dev, mas **não funciona para testers fora da sua rede**. Sem configurar essa env antes do build, o app buildado vai tentar falar com seu IP local e falhar para qualquer pessoa fora da sua rede.
 
 Para o EAS Build pegar essa env, ou:
+
 - Deixar no `.env` versionado só para dev, e configurar via `eas.json` → `env` por perfil (`preview`/`production`), ou
 - Configurar como **EAS secret**: `npx eas env:create --environment preview --name EXPO_PUBLIC_API_URL --value https://sua-api.onrender.com`
 
@@ -174,15 +175,15 @@ Para o EAS Build pegar essa env, ou:
 
 ## 6. Custos totais estimados
 
-| Item | Custo |
-|---|---|
-| MongoDB Atlas M0 | Grátis |
-| Upstash Redis | Grátis (free tier) |
-| Render (backend) | Grátis (com sleep) ou ~US$7/mês (sempre ativo) |
-| Vercel (painel) | Grátis |
-| EAS Build (Android) | Grátis até um limite mensal de builds no plano free do Expo |
-| Distribuição via APK direto | Grátis |
-| Google Play (opcional) | US$25 único |
-| Apple App Store (opcional) | US$99/ano |
+| Item                        | Custo                                                       |
+| --------------------------- | ----------------------------------------------------------- |
+| MongoDB Atlas M0            | Grátis                                                      |
+| Upstash Redis               | Grátis (free tier)                                          |
+| Render (backend)            | Grátis (com sleep) ou ~US$7/mês (sempre ativo)              |
+| Vercel (painel)             | Grátis                                                      |
+| EAS Build (Android)         | Grátis até um limite mensal de builds no plano free do Expo |
+| Distribuição via APK direto | Grátis                                                      |
+| Google Play (opcional)      | US$25 único                                                 |
+| Apple App Store (opcional)  | US$99/ano                                                   |
 
 **Para validar o produto com testers reais, o caminho 100% gratuito é: Atlas + Upstash + Render (free) + EAS Build (preview/apk).**

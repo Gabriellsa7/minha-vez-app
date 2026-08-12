@@ -12,10 +12,18 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://minhavez-backend.onrender.com",
+        "EXPO_PUBLIC_WS_URL": "wss://minhavez-backend.onrender.com"
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://minhavez-backend.onrender.com",
+        "EXPO_PUBLIC_WS_URL": "wss://minhavez-backend.onrender.com"
+      }
     }
   },
   "submit": {
