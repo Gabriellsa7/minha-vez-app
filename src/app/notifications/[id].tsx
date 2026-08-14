@@ -4,7 +4,13 @@ import {
 } from "@/src/hooks/use-notifications";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { router, useLocalSearchParams } from "expo-router";
-import { ArrowLeft, BellRing, CheckCircle2, Circle } from "lucide-react-native";
+import {
+  ArrowLeft,
+  BellRing,
+  CheckCircle2,
+  Circle,
+  FileText,
+} from "lucide-react-native";
 import { useEffect } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -70,6 +76,10 @@ export default function NotificationDetailsScreen() {
   }
 
   const details = relatedInformation(notification.data);
+  const examId =
+    notification.type === "EXAM_READY" && notification.data?.examId
+      ? String(notification.data.examId)
+      : null;
 
   return (
     <SafeAreaView className="flex-1 bg-bgPrimary">
@@ -123,6 +133,17 @@ export default function NotificationDetailsScreen() {
             </View>
           ))}
         </View>
+
+        {examId && (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push(`/exams/${examId}`)}
+            className="flex-row items-center justify-center gap-2 rounded-2xl bg-bgSecondary p-4"
+          >
+            <FileText size={20} color="#FFFFFF" />
+            <Text className="font-bold text-textPrimary">Visualizar exame</Text>
+          </Pressable>
+        )}
       </View>
     </SafeAreaView>
   );
