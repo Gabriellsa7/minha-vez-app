@@ -1,3 +1,4 @@
+import { useDownloadExam } from "@/src/api/download-exam";
 import { useGetExamById } from "@/src/api/get-exam-by-id";
 import Header from "@/src/components/header/header";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
@@ -12,14 +13,12 @@ import {
   MapPin,
   Stethoscope,
 } from "lucide-react-native";
-import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 export default function ExamDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [isDownloading, setIsDownloading] = useState(false);
 
   const {
     data: exam,
@@ -28,32 +27,44 @@ export default function ExamDetailScreen() {
     refetch,
   } = useGetExamById({ id: id ?? "" }, { enabled: Boolean(id) });
 
+  const { mutateAsync: downloadExam, isPending: isDownloading } =
+    useDownloadExam();
+
   const handleViewPdf = async () => {
     if (!exam?.fileUrl) return;
     await WebBrowser.openBrowserAsync(exam.fileUrl);
   };
 
   const handleDownloadPdf = async () => {
-    if (!exam?.fileUrl) return;
+    if (!exam) return;
 
     try {
-      setIsDownloading(true);
-      const destination = new File(Paths.cache, exam.fileName);
+      const downloadedExam = await downloadExam({ id: exam._id });
+      const destination = new File(Paths.cache, downloadedExam.fileName);
+
+      if (destination.exists) {
+        destination.delete();
+      }
+
       const downloaded = await File.downloadFileAsync(
-        exam.fileUrl,
+        downloadedExam.fileUrl,
         destination,
+        { idempotent: true },
       );
 
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(downloaded.uri);
       }
-    } catch {
+
+      refetch();
+    } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Não foi possível baixar o exame",
+        text1:
+          error instanceof Error
+            ? error.message
+            : "Não foi possível baixar o exame",
       });
-    } finally {
-      setIsDownloading(false);
     }
   };
 

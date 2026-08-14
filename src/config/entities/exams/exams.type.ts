@@ -14,6 +14,7 @@ export interface IExam {
   patientCpf: string;
   healthUnitName: string;
   examBookingId?: string | null;
+  downloadCount: number;
   createdAt: string;
   updatedAt: string;
 }
