@@ -1,5 +1,6 @@
 import {
   useClearNotifications,
+  useMarkAllNotificationsAsRead,
   useMarkNotificationAsRead,
   useNotifications,
   useUnreadNotifications,
@@ -23,8 +24,13 @@ export default function NotificationsScreen() {
     useNotifications();
   const { data: unreadNotifications } = useUnreadNotifications();
   const markAsRead = useMarkNotificationAsRead();
+  const markAllAsRead = useMarkAllNotificationsAsRead();
   const clearNotifications = useClearNotifications();
   const unreadCount = unreadNotifications?.length ?? 0;
+
+  const handleMarkAllAsRead = () => {
+    markAllAsRead.mutate();
+  };
 
   const handleClearNotifications = () => {
     Alert.alert(
@@ -132,18 +138,32 @@ export default function NotificationsScreen() {
       )}
 
       {!!notifications?.length && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Limpar todas as notificações"
-          disabled={clearNotifications.isPending}
-          onPress={handleClearNotifications}
-          className="mb-4 mt-3 flex-row items-center justify-center gap-2 rounded-xl border border-borderPrimary py-3"
-        >
-          <Trash2 size={16} color="#B91C1C" />
-          <Text className="font-semibold text-textDanger">
-            {clearNotifications.isPending ? "Limpando..." : "Limpar notificações"}
-          </Text>
-        </Pressable>
+        <View className="mb-4 mt-3 flex-row gap-3">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Marcar todas as notificações como lidas"
+            disabled={markAllAsRead.isPending || unreadCount === 0}
+            onPress={handleMarkAllAsRead}
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-borderPrimary py-3 disabled:opacity-50"
+          >
+            <CheckCheck size={16} color="#006673" />
+            <Text className="font-semibold text-textBlack">
+              {markAllAsRead.isPending ? "Marcando..." : "Marcar como lidas"}
+            </Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Limpar todas as notificações"
+            disabled={clearNotifications.isPending}
+            onPress={handleClearNotifications}
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-borderPrimary py-3"
+          >
+            <Trash2 size={16} color="#B91C1C" />
+            <Text className="font-semibold text-textDanger">
+              {clearNotifications.isPending ? "Limpando..." : "Limpar notificações"}
+            </Text>
+          </Pressable>
+        </View>
       )}
     </SafeAreaView>
   );
