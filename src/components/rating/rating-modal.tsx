@@ -1,3 +1,14 @@
+import { useCreateAppointmentRating } from "@/src/api/create-appointment-rating";
+import {
+  GET_APPOINTMENT_RATING_ELIGIBILITY_KEY,
+  useGetAppointmentRatingEligibility,
+} from "@/src/api/get-appointment-rating-eligibility";
+import { useGetHealthProfessionalById } from "@/src/api/get-health-professional-by-id";
+import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
+import { GET_HEALTH_UNIT_RATING_SUMMARY_KEY } from "@/src/api/get-health-unit-rating-summary";
+import { GET_PROFESSIONAL_RATING_SUMMARY_KEY } from "@/src/api/get-professional-rating-summary";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,17 +20,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft } from "lucide-react-native";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  GET_APPOINTMENT_RATING_ELIGIBILITY_KEY,
-  useGetAppointmentRatingEligibility,
-} from "@/src/api/get-appointment-rating-eligibility";
-import { useCreateAppointmentRating } from "@/src/api/create-appointment-rating";
-import { GET_PROFESSIONAL_RATING_SUMMARY_KEY } from "@/src/api/get-professional-rating-summary";
-import { GET_HEALTH_UNIT_RATING_SUMMARY_KEY } from "@/src/api/get-health-unit-rating-summary";
-import { useGetHealthProfessionalById } from "@/src/api/get-health-professional-by-id";
-import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { StarRatingInput } from "./star-rating-input";
 
 interface RatingModalProps {
@@ -28,7 +28,11 @@ interface RatingModalProps {
   onClose: () => void;
 }
 
-export function RatingModal({ appointmentId, visible, onClose }: RatingModalProps) {
+export function RatingModal({
+  appointmentId,
+  visible,
+  onClose,
+}: RatingModalProps) {
   const queryClient = useQueryClient();
 
   const [professionalStars, setProfessionalStars] = useState(0);
@@ -45,22 +49,26 @@ export function RatingModal({ appointmentId, visible, onClose }: RatingModalProp
     }
   }, [visible, appointmentId]);
 
-  const {
-    data: eligibility,
-    isLoading: isEligibilityLoading,
-  } = useGetAppointmentRatingEligibility(
-    { appointmentId: appointmentId ?? "" },
-    { enabled: visible && Boolean(appointmentId) },
-  );
+  const { data: eligibility, isLoading: isEligibilityLoading } =
+    useGetAppointmentRatingEligibility(
+      { appointmentId: appointmentId ?? "" },
+      { enabled: visible && Boolean(appointmentId) },
+    );
 
   const { data: professional } = useGetHealthProfessionalById(
     { professionalId: eligibility?.professionalId ?? "" },
-    { enabled: Boolean(eligibility?.canRateProfessional && eligibility.professionalId) },
+    {
+      enabled: Boolean(
+        eligibility?.canRateProfessional && eligibility.professionalId,
+      ),
+    },
   );
 
   const { data: healthUnit } = useGetHealthUnitById(
     { healthUnitId: eligibility?.healthUnitId ?? "" },
-    { enabled: Boolean(eligibility?.canRateClinic && eligibility.healthUnitId) },
+    {
+      enabled: Boolean(eligibility?.canRateClinic && eligibility.healthUnitId),
+    },
   );
 
   const createRating = useCreateAppointmentRating();
@@ -86,13 +94,21 @@ export function RatingModal({ appointmentId, visible, onClose }: RatingModalProp
           ? professionalComment.trim() || undefined
           : undefined,
         clinicStars: canRateClinic ? clinicStars : undefined,
-        clinicComment: canRateClinic ? clinicComment.trim() || undefined : undefined,
+        clinicComment: canRateClinic
+          ? clinicComment.trim() || undefined
+          : undefined,
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: [GET_PROFESSIONAL_RATING_SUMMARY_KEY] });
-          queryClient.invalidateQueries({ queryKey: [GET_HEALTH_UNIT_RATING_SUMMARY_KEY] });
-          queryClient.invalidateQueries({ queryKey: [GET_APPOINTMENT_RATING_ELIGIBILITY_KEY] });
+          queryClient.invalidateQueries({
+            queryKey: [GET_PROFESSIONAL_RATING_SUMMARY_KEY],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [GET_HEALTH_UNIT_RATING_SUMMARY_KEY],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [GET_APPOINTMENT_RATING_ELIGIBILITY_KEY],
+          });
           onClose();
         },
       },
@@ -110,7 +126,9 @@ export function RatingModal({ appointmentId, visible, onClose }: RatingModalProp
       <SafeAreaView className="flex-1 justify-center bg-black/50 px-4">
         <View className="max-h-[85%] rounded-2xl bg-bgThird">
           <View className="flex-row items-center justify-between border-b border-borderPrimary px-5 py-4">
-            <Text className="text-lg font-bold text-textBlack">Avalie seu atendimento</Text>
+            <Text className="text-lg font-bold text-textBlack">
+              Avalie seu atendimento
+            </Text>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Fechar avaliação"
@@ -133,20 +151,28 @@ export function RatingModal({ appointmentId, visible, onClose }: RatingModalProp
               </Text>
             </View>
           ) : (
-            <ScrollView showsVerticalScrollIndicator={false} className="px-5 py-4">
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              className="px-5 py-4"
+            >
               {canRateProfessional && (
                 <View className="mb-5 gap-2">
                   <Text className="text-base font-semibold text-textBlack">
-                    {professional?.name ? `Dr(a). ${professional.name}` : "Profissional"}
+                    {professional?.name
+                      ? `Dr(a). ${professional.name}`
+                      : "Profissional"}
                   </Text>
-                  <StarRatingInput value={professionalStars} onChange={setProfessionalStars} />
+                  <StarRatingInput
+                    value={professionalStars}
+                    onChange={setProfessionalStars}
+                  />
                   <TextInput
                     value={professionalComment}
                     onChangeText={setProfessionalComment}
                     placeholder="Deixe um comentário (opcional)"
-                    placeholderTextColor="#A8A8A8"
+                    placeholderTextColor="#888"
                     multiline
-                    className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textBlack"
+                    className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
                   />
                 </View>
               )}
@@ -156,14 +182,17 @@ export function RatingModal({ appointmentId, visible, onClose }: RatingModalProp
                   <Text className="text-base font-semibold text-textBlack">
                     {healthUnit?.name ?? "Clínica"}
                   </Text>
-                  <StarRatingInput value={clinicStars} onChange={setClinicStars} />
+                  <StarRatingInput
+                    value={clinicStars}
+                    onChange={setClinicStars}
+                  />
                   <TextInput
                     value={clinicComment}
                     onChangeText={setClinicComment}
                     placeholder="Deixe um comentário (opcional)"
-                    placeholderTextColor="#A8A8A8"
+                    placeholderTextColor="#888"
                     multiline
-                    className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textBlack"
+                    className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
                   />
                 </View>
               )}
@@ -177,7 +206,9 @@ export function RatingModal({ appointmentId, visible, onClose }: RatingModalProp
                 disabled={!canSubmit || createRating.isPending}
                 onPress={handleSubmit}
                 className={`items-center rounded-xl py-3 ${
-                  canSubmit && !createRating.isPending ? "bg-bgSecondary" : "bg-[#B9DEE3]"
+                  canSubmit && !createRating.isPending
+                    ? "bg-bgSecondary"
+                    : "bg-[#B9DEE3]"
                 }`}
               >
                 <Text className="font-bold text-textPrimary">

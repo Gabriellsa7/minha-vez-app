@@ -50,8 +50,9 @@ export function LoginForm() {
               placeholder="Digite seu email"
               value={value}
               inputMode="email"
+              placeholderTextColor="#888"
               onChangeText={onChange}
-              className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
+              className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-black"
             />
           )}
         />

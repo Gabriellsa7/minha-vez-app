@@ -26,7 +26,7 @@ export default function SearchInput({
         pointerEvents={onPress ? "none" : "auto"}
         textAlignVertical="center"
         style={{ includeFontPadding: false, paddingVertical: 0 }}
-        className="flex-1 text-black"
+        className="flex-1 text-textFourth"
       />
     </View>
   );

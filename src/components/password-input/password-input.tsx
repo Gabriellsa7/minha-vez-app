@@ -15,7 +15,8 @@ export function PasswordInput({
       <TextInput
         placeholder={placeholder}
         secureTextEntry={!isVisible}
-        className="flex-1 p-3 focus:outline-none focus:ring-0"
+        placeholderTextColor="#888"
+        className="flex-1 p-3 focus:outline-none focus:ring-0 text-black"
         {...props}
       />
       <Pressable

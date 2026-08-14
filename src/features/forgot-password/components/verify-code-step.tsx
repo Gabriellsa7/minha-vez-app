@@ -56,6 +56,7 @@ export function VerifyCodeStep({ email, onSuccess }: VerifyCodeStepProps) {
               keyboardType="number-pad"
               maxLength={6}
               onChangeText={onChange}
+              placeholderTextColor="#888"
               className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
             />
           )}

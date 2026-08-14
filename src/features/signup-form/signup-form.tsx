@@ -64,7 +64,8 @@ export function SignupForm() {
                 placeholder="Digite seu email..."
                 onChangeText={onChange}
                 value={value}
-                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
+                placeholderTextColor="#888"
+                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-black"
               />
             )}
           />

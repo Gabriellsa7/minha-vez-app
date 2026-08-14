@@ -159,6 +159,7 @@ export function EditProfile() {
               value={name}
               onChangeText={setName}
               placeholder="Seu nome completo"
+              placeholderTextColor="#888"
               className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3 text-textBlack"
             />
           </View>
@@ -173,6 +174,7 @@ export function EditProfile() {
               placeholder="seu@email.com"
               keyboardType="email-address"
               autoCapitalize="none"
+              placeholderTextColor="#888"
               className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3 text-textBlack"
             />
           </View>
@@ -187,6 +189,7 @@ export function EditProfile() {
                 onChangeText={(value) => setPhone(formatPhone(value))}
                 placeholder="(11) 99999-9999"
                 keyboardType="numeric"
+                placeholderTextColor="#888"
                 className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3 text-textBlack"
               />
             </View>
@@ -209,6 +212,7 @@ export function EditProfile() {
               <TextInput
                 value={patient.cpf}
                 editable={false}
+                placeholderTextColor="#888"
                 className="rounded-[16px] border border-[#E6E6E6] bg-[#F1F5F9] px-3 py-3 text-textFourth"
               />
             </View>
@@ -220,6 +224,7 @@ export function EditProfile() {
               <TextInput
                 value={patient.birthDate}
                 editable={false}
+                placeholderTextColor="#888"
                 className="rounded-[16px] border border-[#E6E6E6] bg-[#F1F5F9] px-3 py-3 text-textFourth"
               />
             </View>

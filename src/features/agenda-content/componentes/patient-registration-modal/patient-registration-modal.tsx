@@ -64,6 +64,7 @@ export default function PatientRegistrationModal({
                   onChangeText={setCpf}
                   placeholder="000.000.000-00"
                   keyboardType="numeric"
+                  placeholderTextColor="#888"
                   className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
                 />
               </View>
@@ -77,6 +78,7 @@ export default function PatientRegistrationModal({
                   onChangeText={setBirthDate}
                   placeholder="DD/MM/YYYY"
                   keyboardType="numeric"
+                  placeholderTextColor="#888"
                   className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
                 />
               </View>
@@ -90,6 +92,7 @@ export default function PatientRegistrationModal({
                   onChangeText={setPhone}
                   placeholder="(11) 99999-9999"
                   keyboardType="numeric"
+                  placeholderTextColor="#888"
                   className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
                 />
               </View>
