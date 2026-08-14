@@ -1,6 +1,7 @@
 import { useCreateExamBooking } from "@/src/api/create-exam-booking";
 import { useCreatePatient } from "@/src/api/create-patient";
 import { GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY } from "@/src/api/get-exam-bookings-by-patient-id";
+import { GET_EXAM_SLOTS_KEY } from "@/src/api/get-exam-slots";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { IExamOffering } from "@/src/config/entities/exam-offerings/exam-offerings.type";
 import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
@@ -151,6 +152,9 @@ export function useExamBooking({
           });
           queryClient.invalidateQueries({
             queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [GET_EXAM_SLOTS_KEY],
           });
           setShowConfirmModal(false);
         },
