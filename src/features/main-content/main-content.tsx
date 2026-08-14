@@ -7,6 +7,7 @@ import {
   EExamBookingStatus,
   IExamBooking,
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
+import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
@@ -48,7 +49,11 @@ export default function MainContent({ user, patient }: MainContentProps) {
     const now = new Date();
 
     return userAppointments
-      ?.filter((item) => new Date(item.dateTime) > now)
+      ?.filter(
+        (item) =>
+          item.status === EAppointmentStatus.SCHEDULED &&
+          new Date(item.dateTime) > now,
+      )
       .sort(
         (first, second) =>
           new Date(first.dateTime).getTime() -

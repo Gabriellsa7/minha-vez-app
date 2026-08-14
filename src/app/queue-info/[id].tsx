@@ -8,6 +8,7 @@ import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-de
 import { useGetUser } from "@/src/api/get-user-me";
 import { QueueInfoSkeleton } from "@/src/components/skeletons/queue-info-skeleton";
 import { RatingModal } from "@/src/components/rating/rating-modal";
+import { CancelAppointmentModal } from "@/src/components/cancel-appointment/cancel-appointment-modal";
 import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { EQueueShift, EQueueStatus } from "@/src/config/entities/queue/queue.type";
 import { EQueueItemStatus } from "@/src/config/entities/queue-items/queue-items.types";
@@ -127,7 +128,24 @@ export default function QueueInfoScreen() {
   const estimatedWaitMinutes = queue?.estimatedWaitMinutes ?? null;
 
   const [ratingAppointmentId, setRatingAppointmentId] = useState<string | null>(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const previousQueueItemStatusRef = useRef<EQueueItemStatus | undefined>(undefined);
+
+  const currentAppointment = patientAppointments?.find(
+    (appointment) =>
+      appointment.queueItemId === patientQueueItem?._id &&
+      appointment.status === EAppointmentStatus.SCHEDULED,
+  );
+
+  const canCancelAppointment = (() => {
+    if (!currentAppointment) return false;
+
+    const cutoff = new Date(currentAppointment.dateTime);
+    cutoff.setDate(cutoff.getDate() - 1);
+    cutoff.setHours(12, 0, 0, 0);
+
+    return new Date() < cutoff;
+  })();
 
   useEffect(() => {
     const currentStatus = patientQueueItem?.status;
@@ -394,10 +412,29 @@ export default function QueueInfoScreen() {
         </ScrollView>
       )}
 
+      {!isLoading && !isError && queue && canCancelAppointment && (
+        <View className="border-t border-borderPrimary bg-bgPrimary px-5 py-4">
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setIsCancelModalOpen(true)}
+            className="items-center rounded-xl bg-[#BA1A1A] py-3"
+          >
+            <Text className="font-bold text-white">Cancelar consulta</Text>
+          </Pressable>
+        </View>
+      )}
+
       <RatingModal
         appointmentId={ratingAppointmentId}
         visible={Boolean(ratingAppointmentId)}
         onClose={() => setRatingAppointmentId(null)}
+      />
+
+      <CancelAppointmentModal
+        appointmentId={currentAppointment?._id ?? null}
+        visible={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onCanceled={() => router.replace("/home")}
       />
     </SafeAreaView>
   );
