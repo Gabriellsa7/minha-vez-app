@@ -8,6 +8,14 @@ interface HomeHeaderProps {
   user: IUser;
 }
 
+function getGreeting() {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return "Bom dia";
+  if (hour < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
 export default function HomeHeader({ user }: HomeHeaderProps) {
   return (
     <View className="flex-row items-center justify-between pb-2">
@@ -15,7 +23,7 @@ export default function HomeHeader({ user }: HomeHeaderProps) {
         <Avatar uri={user?.avatar} name={user?.name} variant="sm" />
         <View>
           <Text className="text-textPrimary font-bold text-lg">
-            Bom dia, {user?.name || "User"}
+            {getGreeting()}, {user?.name || "User"}
           </Text>
           <Text className="text-textThird">Permita-nós ajuda-lo</Text>
         </View>
