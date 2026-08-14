@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -8,6 +9,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+
+import {
+  isValidBirthDate,
+  isValidCpf,
+  isValidPhone,
+} from "@/src/utils/validation.util";
 
 interface PatientRegistrationModalProps {
   visible: boolean;
@@ -22,6 +29,8 @@ interface PatientRegistrationModalProps {
   isSubmitting: boolean;
 }
 
+type FieldName = "cpf" | "birthDate" | "phone";
+
 export default function PatientRegistrationModal({
   visible,
   onClose,
@@ -34,6 +43,55 @@ export default function PatientRegistrationModal({
   onSubmit,
   isSubmitting,
 }: PatientRegistrationModalProps) {
+  const [touched, setTouched] = useState<Record<FieldName, boolean>>({
+    cpf: false,
+    birthDate: false,
+    phone: false,
+  });
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      setTouched({ cpf: false, birthDate: false, phone: false });
+      setSubmitAttempted(false);
+    }
+  }, [visible]);
+
+  const cpfError = !cpf.trim()
+    ? "Informe o CPF"
+    : !isValidCpf(cpf)
+      ? "CPF inválido"
+      : undefined;
+
+  const birthDateError = !birthDate.trim()
+    ? "Informe a data de nascimento"
+    : !isValidBirthDate(birthDate)
+      ? "Data de nascimento inválida"
+      : undefined;
+
+  const phoneError = !phone.trim()
+    ? "Informe o telefone"
+    : !isValidPhone(phone)
+      ? "Telefone inválido"
+      : undefined;
+
+  const showCpfError = (touched.cpf || submitAttempted) && cpfError;
+  const showBirthDateError =
+    (touched.birthDate || submitAttempted) && birthDateError;
+  const showPhoneError = (touched.phone || submitAttempted) && phoneError;
+
+  const handleBlur = (field: FieldName) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const handleSubmit = () => {
+    setSubmitAttempted(true);
+
+    if (cpfError || birthDateError || phoneError) return;
+
+    onSubmit();
+  };
+
   return (
     <Modal
       transparent
@@ -62,11 +120,19 @@ export default function PatientRegistrationModal({
                 <TextInput
                   value={cpf}
                   onChangeText={setCpf}
+                  onBlur={() => handleBlur("cpf")}
                   placeholder="000.000.000-00"
                   keyboardType="numeric"
                   placeholderTextColor="#888"
-                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                  className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 ${
+                    showCpfError ? "border-red-500" : "border-[#D7EEF2]"
+                  }`}
                 />
+                {showCpfError && (
+                  <Text className="mt-1 text-xs text-red-500">
+                    {cpfError}
+                  </Text>
+                )}
               </View>
 
               <View>
@@ -76,11 +142,19 @@ export default function PatientRegistrationModal({
                 <TextInput
                   value={birthDate}
                   onChangeText={setBirthDate}
+                  onBlur={() => handleBlur("birthDate")}
                   placeholder="DD/MM/YYYY"
                   keyboardType="numeric"
                   placeholderTextColor="#888"
-                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                  className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 ${
+                    showBirthDateError ? "border-red-500" : "border-[#D7EEF2]"
+                  }`}
                 />
+                {showBirthDateError && (
+                  <Text className="mt-1 text-xs text-red-500">
+                    {birthDateError}
+                  </Text>
+                )}
               </View>
 
               <View>
@@ -90,11 +164,19 @@ export default function PatientRegistrationModal({
                 <TextInput
                   value={phone}
                   onChangeText={setPhone}
+                  onBlur={() => handleBlur("phone")}
                   placeholder="(11) 99999-9999"
                   keyboardType="numeric"
                   placeholderTextColor="#888"
-                  className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3"
+                  className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 ${
+                    showPhoneError ? "border-red-500" : "border-[#D7EEF2]"
+                  }`}
                 />
+                {showPhoneError && (
+                  <Text className="mt-1 text-xs text-red-500">
+                    {phoneError}
+                  </Text>
+                )}
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -109,7 +191,7 @@ export default function PatientRegistrationModal({
               </Text>
             </Pressable>
             <Pressable
-              onPress={onSubmit}
+              onPress={handleSubmit}
               disabled={isSubmitting}
               className={`flex-1 rounded-[16px] px-4 py-3 ${
                 isSubmitting ? "bg-[#67B5C0]" : "bg-[#008096]"

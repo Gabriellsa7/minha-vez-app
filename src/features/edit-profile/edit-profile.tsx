@@ -6,6 +6,7 @@ import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUpdatePatient } from "@/src/api/update-patient";
 import { useUpdateUser } from "@/src/api/update-user";
 import { formatPhone } from "@/src/utils/util";
+import { isValidEmail, isValidPhone } from "@/src/utils/validation.util";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Lock } from "lucide-react-native";
@@ -22,7 +23,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+type FieldName = "name" | "email" | "phone";
 
 export function EditProfile() {
   const queryClient = useQueryClient();
@@ -36,6 +37,17 @@ export function EditProfile() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+
+  const [touched, setTouched] = useState<Record<FieldName, boolean>>({
+    name: false,
+    email: false,
+    phone: false,
+  });
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const handleBlur = (field: FieldName) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
 
   useEffect(() => {
     if (user) {
@@ -62,25 +74,32 @@ export function EditProfile() {
 
   const hasChanges = nameChanged || emailChanged || phoneChanged;
 
+  const nameError = !name.trim() ? "Informe seu nome" : undefined;
+
+  const emailError = !email.trim()
+    ? "Informe seu email"
+    : !isValidEmail(email)
+      ? "Email inválido"
+      : undefined;
+
+  const phoneError = patient
+    ? !phone.trim()
+      ? "Informe seu telefone"
+      : !isValidPhone(phone)
+        ? "Telefone inválido"
+        : undefined
+    : undefined;
+
+  const showNameError = (touched.name || submitAttempted) && nameError;
+  const showEmailError = (touched.email || submitAttempted) && emailError;
+  const showPhoneError = (touched.phone || submitAttempted) && phoneError;
+
   const handleSave = () => {
     if (!user) return;
 
-    if (!name.trim() || !email.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Preencha nome e email",
-      });
-      return;
-    }
+    setSubmitAttempted(true);
 
-    if (!EMAIL_REGEX.test(email.trim())) {
-      Toast.show({
-        type: "error",
-        text1: "Email inválido",
-        text2: "Verifique o endereço de email informado.",
-      });
-      return;
-    }
+    if (nameError || emailError || phoneError) return;
 
     if (!hasChanges) {
       router.back();
@@ -158,10 +177,16 @@ export function EditProfile() {
             <TextInput
               value={name}
               onChangeText={setName}
+              onBlur={() => handleBlur("name")}
               placeholder="Seu nome completo"
               placeholderTextColor="#888"
-              className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3 text-textBlack"
+              className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 text-textBlack ${
+                showNameError ? "border-red-500" : "border-[#D7EEF2]"
+              }`}
             />
+            {showNameError && (
+              <Text className="mt-1 text-xs text-red-500">{nameError}</Text>
+            )}
           </View>
 
           <View>
@@ -171,12 +196,18 @@ export function EditProfile() {
             <TextInput
               value={email}
               onChangeText={setEmail}
+              onBlur={() => handleBlur("email")}
               placeholder="seu@email.com"
               keyboardType="email-address"
               autoCapitalize="none"
               placeholderTextColor="#888"
-              className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3 text-textBlack"
+              className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 text-textBlack ${
+                showEmailError ? "border-red-500" : "border-[#D7EEF2]"
+              }`}
             />
+            {showEmailError && (
+              <Text className="mt-1 text-xs text-red-500">{emailError}</Text>
+            )}
           </View>
 
           {patient && (
@@ -187,11 +218,19 @@ export function EditProfile() {
               <TextInput
                 value={phone}
                 onChangeText={(value) => setPhone(formatPhone(value))}
+                onBlur={() => handleBlur("phone")}
                 placeholder="(11) 99999-9999"
                 keyboardType="numeric"
                 placeholderTextColor="#888"
-                className="rounded-[16px] border border-[#D7EEF2] bg-[#F4FBFC] px-3 py-3 text-textBlack"
+                className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 text-textBlack ${
+                  showPhoneError ? "border-red-500" : "border-[#D7EEF2]"
+                }`}
               />
+              {showPhoneError && (
+                <Text className="mt-1 text-xs text-red-500">
+                  {phoneError}
+                </Text>
+              )}
             </View>
           )}
         </View>
