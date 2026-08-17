@@ -1,4 +1,5 @@
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { generateTimes, getDateTimeFromDateAndTime } from "@/src/utils/util";
 import { Clock3 } from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -22,6 +23,7 @@ export default function AvaliableTimes({
   professional,
   isProfessionalAppointmentsLoading,
 }: AvaliableTimesProps) {
+  const colors = useThemeColors();
   const AVAILABLE_TIMES = [
     ...generateTimes(
       professional.schedule.morning?.start || "",
@@ -37,7 +39,7 @@ export default function AvaliableTimes({
   ];
   return (
     <View className="mb-5">
-      <Text className="mb-3 text-base font-semibold text-[#0F172A]">
+      <Text className="mb-3 text-base font-semibold text-textBlack">
         Horários disponíveis
       </Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -61,35 +63,35 @@ export default function AvaliableTimes({
                 disabled={isUnavailable}
                 className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
                   isUnavailable
-                    ? "border-[#E2E8F0] bg-[#F1F5F9] opacity-60"
+                    ? "border-borderPrimary bg-bgPrimary opacity-60"
                     : isSelected
-                      ? "border-[#008096] bg-[#008096]"
-                      : "border-[#D7EEF2] bg-white"
+                      ? "border-bgSecondary bg-bgSecondary"
+                      : "border-infoBorder bg-bgThird"
                 }`}
               >
                 <Clock3
                   size={16}
                   color={
                     isUnavailable
-                      ? "#94A3B8"
+                      ? colors.textFourth
                       : isSelected
-                        ? "#FFFFFF"
-                        : "#008096"
+                        ? colors.textPrimary
+                        : colors.textSecondary
                   }
                 />
                 <Text
                   className={`text-sm ${
                     isUnavailable
-                      ? "text-[#94A3B8]"
+                      ? "text-textFourth"
                       : isSelected
-                        ? "text-white"
-                        : "text-[#0F172A]"
+                        ? "text-textPrimary"
+                        : "text-textBlack"
                   }`}
                 >
                   {time}
                 </Text>
                 {(isBooked || isPast) && (
-                  <Text className="text-xs font-medium text-[#94A3B8]">
+                  <Text className="text-xs font-medium text-textFourth">
                     {isBooked ? "Ocupado" : "Indisponível"}
                   </Text>
                 )}

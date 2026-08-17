@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import {
   Baby,
   Bone,
@@ -30,6 +31,7 @@ export function CategoriesSection({
   selected,
   onSelect,
 }: CategoriesSectionProps) {
+  const colors = useThemeColors();
   const options = [ALL_SPECIALTIES_OPTION, ...specialties];
 
   return (
@@ -53,14 +55,14 @@ export function CategoriesSection({
               onPress={() => onSelect(specialty)}
               className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
                 isActive
-                  ? "border-[#008096] bg-[#008096]"
-                  : "border-[#D7EEF2] bg-white"
+                  ? "border-bgSecondary bg-bgSecondary"
+                  : "border-infoBorder bg-bgThird"
               }`}
             >
-              <Icon size={16} color={isActive ? "#FFFFFF" : "#008096"} />
+              <Icon size={16} color={isActive ? colors.textPrimary : colors.textSecondary} />
               <Text
                 className={`text-sm font-medium ${
-                  isActive ? "text-white" : "text-textBlack"
+                  isActive ? "text-textPrimary" : "text-textBlack"
                 }`}
               >
                 {specialty}

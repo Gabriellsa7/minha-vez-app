@@ -8,11 +8,13 @@ import { LoginFormSchema } from "./entities/login-form.types";
 
 import { PasswordInput } from "@/src/components/password-input/password-input";
 import { ForgotPasswordModal } from "@/src/features/forgot-password/forgot-password-modal";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useLogin } from "@/src/hooks/useLogin";
 import { NotificationService } from "@/src/services/notifications/notification.service";
 
 export function LoginForm() {
   const [isForgotPasswordVisible, setIsForgotPasswordVisible] = useState(false);
+  const colors = useThemeColors();
 
   const {
     control,
@@ -39,7 +41,7 @@ export function LoginForm() {
   return (
     <View className="gap-6 items-center w-full">
       <View className="w-[80%] gap-3">
-        <Text>
+        <Text className="text-textBlack">
           Email <Text className="text-textDanger">*</Text>
         </Text>
         <Controller
@@ -50,19 +52,19 @@ export function LoginForm() {
               placeholder="Digite seu email"
               value={value}
               inputMode="email"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textFourth}
               onChangeText={onChange}
-              className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-black"
+              className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-textBlack"
             />
           )}
         />
         {errors.email && (
-          <Text className="text-red-500">{errors.email.message}</Text>
+          <Text className="text-textDanger">{errors.email.message}</Text>
         )}
       </View>
       <View className="w-[80%] gap-3">
         <View className="flex-row justify-between">
-          <Text>
+          <Text className="text-textBlack">
             Senha <Text className="text-textDanger">*</Text>
           </Text>
           <Text
@@ -81,11 +83,11 @@ export function LoginForm() {
             )}
           />
           {errors.password && (
-            <Text className="text-red-500">{errors.password.message}</Text>
+            <Text className="text-textDanger">{errors.password.message}</Text>
           )}
         </View>
       </View>
-      <View className="w-[80%] gap-2">
+      <View className="w-[80%] gap-5">
         <TouchableOpacity
           className="bg-button-primary py-3 px-2 rounded-xl items-center"
           onPress={handleSubmit(onSubmit)}
@@ -93,7 +95,10 @@ export function LoginForm() {
           <Text className="text-textPrimary">Entrar</Text>
         </TouchableOpacity>
         <View className="items-center">
-          <Text onPress={() => router.push("/signup")}>
+          <Text
+            className="text-textBlack"
+            onPress={() => router.push("/signup")}
+          >
             Ainda não tem uma conta?{" "}
             <Text className="text-textSecondary underline">Crie Agora</Text>
           </Text>

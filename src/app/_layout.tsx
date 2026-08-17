@@ -6,11 +6,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { AppState, Linking } from "react-native";
 import Toast from "react-native-toast-message";
 import "../config/axios";
 import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
+import { useThemeColors } from "../hooks/use-theme-colors";
 import { queryClient } from "../lib/react-query";
 import { NotificationService } from "../services/notifications/notification.service";
 import { notificationQueryKeys } from "../hooks/use-notifications";
@@ -39,6 +41,7 @@ function navigateToNotification(data?: Record<string, unknown> | null) {
 }
 
 export default function RootLayout() {
+  const colors = useThemeColors();
   const [permissionModal, setPermissionModal] = useState({
     visible: false,
     canAskAgain: true,
@@ -169,7 +172,12 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.bgPrimary },
+          }}
+        >
           <Stack.Screen name="login" />
           <Stack.Screen name="notifications" />
           <Stack.Screen name="notifications/[id]" />
@@ -177,6 +185,7 @@ export default function RootLayout() {
           <Stack.Screen name="search" options={{ presentation: "modal" }} />
           <Stack.Screen name="(tabs)" />
         </Stack>
+        <StatusBar style="auto" />
         <NotificationPermissionModal
           visible={permissionModal.visible}
           canAskAgain={permissionModal.canAskAgain}

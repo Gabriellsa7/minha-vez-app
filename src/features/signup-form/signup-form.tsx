@@ -1,4 +1,5 @@
 import { PasswordInput } from "@/src/components/password-input/password-input";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useSignup } from "@/src/hooks/useSignup";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
@@ -15,6 +16,7 @@ export function SignupForm() {
   } = useForm<SignupFormSchema>({ resolver: zodResolver(SIGNUP_FORM_SCHEMA) });
 
   const { mutate: createUser } = useSignup();
+  const colors = useThemeColors();
 
   const onSubmit = (data: SignupFormSchema) => {
     createUser(
@@ -30,7 +32,7 @@ export function SignupForm() {
   return (
     <View className="gap-6 w-full items-center">
       <View className="w-[80%] gap-3">
-        <Text>
+        <Text className="text-textBlack">
           Nome <Text className="text-textDanger">*</Text>
         </Text>
         <View>
@@ -42,17 +44,18 @@ export function SignupForm() {
                 placeholder="Digite seu nome..."
                 onChangeText={onChange}
                 value={value}
-                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
+                placeholderTextColor={colors.textFourth}
+                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-textBlack"
               />
             )}
           />
           {errors.name && (
-            <Text className="text-red-500">{errors.name.message}</Text>
+            <Text className="text-textDanger">{errors.name.message}</Text>
           )}
         </View>
       </View>
       <View className="w-[80%] gap-3">
-        <Text>
+        <Text className="text-textBlack">
           Email <Text className="text-textDanger">*</Text>
         </Text>
         <View>
@@ -64,18 +67,18 @@ export function SignupForm() {
                 placeholder="Digite seu email..."
                 onChangeText={onChange}
                 value={value}
-                placeholderTextColor="#888"
-                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-black"
+                placeholderTextColor={colors.textFourth}
+                className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-textBlack"
               />
             )}
           />
           {errors.email && (
-            <Text className="text-red-500">{errors.email.message}</Text>
+            <Text className="text-textDanger">{errors.email.message}</Text>
           )}
         </View>
       </View>
       <View className="w-[80%] gap-3">
-        <Text>
+        <Text className="text-textBlack">
           Senha <Text className="text-textDanger">*</Text>
         </Text>
         <View>
@@ -87,7 +90,7 @@ export function SignupForm() {
             )}
           />
           {errors.password && (
-            <Text className="text-red-500">{errors.password.message}</Text>
+            <Text className="text-textDanger">{errors.password.message}</Text>
           )}
         </View>
       </View>
@@ -99,7 +102,7 @@ export function SignupForm() {
           <Text className="text-textPrimary">Entrar</Text>
         </TouchableOpacity>
         <View className="items-center">
-          <Text onPress={() => router.push("/login")}>
+          <Text className="text-textBlack" onPress={() => router.push("/login")}>
             Já tem uma conta?{" "}
             <Text className="text-textSecondary underline">Entrar</Text>
           </Text>

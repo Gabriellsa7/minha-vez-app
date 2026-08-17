@@ -1,5 +1,6 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getServiceIcon } from "@/src/utils/service-icon.util";
 import { isToday, weekDayLabel } from "@/src/utils/util";
 import { Image } from "expo-image";
@@ -16,6 +17,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 
 export default function HealthUnitInfo() {
   const { id } = useLocalSearchParams();
+  const colors = useThemeColors();
 
   const { data: healthUnit } = useGetHealthUnitById({
     healthUnitId: id as string,
@@ -28,7 +30,7 @@ export default function HealthUnitInfo() {
     <ScrollView showsVerticalScrollIndicator={false}>
       <View className="p-4 gap-6">
         <View>
-          <View className=" h-64 w-full overflow-hidden rounded-xl bg-bgThird border-solid border-[6px] border-[#006673]">
+          <View className=" h-64 w-full overflow-hidden rounded-xl bg-bgThird border-solid border-[6px] border-bgFourth">
             {healthUnit?.img ? (
               <Image
                 source={{ uri: healthUnit.img }}
@@ -51,7 +53,7 @@ export default function HealthUnitInfo() {
             </Text>
             {rating && rating.count > 0 && (
               <View className="flex-row items-center gap-1">
-                <Star size={16} color="#F5B301" fill="#F5B301" />
+                <Star size={16} color={colors.accentStar} fill={colors.accentStar} />
                 <Text className="text-sm font-semibold text-textBlack">
                   {rating.average?.toFixed(1)}
                 </Text>
@@ -65,12 +67,12 @@ export default function HealthUnitInfo() {
             </Text>
           </View>
           <View className="flex-row items-center gap-3">
-            <View className="bg-[#DDF4F7] p-2 rounded-xl">
-              <MapPin size={20} color="#006673" />
+            <View className="bg-infoBg p-2 rounded-xl">
+              <MapPin size={20} color={colors.textSecondary} />
             </View>
 
             <View className="flex-1">
-              <Text className="text-text-textBlack text-xl font-medium">
+              <Text className="text-textBlack text-xl font-medium">
                 Endereço
               </Text>
 
@@ -83,10 +85,10 @@ export default function HealthUnitInfo() {
           </View>
           <View className="flex gap-2">
             <View className="flex-row items-center gap-2">
-              <View className="bg-[#DDF4F7] p-2 rounded-xl">
-                <Clock size={22} color="#006673" />
+              <View className="bg-infoBg p-2 rounded-xl">
+                <Clock size={22} color={colors.textSecondary} />
               </View>
-              <Text className="text-text-textBlack text-xl font-medium">
+              <Text className="text-textBlack text-xl font-medium">
                 Horários de funcionamento
               </Text>
             </View>
@@ -96,8 +98,8 @@ export default function HealthUnitInfo() {
                   key={openingHour.day}
                   className={`flex-row items-center justify-between rounded-2xl px-4 py-4 border ${
                     isToday(openingHour.day)
-                      ? "bg-[#EAF9FB] border-[#0B7A87]"
-                      : "bg-bgPrimary border-[#E6ECEE]"
+                      ? "bg-highlightBg border-highlightBorder"
+                      : "bg-bgPrimary border-borderPrimary"
                   }`}
                 >
                   <View>
@@ -106,20 +108,20 @@ export default function HealthUnitInfo() {
                     </Text>
 
                     {isToday(openingHour.day) && (
-                      <Text className="text-xs text-[#0B7A87] font-medium">
+                      <Text className="text-xs text-highlightText font-medium">
                         Hoje
                       </Text>
                     )}
                   </View>
                   {openingHour.isClosed ? (
-                    <View className="bg-red-100 px-3 py-1 rounded-full">
-                      <Text className="text-red-600 font-semibold text-xs">
+                    <View className="bg-statusDangerBg px-3 py-1 rounded-full">
+                      <Text className="text-statusDangerText font-semibold text-xs">
                         Fechado
                       </Text>
                     </View>
                   ) : (
-                    <View className="bg-[#DDF4F7] px-3 py-2 rounded-full">
-                      <Text className="font-bold text-[#0B7A87]">
+                    <View className="bg-infoBg px-3 py-2 rounded-full">
+                      <Text className="font-bold text-highlightText">
                         {openingHour.open} - {openingHour.close}
                       </Text>
                     </View>
@@ -129,21 +131,21 @@ export default function HealthUnitInfo() {
             </View>
           </View>
         </View>
-        <View className="bg-[#EEF9FB] border border-[#D2E8EC] rounded-2xl p-5 gap-3">
+        <View className="bg-infoBg border border-infoBorder rounded-2xl p-5 gap-3">
           <View className="flex-row items-center gap-2">
-            <View className="w-3 h-3 rounded-3xl bg-[#0B7A87]" />
-            <Text className="text-[#0B7A87] font-bold tracking-widest uppercase text-sm">
+            <View className="w-3 h-3 rounded-3xl bg-highlightBorder" />
+            <Text className="text-highlightText font-bold tracking-widest uppercase text-sm">
               Status da Fila
             </Text>
           </View>
 
           <Text className="text-base text-textBlack">
             Tempo médio de espera:{" "}
-            <Text className="font-bold text-[#0B7A87]">15 min</Text>
+            <Text className="font-bold text-highlightText">15 min</Text>
           </Text>
         </View>
         <View className="flex-row items-center justify-between">
-          <Text className="text-lg font-bold">Serviços Oferecidos</Text>
+          <Text className="text-lg font-bold text-textBlack">Serviços Oferecidos</Text>
           <Pressable
             onPress={() =>
               router.push({
@@ -161,12 +163,12 @@ export default function HealthUnitInfo() {
 
             return (
               <View
-                className="bg-bgThird rounded-2xl p-5 gap-4 border border-[#E7ECEF]"
+                className="bg-bgThird rounded-2xl p-5 gap-4 border border-borderPrimary"
                 key={health._id}
               >
                 <View className="flex-row gap-4 items-start">
-                  <View className="bg-[#DDF4F7] p-3 rounded-xl">
-                    <ServiceIcon size={24} color="#0B7A87" />
+                  <View className="bg-infoBg p-3 rounded-xl">
+                    <ServiceIcon size={24} color={colors.highlightText} />
                   </View>
 
                   <View className="flex-1 gap-1">
@@ -191,11 +193,11 @@ export default function HealthUnitInfo() {
                 params: { unitId: healthUnit?._id },
               })
             }
-            className="rounded-[20px] bg-[#008096] p-4"
+            className="rounded-[20px] bg-bgSecondary p-4"
           >
             <View className="flex-row items-center justify-center gap-2">
-              <CalendarDays size={18} color="#FFFFFF" />
-              <Text className="text-base font-semibold text-white">
+              <CalendarDays size={18} color={colors.textPrimary} />
+              <Text className="text-base font-semibold text-textPrimary">
                 Marcar Consulta
               </Text>
             </View>
@@ -207,11 +209,11 @@ export default function HealthUnitInfo() {
                 params: { id: healthUnit?._id ?? "" },
               })
             }
-            className="rounded-[20px] border border-[#008096] bg-white p-4"
+            className="rounded-[20px] border border-bgSecondary bg-bgThird p-4"
           >
             <View className="flex-row items-center justify-center gap-2">
-              <Stethoscope size={18} color="#008096" />
-              <Text className="text-base font-semibold text-[#008096]">
+              <Stethoscope size={18} color={colors.textSecondary} />
+              <Text className="text-base font-semibold text-textSecondary">
                 Agendar por Especialidade
               </Text>
             </View>
@@ -220,11 +222,11 @@ export default function HealthUnitInfo() {
             onPress={() =>
               router.push(`/exam-scheduling/${healthUnit?._id ?? ""}`)
             }
-            className="rounded-[20px] border border-[#008096] bg-white p-4"
+            className="rounded-[20px] border border-bgSecondary bg-bgThird p-4"
           >
             <View className="flex-row items-center justify-center gap-2">
-              <TestTube size={18} color="#008096" />
-              <Text className="text-base font-semibold text-[#008096]">
+              <TestTube size={18} color={colors.textSecondary} />
+              <Text className="text-base font-semibold text-textSecondary">
                 Agendar Exame
               </Text>
             </View>

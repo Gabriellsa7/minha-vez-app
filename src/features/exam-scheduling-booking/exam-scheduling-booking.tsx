@@ -5,6 +5,7 @@ import { useGetUser } from "@/src/api/get-user-me";
 import { WeekDay } from "@/src/config/entities/health-unit/health-unit.types";
 import AvaliableDays from "@/src/features/agenda-content/componentes/avaliable-days/avaliable-days";
 import PatientRegistrationModal from "@/src/features/agenda-content/componentes/patient-registration-modal/patient-registration-modal";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getDateKey } from "@/src/utils/util";
 import { Clock, Droplet } from "lucide-react-native";
 import { useMemo, useState } from "react";
@@ -34,6 +35,7 @@ export function ExamSchedulingBooking({
   healthUnitId,
   offeringId,
 }: ExamSchedulingBookingProps) {
+  const colors = useThemeColors();
   const { data: user } = useGetUser();
   const { data: healthUnit } = useGetHealthUnitById({ healthUnitId });
   const { data: offering } = useGetExamOfferingById({ id: offeringId });
@@ -91,7 +93,7 @@ export function ExamSchedulingBooking({
   return (
     <ScrollView showsVerticalScrollIndicator={false} className="bg-bgPrimary">
       <View className="gap-1 p-5">
-        <View className="mb-4 rounded-2xl border border-[#E7ECEF] bg-bgThird p-4">
+        <View className="mb-4 rounded-2xl border border-borderPrimary bg-bgThird p-4">
           <Text className="text-lg font-bold text-textBlack">
             {offering?.name}
           </Text>
@@ -100,14 +102,14 @@ export function ExamSchedulingBooking({
           </Text>
           <View className="mt-3 flex-row flex-wrap items-center gap-4">
             <View className="flex-row items-center gap-1">
-              <Clock size={13} color="#006673" />
+              <Clock size={13} color={colors.textSecondary} />
               <Text className="text-xs text-textSecondary">
                 {offering?.durationMinutes} min
               </Text>
             </View>
             {offering?.requiresFasting && (
               <View className="flex-row items-center gap-1">
-                <Droplet size={13} color="#006673" />
+                <Droplet size={13} color={colors.textSecondary} />
                 <Text className="text-xs text-textSecondary">
                   Jejum
                   {offering.fastingHours
@@ -118,8 +120,8 @@ export function ExamSchedulingBooking({
             )}
           </View>
           {offering?.requiresPreparation && offering.preparationInstructions && (
-            <View className="mt-3 rounded-xl bg-[#FFF7E6] p-3">
-              <Text className="text-xs font-semibold text-[#8A5A00]">
+            <View className="mt-3 rounded-xl bg-warningBg p-3">
+              <Text className="text-xs font-semibold text-warningText">
                 Preparo: {offering.preparationInstructions}
               </Text>
             </View>
@@ -145,11 +147,11 @@ export function ExamSchedulingBooking({
           disabled={!offering || !selectedDate || !selectedTime}
           className={`mb-8 rounded-[16px] px-4 py-3 ${
             offering && selectedDate && selectedTime
-              ? "bg-[#008096]"
-              : "bg-[#B9DEE3]"
+              ? "bg-bgSecondary"
+              : "bg-infoBorder"
           }`}
         >
-          <Text className="text-center text-sm font-semibold text-white">
+          <Text className="text-center text-sm font-semibold text-textPrimary">
             Continuar
           </Text>
         </Pressable>

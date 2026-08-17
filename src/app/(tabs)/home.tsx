@@ -18,9 +18,10 @@ export default function Home() {
   if (isUserLoading || (user?._id && isPatientLoading)) {
     return (
       <SafeAreaView
+        className="bg-bgPrimary"
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       >
-        <Text>Carregando...</Text>
+        <Text className="text-textBlack">Carregando...</Text>
       </SafeAreaView>
     );
   }
@@ -28,9 +29,10 @@ export default function Home() {
   if (!user) {
     return (
       <SafeAreaView
+        className="bg-bgPrimary"
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       >
-        <Text>Não foi possível carregar o usuário.</Text>
+        <Text className="text-textBlack">Não foi possível carregar o usuário.</Text>
       </SafeAreaView>
     );
   }

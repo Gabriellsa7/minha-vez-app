@@ -77,13 +77,13 @@ export function ExploreContent() {
         <View className="p-6 gap-8">
           <View className="gap-2">
             <View>
-              <Text className=" text-2xl">
+              <Text className="text-textBlack text-2xl">
                 Encontre o cuidado{" "}
                 <Text className="text-textSecondary">que você merece</Text>.
               </Text>
             </View>
             <View>
-              <Text>
+              <Text className="text-textFifth">
                 Busque por clínicas, especialistas ou sintomas para iniciar seu
                 atendimento.
               </Text>

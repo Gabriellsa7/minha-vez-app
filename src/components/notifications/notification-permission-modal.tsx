@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Bell } from "lucide-react-native";
 import { Modal, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,6 +16,7 @@ export function NotificationPermissionModal({
   onAllow,
   onDismiss,
 }: NotificationPermissionModalProps) {
+  const colors = useThemeColors();
   return (
     <Modal
       transparent
@@ -25,8 +27,8 @@ export function NotificationPermissionModal({
     >
       <SafeAreaView className="flex-1 items-center justify-center bg-black/50 px-6">
         <View className="w-full items-center gap-4 rounded-2xl bg-bgThird p-6">
-          <View className="items-center justify-center rounded-full bg-[#E6F7F8] p-4">
-            <Bell size={28} color="#006673" />
+          <View className="items-center justify-center rounded-full bg-infoBg p-4">
+            <Bell size={28} color={colors.textSecondary} />
           </View>
           <Text className="text-center text-lg font-bold text-textBlack">
             Ative as notificações

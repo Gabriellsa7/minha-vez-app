@@ -18,7 +18,7 @@ export function ProfessionalResultsList({
 }: ProfessionalResultsListProps) {
   if (isLoading) {
     return (
-      <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+      <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
         <Text className="text-sm text-textFourth">
           Buscando especialidades...
         </Text>
@@ -28,7 +28,7 @@ export function ProfessionalResultsList({
 
   if (!professionals || professionals.length === 0) {
     return (
-      <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+      <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
         <Text className="text-sm text-textFourth">
           Nenhum médico encontrado para essa especialidade.
         </Text>
@@ -49,7 +49,7 @@ export function ProfessionalResultsList({
             onPress={() =>
               onSelect(professional._id, professional.healthUnitId)
             }
-            className="flex-row items-center gap-3 rounded-2xl border border-[#E7ECEF] bg-bgThird p-3"
+            className="flex-row items-center gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3"
           >
             <View className="h-12 w-12 items-center justify-center rounded-full bg-bgSecondary">
               <Text className="text-base font-bold text-textPrimary">

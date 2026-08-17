@@ -2,6 +2,7 @@ import { useCancelAppointment } from "@/src/api/cancel-appointment";
 import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
 import { GET_QUEUE_ITEMS_KEY } from "@/src/api/get-queue-item-by-patient-id";
 import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "@/src/api/get-queue-item-by-queue-id";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useQueryClient } from "@tanstack/react-query";
 import { X } from "lucide-react-native";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
@@ -20,6 +21,7 @@ export function CancelAppointmentModal({
   onClose,
   onCanceled,
 }: CancelAppointmentModalProps) {
+  const colors = useThemeColors();
   const queryClient = useQueryClient();
   const { mutate: cancelAppointment, isPending: isCanceling } =
     useCancelAppointment();
@@ -76,7 +78,7 @@ export function CancelAppointmentModal({
               disabled={isCanceling}
               onPress={onClose}
             >
-              <X size={22} color="#006673" />
+              <X size={22} color={colors.textSecondary} />
             </Pressable>
           </View>
 
@@ -91,13 +93,13 @@ export function CancelAppointmentModal({
               disabled={isCanceling}
               onPress={handleConfirm}
               className={`items-center rounded-xl py-3 ${
-                isCanceling ? "bg-[#E29B9B]" : "bg-[#BA1A1A]"
+                isCanceling ? "bg-statusDangerText opacity-60" : "bg-statusDangerText"
               }`}
             >
               {isCanceling ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color={colors.textPrimary} />
               ) : (
-                <Text className="font-bold text-white">
+                <Text className="font-bold text-textPrimary">
                   Cancelar consulta
                 </Text>
               )}

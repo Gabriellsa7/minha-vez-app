@@ -4,6 +4,7 @@ import { router } from "expo-router";
 
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { useState } from "react";
 
@@ -19,6 +20,7 @@ export default function QueueDetails({
   appointmentDateTime,
 }: QueueDetailsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const colors = useThemeColors();
 
   const { width } = Dimensions.get("window");
 
@@ -89,12 +91,12 @@ export default function QueueDetails({
                         params: { id: item._id },
                       })
                     }
-                    className="w-[90%] flex-row items-center justify-between bg-[#0092AA] p-3 rounded-t-xl"
+                    className="w-[90%] flex-row items-center justify-between bg-bgSecondary p-3 rounded-t-xl"
                   >
                     <View className="flex-row items-center gap-2">
                       <View className="rounded-full bg-bgSecondary p-2">
                         {/* Clinic Image */}
-                        <Smile color="#FFFFFF" size={24} />
+                        <Smile color={colors.textPrimary} size={24} />
                       </View>
                       <View className="gap-1">
                         <Text className="text-textPrimary">
@@ -112,11 +114,11 @@ export default function QueueDetails({
                         </Text>
                       </View>
                     </View>
-                    <ArrowRight size={28} color="#FFFFFF" />
+                    <ArrowRight size={28} color={colors.textPrimary} />
                   </Pressable>
                   <View className="bg-bgPrimary rounded-b-xl p-3 w-[90%]">
-                    <View className="border border-[#D8D8D8] gap-1 p-3 rounded-xl">
-                      <Text className="font-bold text-xl">
+                    <View className="border border-borderPrimary gap-1 p-3 rounded-xl">
+                      <Text className="font-bold text-xl text-textBlack">
                         Posição {patientQueueItem?.position || "N/A"}
                       </Text>
                       <Text className="text-textFourth text-sm">
@@ -145,7 +147,7 @@ export default function QueueDetails({
               width: activeIndex === index ? 20 : 6,
               height: 6,
               borderRadius: 3,
-              backgroundColor: activeIndex === index ? "#FFF" : "#FFF",
+              backgroundColor: colors.textPrimary,
             }}
           />
         ))}

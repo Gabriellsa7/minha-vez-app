@@ -1,11 +1,13 @@
 import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
 import HealthUnitSchedule from "@/src/features/health-unit-schedule/health-unit-schedule";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HealthUnitSchedulePage() {
+  const colors = useThemeColors();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: user } = useGetUser();
 
@@ -14,7 +16,7 @@ export default function HealthUnitSchedulePage() {
       <Header text="Agendar Consulta" />
       {!user ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#008096" />
+          <ActivityIndicator size="large" color={colors.textSecondary} />
         </View>
       ) : (
         <HealthUnitSchedule user={user} healthUnitId={id} />

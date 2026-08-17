@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import {
   isValidBirthDate,
   isValidCpf,
@@ -43,6 +44,7 @@ export default function PatientRegistrationModal({
   onSubmit,
   isSubmitting,
 }: PatientRegistrationModalProps) {
+  const colors = useThemeColors();
   const [touched, setTouched] = useState<Record<FieldName, boolean>>({
     cpf: false,
     birthDate: false,
@@ -100,12 +102,12 @@ export default function PatientRegistrationModal({
       onRequestClose={onClose}
     >
       <View className="flex-1 items-center justify-center bg-black/50 px-5">
-        <View className="w-full rounded-[24px] bg-white p-5">
+        <View className="w-full rounded-[24px] bg-bgThird p-5">
           <View className="mb-4">
-            <Text className="text-lg font-semibold text-[#0F172A]">
+            <Text className="text-lg font-semibold text-textBlack">
               Complete seu cadastro
             </Text>
-            <Text className="mt-1 text-sm text-[#64748B]">
+            <Text className="mt-1 text-sm text-textFourth">
               Precisamos de alguns dados para criar seu perfil de paciente e
               concluir o agendamento.
             </Text>
@@ -114,7 +116,7 @@ export default function PatientRegistrationModal({
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View className="gap-3">
               <View>
-                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                <Text className="mb-1 text-sm font-medium text-textBlack">
                   CPF
                 </Text>
                 <TextInput
@@ -123,20 +125,20 @@ export default function PatientRegistrationModal({
                   onBlur={() => handleBlur("cpf")}
                   placeholder="000.000.000-00"
                   keyboardType="numeric"
-                  placeholderTextColor="#888"
-                  className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 ${
-                    showCpfError ? "border-red-500" : "border-[#D7EEF2]"
+                  placeholderTextColor={colors.textFourth}
+                  className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                    showCpfError ? "border-textDanger" : "border-infoBorder"
                   }`}
                 />
                 {showCpfError && (
-                  <Text className="mt-1 text-xs text-red-500">
+                  <Text className="mt-1 text-xs text-textDanger">
                     {cpfError}
                   </Text>
                 )}
               </View>
 
               <View>
-                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                <Text className="mb-1 text-sm font-medium text-textBlack">
                   Data de nascimento
                 </Text>
                 <TextInput
@@ -145,20 +147,20 @@ export default function PatientRegistrationModal({
                   onBlur={() => handleBlur("birthDate")}
                   placeholder="DD/MM/AAAA"
                   keyboardType="numeric"
-                  placeholderTextColor="#888"
-                  className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 ${
-                    showBirthDateError ? "border-red-500" : "border-[#D7EEF2]"
+                  placeholderTextColor={colors.textFourth}
+                  className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                    showBirthDateError ? "border-textDanger" : "border-infoBorder"
                   }`}
                 />
                 {showBirthDateError && (
-                  <Text className="mt-1 text-xs text-red-500">
+                  <Text className="mt-1 text-xs text-textDanger">
                     {birthDateError}
                   </Text>
                 )}
               </View>
 
               <View>
-                <Text className="mb-1 text-sm font-medium text-[#0F172A]">
+                <Text className="mb-1 text-sm font-medium text-textBlack">
                   Telefone
                 </Text>
                 <TextInput
@@ -167,13 +169,13 @@ export default function PatientRegistrationModal({
                   onBlur={() => handleBlur("phone")}
                   placeholder="(11) 99999-9999"
                   keyboardType="numeric"
-                  placeholderTextColor="#888"
-                  className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 ${
-                    showPhoneError ? "border-red-500" : "border-[#D7EEF2]"
+                  placeholderTextColor={colors.textFourth}
+                  className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                    showPhoneError ? "border-textDanger" : "border-infoBorder"
                   }`}
                 />
                 {showPhoneError && (
-                  <Text className="mt-1 text-xs text-red-500">
+                  <Text className="mt-1 text-xs text-textDanger">
                     {phoneError}
                   </Text>
                 )}
@@ -184,9 +186,9 @@ export default function PatientRegistrationModal({
           <View className="mt-5 flex-row gap-3">
             <Pressable
               onPress={onClose}
-              className="flex-1 rounded-[16px] border border-[#CBD5E1] bg-white px-4 py-3"
+              className="flex-1 rounded-[16px] border border-borderPrimary bg-bgThird px-4 py-3"
             >
-              <Text className="text-center text-sm font-semibold text-[#0F172A]">
+              <Text className="text-center text-sm font-semibold text-textBlack">
                 Cancelar
               </Text>
             </Pressable>
@@ -194,13 +196,13 @@ export default function PatientRegistrationModal({
               onPress={handleSubmit}
               disabled={isSubmitting}
               className={`flex-1 rounded-[16px] px-4 py-3 ${
-                isSubmitting ? "bg-[#67B5C0]" : "bg-[#008096]"
+                isSubmitting ? "bg-buttonPrimary" : "bg-bgSecondary"
               }`}
             >
               {isSubmitting ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color={colors.textPrimary} />
               ) : (
-                <Text className="text-center text-sm font-semibold text-white">
+                <Text className="text-center text-sm font-semibold text-textPrimary">
                   Salvar e continuar
                 </Text>
               )}

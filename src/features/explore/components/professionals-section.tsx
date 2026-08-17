@@ -1,6 +1,7 @@
 import { useGetProfessionalRatingSummary } from "@/src/api/get-professional-rating-summary";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getUserInitials } from "@/src/utils/util";
 import { router } from "expo-router";
 import { Star } from "lucide-react-native";
@@ -29,13 +30,13 @@ export function ProfessionalsSection({
       </View>
 
       {isLoading ? (
-        <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+        <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
           <Text className="text-sm text-textFourth">
             Carregando especialistas...
           </Text>
         </View>
       ) : !professionals || professionals.length === 0 ? (
-        <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+        <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
           <Text className="text-sm text-textFourth">
             Nenhum especialista encontrado.
           </Text>
@@ -70,9 +71,10 @@ function ProfessionalCard({ professional, unit }: ProfessionalCardProps) {
   const { data: rating } = useGetProfessionalRatingSummary({
     professionalId: professional._id,
   });
+  const colors = useThemeColors();
 
   return (
-    <View className="flex-row items-center gap-3 rounded-2xl border border-[#E7ECEF] bg-bgThird p-3">
+    <View className="flex-row items-center gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3">
       <View className="h-12 w-12 items-center justify-center rounded-full bg-bgSecondary">
         <Text className="text-base font-bold text-textPrimary">
           {getUserInitials(professional.name)}
@@ -89,7 +91,7 @@ function ProfessionalCard({ professional, unit }: ProfessionalCardProps) {
           </Text>
           {rating && rating.count > 0 ? (
             <View className="flex-row items-center gap-1">
-              <Star size={13} color="#F5B301" fill="#F5B301" />
+              <Star size={13} color={colors.accentStar} fill={colors.accentStar} />
               <Text className="text-xs font-semibold text-textFifth">
                 {rating.average?.toFixed(1)}
               </Text>
@@ -118,9 +120,9 @@ function ProfessionalCard({ professional, unit }: ProfessionalCardProps) {
             },
           })
         }
-        className="rounded-full bg-[#008096] px-4 py-2"
+        className="rounded-full bg-bgSecondary px-4 py-2"
       >
-        <Text className="text-xs font-semibold text-white">Ver Agenda</Text>
+        <Text className="text-xs font-semibold text-textPrimary">Ver Agenda</Text>
       </Pressable>
     </View>
   );

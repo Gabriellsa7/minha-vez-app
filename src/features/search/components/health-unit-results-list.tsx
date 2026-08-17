@@ -1,4 +1,5 @@
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Image } from "expo-image";
 import { MapPin } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
@@ -14,9 +15,11 @@ export function HealthUnitResultsList({
   isLoading,
   onSelect,
 }: HealthUnitResultsListProps) {
+  const colors = useThemeColors();
+
   if (isLoading) {
     return (
-      <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+      <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
         <Text className="text-sm text-textFourth">Buscando clínicas...</Text>
       </View>
     );
@@ -24,7 +27,7 @@ export function HealthUnitResultsList({
 
   if (!units || units.length === 0) {
     return (
-      <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+      <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
         <Text className="text-sm text-textFourth">
           Nenhuma clínica encontrada.
         </Text>
@@ -38,9 +41,9 @@ export function HealthUnitResultsList({
         <Pressable
           key={unit._id}
           onPress={() => onSelect(unit._id)}
-          className="flex-row gap-3 rounded-2xl border border-[#E7ECEF] bg-bgThird p-3"
+          className="flex-row gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3"
         >
-          <View className="h-16 w-16 overflow-hidden rounded-xl bg-[#E2E8F0]">
+          <View className="h-16 w-16 overflow-hidden rounded-xl bg-borderPrimary">
             {unit.img ? (
               <Image
                 source={{ uri: unit.img }}
@@ -64,7 +67,7 @@ export function HealthUnitResultsList({
               {unit.name}
             </Text>
             <View className="flex-row items-center gap-1">
-              <MapPin size={12} color="#A8A8A8" />
+              <MapPin size={12} color={colors.textFourth} />
               <Text
                 className="flex-1 text-xs text-textFourth"
                 numberOfLines={1}

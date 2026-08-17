@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Eye, EyeOff } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, TextInput, TextInputProps, View } from "react-native";
@@ -9,14 +10,15 @@ export function PasswordInput({
   ...props
 }: PasswordInputProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const colors = useThemeColors();
 
   return (
     <View className="flex-row items-center rounded-lg border-borderPrimary border-[2px] pr-3">
       <TextInput
         placeholder={placeholder}
         secureTextEntry={!isVisible}
-        placeholderTextColor="#888"
-        className="flex-1 p-3 focus:outline-none focus:ring-0 text-black"
+        placeholderTextColor={colors.textFourth}
+        className="flex-1 p-3 focus:outline-none focus:ring-0 text-textBlack"
         {...props}
       />
       <Pressable
@@ -24,9 +26,9 @@ export function PasswordInput({
         hitSlop={8}
       >
         {isVisible ? (
-          <EyeOff size={20} color="#888" />
+          <EyeOff size={20} color={colors.textFourth} />
         ) : (
-          <Eye size={20} color="#888" />
+          <Eye size={20} color={colors.textFourth} />
         )}
       </Pressable>
     </View>

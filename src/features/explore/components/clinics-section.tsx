@@ -1,5 +1,6 @@
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { MapPin, Star, Timer, Users } from "lucide-react-native";
@@ -31,13 +32,13 @@ export function ClinicsSection({ healthUnits, isLoading }: ClinicsSectionProps) 
       </View>
 
       {isLoading ? (
-        <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+        <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
           <Text className="text-sm text-textFourth">
             Carregando clínicas...
           </Text>
         </View>
       ) : !healthUnits || healthUnits.length === 0 ? (
-        <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+        <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
           <Text className="text-sm text-textFourth">
             Nenhuma clínica encontrada.
           </Text>
@@ -66,13 +67,14 @@ function ClinicCard({ unit }: ClinicCardProps) {
   const { data: rating } = useGetHealthUnitRatingSummary({
     healthUnitId: unit._id,
   });
+  const colors = useThemeColors();
 
   return (
     <Pressable
       onPress={() => router.push(`/health-unit-info/${unit._id}`)}
-      className="w-64 rounded-2xl border border-[#E7ECEF] bg-bgThird"
+      className="w-64 rounded-2xl border border-borderPrimary bg-bgThird"
     >
-      <View className="h-32 w-full overflow-hidden rounded-t-2xl bg-[#E2E8F0]">
+      <View className="h-32 w-full overflow-hidden rounded-t-2xl bg-borderPrimary">
         {unit.img ? (
           <Image
             source={{ uri: unit.img }}
@@ -88,8 +90,8 @@ function ClinicCard({ unit }: ClinicCardProps) {
         )}
 
         {rating && rating.count > 0 && (
-          <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-white px-2 py-1">
-            <Star size={12} color="#F5B301" fill="#F5B301" />
+          <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-bgThird px-2 py-1">
+            <Star size={12} color={colors.accentStar} fill={colors.accentStar} />
             <Text className="text-xs font-semibold text-textBlack">
               {rating.average?.toFixed(1)}
             </Text>
@@ -101,20 +103,20 @@ function ClinicCard({ unit }: ClinicCardProps) {
           {unit.name}
         </Text>
         <View className="flex-row items-center gap-1">
-          <MapPin size={12} color="#A8A8A8" />
+          <MapPin size={12} color={colors.textFourth} />
           <Text className="text-xs text-textFourth" numberOfLines={1}>
             {unit.address.street}, {unit.address.number}
           </Text>
         </View>
-        <View className="flex-row items-center justify-between rounded-xl bg-[#F4FBFC] px-3 py-2">
+        <View className="flex-row items-center justify-between rounded-xl bg-infoBg px-3 py-2">
           <View className="flex-row items-center gap-1">
-            <Timer size={14} color="#006673" />
+            <Timer size={14} color={colors.textSecondary} />
             <Text className="text-xs text-textSecondary">
               <Text className="font-bold">{stats.waitMinutes} min</Text> espera
             </Text>
           </View>
           <View className="flex-row items-center gap-1">
-            <Users size={14} color="#006673" />
+            <Users size={14} color={colors.textSecondary} />
             <Text className="text-xs text-textSecondary">
               <Text className="font-bold">{stats.activeQueueSize}</Text> na fila
             </Text>

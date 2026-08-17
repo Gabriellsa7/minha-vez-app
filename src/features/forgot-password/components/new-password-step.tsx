@@ -4,6 +4,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { PasswordInput } from "@/src/components/password-input/password-input";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useResetPassword } from "@/src/hooks/useForgotPassword";
 import { NEW_PASSWORD_SCHEMA } from "../entities/forgot-password.constants";
 import { NewPasswordSchema } from "../entities/forgot-password.types";
@@ -23,6 +24,7 @@ export function NewPasswordStep({ resetToken, onSuccess }: NewPasswordStepProps)
   });
 
   const { mutate: confirmResetPassword, isPending } = useResetPassword();
+  const colors = useThemeColors();
 
   const onSubmit = (data: NewPasswordSchema) => {
     confirmResetPassword(
@@ -43,7 +45,7 @@ export function NewPasswordStep({ resetToken, onSuccess }: NewPasswordStepProps)
   return (
     <View className="gap-4">
       <View className="gap-2">
-        <Text>
+        <Text className="text-textBlack">
           Nova senha <Text className="text-textDanger">*</Text>
         </Text>
         <Controller
@@ -54,12 +56,12 @@ export function NewPasswordStep({ resetToken, onSuccess }: NewPasswordStepProps)
           )}
         />
         {errors.password && (
-          <Text className="text-red-500">{errors.password.message}</Text>
+          <Text className="text-textDanger">{errors.password.message}</Text>
         )}
       </View>
 
       <View className="gap-2">
-        <Text>
+        <Text className="text-textBlack">
           Confirmar nova senha <Text className="text-textDanger">*</Text>
         </Text>
         <Controller
@@ -70,7 +72,7 @@ export function NewPasswordStep({ resetToken, onSuccess }: NewPasswordStepProps)
           )}
         />
         {errors.confirmPassword && (
-          <Text className="text-red-500">{errors.confirmPassword.message}</Text>
+          <Text className="text-textDanger">{errors.confirmPassword.message}</Text>
         )}
       </View>
 
@@ -80,7 +82,7 @@ export function NewPasswordStep({ resetToken, onSuccess }: NewPasswordStepProps)
         disabled={isPending}
       >
         {isPending ? (
-          <ActivityIndicator size="small" color="#FFFFFF" />
+          <ActivityIndicator size="small" color={colors.textPrimary} />
         ) : (
           <Text className="text-textPrimary">Confirmar</Text>
         )}

@@ -2,6 +2,7 @@ import {
   useMarkNotificationAsRead,
   useNotifications,
 } from "@/src/hooks/use-notifications";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { router } from "expo-router";
 import { ArrowLeft, BellRing, Check, Circle, RefreshCw } from "lucide-react-native";
@@ -24,6 +25,7 @@ interface NotificationModalProps {
 const PREVIEW_LIMIT = 5;
 
 export function NotificationModal({ visible, onClose }: NotificationModalProps) {
+  const colors = useThemeColors();
   const { data: notifications, isLoading, isError, refetch } = useNotifications({
     enabled: visible,
   });
@@ -71,13 +73,13 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
               hitSlop={8}
               onPress={onClose}
             >
-              <ArrowLeft size={24} color="#006673" />
+              <ArrowLeft size={24} color={colors.textSecondary} />
             </Pressable>
           </View>
 
           {isLoading ? (
             <View className="items-center gap-3 p-8">
-              <ActivityIndicator color="#008096" />
+              <ActivityIndicator color={colors.textSecondary} />
               <Text className="text-textFifth">Carregando notificações...</Text>
             </View>
           ) : isError ? (
@@ -90,13 +92,13 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                 onPress={() => refetch()}
                 className="flex-row items-center gap-2 rounded-lg bg-bgSecondary px-4 py-2"
               >
-                <RefreshCw size={16} color="#FFFFFF" />
+                <RefreshCw size={16} color={colors.textPrimary} />
                 <Text className="font-bold text-textPrimary">Tentar novamente</Text>
               </Pressable>
             </View>
           ) : recentNotifications.length === 0 ? (
             <View className="items-center gap-3 p-8">
-              <BellRing size={28} color="#006673" />
+              <BellRing size={28} color={colors.textSecondary} />
               <Text className="text-center text-textFifth">
                 Você não possui notificações.
               </Text>
@@ -109,13 +111,13 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
                   accessibilityRole="button"
                   accessibilityLabel={`${notification.read ? "Lida" : "Não lida"}: ${notification.title}`}
                   onPress={() => void openNotification(notification._id)}
-                  className={`border-b border-borderPrimary px-5 py-4 ${notification.read ? "bg-bgThird" : "bg-[#E6F7F8]"}`}
+                  className={`border-b border-borderPrimary px-5 py-4 ${notification.read ? "bg-bgThird" : "bg-infoBg"}`}
                 >
                   <View className="flex-row items-start gap-2">
                     {notification.read ? (
-                      <Check size={18} color="#006673" />
+                      <Check size={18} color={colors.textSecondary} />
                     ) : (
-                      <Circle fill="#008096" size={14} color="#008096" />
+                      <Circle fill={colors.textSecondary} size={14} color={colors.textSecondary} />
                     )}
                     <View className="flex-1">
                       <View className="flex-row items-center justify-between gap-2">

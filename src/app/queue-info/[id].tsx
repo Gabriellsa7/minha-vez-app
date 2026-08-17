@@ -12,6 +12,7 @@ import { CancelAppointmentModal } from "@/src/components/cancel-appointment/canc
 import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { EQueueShift, EQueueStatus } from "@/src/config/entities/queue/queue.type";
 import { EQueueItemStatus } from "@/src/config/entities/queue-items/queue-items.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
@@ -49,6 +50,7 @@ const ITEM_STATUS_LABEL: Record<EQueueItemStatus, string> = {
 };
 
 export default function QueueInfoScreen() {
+  const colors = useThemeColors();
   const { id: queueId } = useLocalSearchParams<{ id: string }>();
 
   const { data: user } = useGetUser();
@@ -179,7 +181,7 @@ export default function QueueInfoScreen() {
           hitSlop={8}
           onPress={() => router.back()}
         >
-          <ArrowLeft size={24} color="#006673" />
+          <ArrowLeft size={24} color={colors.textSecondary} />
         </Pressable>
         <Text className="text-xl font-semibold text-textBlack">Fila</Text>
       </View>
@@ -196,7 +198,7 @@ export default function QueueInfoScreen() {
             onPress={handleRefresh}
             className="flex-row items-center gap-2 rounded-lg bg-bgSecondary px-4 py-3"
           >
-            <RefreshCw size={16} color="#FFFFFF" />
+            <RefreshCw size={16} color={colors.textPrimary} />
             <Text className="font-bold text-textPrimary">Tentar novamente</Text>
           </Pressable>
         </View>
@@ -207,7 +209,7 @@ export default function QueueInfoScreen() {
           contentContainerStyle={{ paddingBottom: 32 }}
         >
           <LinearGradient
-            colors={["#006579", "#008096"]}
+            colors={[colors.bgFourth, colors.bgSecondary]}
             style={{ paddingHorizontal: 20, paddingVertical: 24, gap: 16 }}
           >
             <View className="flex-row items-center justify-between">
@@ -220,7 +222,7 @@ export default function QueueInfoScreen() {
                 hitSlop={8}
                 onPress={handleRefresh}
               >
-                <RefreshCw size={18} color="#FFFFFF" />
+                <RefreshCw size={18} color={colors.textPrimary} />
               </Pressable>
             </View>
 
@@ -268,7 +270,7 @@ export default function QueueInfoScreen() {
                 {patientQueueItem?.code ? ` · Senha #${patientQueueItem.code}` : ""}
               </Text>
               <View className="flex-row items-center gap-2">
-                <Megaphone size={16} color="#FFFFFF" />
+                <Megaphone size={16} color={colors.textPrimary} />
                 <Text className="text-textPrimary">
                   {inServiceItem
                     ? `Chamando senha #${inServiceItem.code}`
@@ -280,8 +282,8 @@ export default function QueueInfoScreen() {
 
           <View className="gap-4 p-5">
             {isMyTurn && (
-              <View className="rounded-2xl border border-borderPrimary bg-[#E6F7EF] p-4">
-                <Text className="font-bold text-[#0F9D58]">
+              <View className="rounded-2xl border border-borderPrimary bg-statusSuccessBg p-4">
+                <Text className="font-bold text-statusSuccessText">
                   É a sua vez! Dirija-se ao consultório
                   {professional?.room ? ` ${professional.room}` : ""}.
                 </Text>
@@ -291,7 +293,7 @@ export default function QueueInfoScreen() {
             <View className="flex-row gap-3">
               <View className="flex-1 gap-1 rounded-2xl border border-borderPrimary bg-bgThird p-4">
                 <View className="flex-row items-center gap-2">
-                  <Users size={16} color="#006673" />
+                  <Users size={16} color={colors.textSecondary} />
                   <Text className="text-xs text-textFifth">Aguardando</Text>
                 </View>
                 <Text className="text-2xl font-bold text-textBlack">
@@ -300,7 +302,7 @@ export default function QueueInfoScreen() {
               </View>
               <View className="flex-1 gap-1 rounded-2xl border border-borderPrimary bg-bgThird p-4">
                 <View className="flex-row items-center gap-2">
-                  <CalendarClock size={16} color="#006673" />
+                  <CalendarClock size={16} color={colors.textSecondary} />
                   <Text className="text-xs text-textFifth">Espera estimada</Text>
                 </View>
                 <Text className="text-2xl font-bold text-textBlack">
@@ -353,7 +355,7 @@ export default function QueueInfoScreen() {
 
             {patientQueueItem?.code && (
               <View className="flex-row items-center gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-4">
-                <Hash size={18} color="#006673" />
+                <Hash size={18} color={colors.textSecondary} />
                 <View>
                   <Text className="text-xs text-textFifth">Sua senha</Text>
                   <Text className="text-lg font-bold text-textBlack">
@@ -366,7 +368,7 @@ export default function QueueInfoScreen() {
             {professional && (
               <View className="gap-2 rounded-2xl border border-borderPrimary bg-bgThird p-4">
                 <View className="flex-row items-center gap-2">
-                  <Stethoscope size={16} color="#006673" />
+                  <Stethoscope size={16} color={colors.textSecondary} />
                   <Text className="text-sm font-semibold text-textBlack">
                     Profissional
                   </Text>
@@ -384,7 +386,7 @@ export default function QueueInfoScreen() {
             {healthUnit && (
               <View className="gap-2 rounded-2xl border border-borderPrimary bg-bgThird p-4">
                 <View className="flex-row items-center gap-2">
-                  <MapPin size={16} color="#006673" />
+                  <MapPin size={16} color={colors.textSecondary} />
                   <Text className="text-sm font-semibold text-textBlack">
                     {healthUnit.name}
                   </Text>
@@ -400,7 +402,7 @@ export default function QueueInfoScreen() {
                 </Text>
                 {healthUnit.phone && (
                   <View className="mt-1 flex-row items-center gap-2">
-                    <Phone size={14} color="#A8A8A8" />
+                    <Phone size={14} color={colors.textFourth} />
                     <Text className="text-xs text-textFourth">
                       {healthUnit.phone}
                     </Text>
@@ -417,9 +419,9 @@ export default function QueueInfoScreen() {
           <Pressable
             accessibilityRole="button"
             onPress={() => setIsCancelModalOpen(true)}
-            className="items-center rounded-xl bg-[#BA1A1A] py-3"
+            className="items-center rounded-xl bg-statusDangerText py-3"
           >
-            <Text className="font-bold text-white">Cancelar consulta</Text>
+            <Text className="font-bold text-textPrimary">Cancelar consulta</Text>
           </Pressable>
         </View>
       )}

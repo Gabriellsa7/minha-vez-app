@@ -1,6 +1,7 @@
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import SearchInput from "@/src/components/search-input/search-input";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { MapPin } from "lucide-react-native";
@@ -36,13 +37,13 @@ export function ExamSchedulingList() {
         />
 
         {isLoading ? (
-          <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+          <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
             <Text className="text-sm text-textFourth">
               Carregando clínicas...
             </Text>
           </View>
         ) : !filteredHealthUnits || filteredHealthUnits.length === 0 ? (
-          <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+          <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
             <Text className="text-sm text-textFourth">
               Nenhuma clínica encontrada.
             </Text>
@@ -60,12 +61,14 @@ export function ExamSchedulingList() {
 }
 
 function ExamClinicListItem({ unit }: { unit: IHealthUnit }) {
+  const colors = useThemeColors();
+
   return (
     <Pressable
       onPress={() => router.push(`/exam-scheduling/${unit._id}`)}
-      className="flex-row gap-3 rounded-2xl border border-[#E7ECEF] bg-bgThird p-3"
+      className="flex-row gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3"
     >
-      <View className="h-20 w-20 overflow-hidden rounded-xl bg-[#E2E8F0]">
+      <View className="h-20 w-20 overflow-hidden rounded-xl bg-borderPrimary">
         {unit.img ? (
           <Image
             source={{ uri: unit.img }}
@@ -86,7 +89,7 @@ function ExamClinicListItem({ unit }: { unit: IHealthUnit }) {
           {unit.name}
         </Text>
         <View className="flex-row items-center gap-1">
-          <MapPin size={12} color="#A8A8A8" />
+          <MapPin size={12} color={colors.textFourth} />
           <Text className="flex-1 text-xs text-textFourth" numberOfLines={1}>
             {unit.address.street}, {unit.address.number} -{" "}
             {unit.address.neighborhood}

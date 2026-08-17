@@ -6,7 +6,7 @@ export function AgendaSkeleton() {
     <View className="gap-5 px-5 pt-4">
       <SkeletonBox width={160} height={20} />
 
-      <View className="rounded-[24px] border border-[#D7EEF2] bg-white p-4 gap-3">
+      <View className="rounded-[24px] border border-infoBorder bg-bgThird p-4 gap-3">
         <SkeletonBox width="70%" height={16} />
         <SkeletonBox width="100%" height={12} />
         <SkeletonBox width="90%" height={12} />

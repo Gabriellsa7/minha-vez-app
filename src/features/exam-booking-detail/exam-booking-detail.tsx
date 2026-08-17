@@ -6,6 +6,7 @@ import {
   EExamBookingStatus,
   isExamResultAvailable,
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -23,21 +24,21 @@ const STATUS_LABEL: Record<EExamBookingStatus, string> = {
 };
 
 const STATUS_BG: Record<EExamBookingStatus, string> = {
-  [EExamBookingStatus.SCHEDULED]: "bg-[#E6F0FB]",
-  [EExamBookingStatus.CONFIRMED]: "bg-[#E6F4F4]",
-  [EExamBookingStatus.IN_PROGRESS]: "bg-[#FEF3C7]",
-  [EExamBookingStatus.COMPLETED]: "bg-[#E6F7EF]",
-  [EExamBookingStatus.CANCELED]: "bg-[#FDEAEA]",
-  [EExamBookingStatus.NO_SHOW]: "bg-[#F1F0F0]",
+  [EExamBookingStatus.SCHEDULED]: "bg-infoBg",
+  [EExamBookingStatus.CONFIRMED]: "bg-infoBg",
+  [EExamBookingStatus.IN_PROGRESS]: "bg-warningBg",
+  [EExamBookingStatus.COMPLETED]: "bg-statusSuccessBg",
+  [EExamBookingStatus.CANCELED]: "bg-statusDangerBg",
+  [EExamBookingStatus.NO_SHOW]: "bg-borderPrimary",
 };
 
 const STATUS_TEXT: Record<EExamBookingStatus, string> = {
-  [EExamBookingStatus.SCHEDULED]: "text-[#2563EB]",
-  [EExamBookingStatus.CONFIRMED]: "text-[#08777A]",
-  [EExamBookingStatus.IN_PROGRESS]: "text-[#B45309]",
-  [EExamBookingStatus.COMPLETED]: "text-[#0F9D58]",
-  [EExamBookingStatus.CANCELED]: "text-[#BA1A1A]",
-  [EExamBookingStatus.NO_SHOW]: "text-[#6B7280]",
+  [EExamBookingStatus.SCHEDULED]: "text-accentBlue",
+  [EExamBookingStatus.CONFIRMED]: "text-textSecondary",
+  [EExamBookingStatus.IN_PROGRESS]: "text-warningText",
+  [EExamBookingStatus.COMPLETED]: "text-statusSuccessText",
+  [EExamBookingStatus.CANCELED]: "text-statusDangerText",
+  [EExamBookingStatus.NO_SHOW]: "text-textFourth",
 };
 
 interface ExamBookingDetailProps {
@@ -46,6 +47,7 @@ interface ExamBookingDetailProps {
 
 export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
   const queryClient = useQueryClient();
+  const colors = useThemeColors();
 
   const {
     data: booking,
@@ -140,14 +142,14 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
         </View>
 
         <View className="mt-3 flex-row items-center gap-2">
-          <CalendarClock size={16} color="#A8A8A8" />
+          <CalendarClock size={16} color={colors.textFourth} />
           <Text className="text-sm text-textFourth">
             {formatExamDateTime(booking.scheduledAt)}
           </Text>
         </View>
 
         <View className="mt-2 flex-row items-center gap-2">
-          <MapPin size={16} color="#A8A8A8" />
+          <MapPin size={16} color={colors.textFourth} />
           <Text className="text-sm text-textFourth">{booking.healthUnitName}</Text>
         </View>
 
@@ -170,7 +172,7 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
           onPress={() => router.push(`/exams/${booking.resultExamId}`)}
           className="mt-4 flex-row items-center justify-center gap-2 rounded-xl bg-bgSecondary py-3"
         >
-          <FileCheck2 size={18} color="#FFFFFF" />
+          <FileCheck2 size={18} color={colors.textPrimary} />
           <Text className="font-bold text-textPrimary">Ver Resultado</Text>
         </Pressable>
       )}

@@ -2,6 +2,7 @@ import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import SearchInput from "@/src/components/search-input/search-input";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getMockClinicStats } from "@/src/features/explore/utils/mock-clinic-stats";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -38,13 +39,13 @@ export function HealthUnitsList() {
         />
 
         {isLoading ? (
-          <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+          <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
             <Text className="text-sm text-textFourth">
               Carregando clínicas...
             </Text>
           </View>
         ) : !filteredHealthUnits || filteredHealthUnits.length === 0 ? (
-          <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+          <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
             <Text className="text-sm text-textFourth">
               Nenhuma clínica encontrada.
             </Text>
@@ -66,6 +67,7 @@ interface HealthUnitListItemProps {
 }
 
 function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
+  const colors = useThemeColors();
   const stats = getMockClinicStats(unit._id);
   const { data: rating } = useGetHealthUnitRatingSummary({
     healthUnitId: unit._id,
@@ -74,9 +76,9 @@ function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
   return (
     <Pressable
       onPress={() => router.push(`/health-unit-info/${unit._id}`)}
-      className="flex-row gap-3 rounded-2xl border border-[#E7ECEF] bg-bgThird p-3"
+      className="flex-row gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3"
     >
-      <View className="h-20 w-20 overflow-hidden rounded-xl bg-[#E2E8F0]">
+      <View className="h-20 w-20 overflow-hidden rounded-xl bg-borderPrimary">
         {unit.img ? (
           <Image
             source={{ uri: unit.img }}
@@ -102,7 +104,7 @@ function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
           </Text>
           {rating && rating.count > 0 && (
             <View className="flex-row items-center gap-1">
-              <Star size={12} color="#F5B301" fill="#F5B301" />
+              <Star size={12} color={colors.accentStar} fill={colors.accentStar} />
               <Text className="text-xs font-semibold text-textFifth">
                 {rating.average?.toFixed(1)}
               </Text>
@@ -110,7 +112,7 @@ function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
           )}
         </View>
         <View className="flex-row items-center gap-1">
-          <MapPin size={12} color="#A8A8A8" />
+          <MapPin size={12} color={colors.textFourth} />
           <Text
             className="flex-1 text-xs text-textFourth"
             numberOfLines={1}
@@ -121,13 +123,13 @@ function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
         </View>
         <View className="flex-row items-center gap-3 mt-1">
           <View className="flex-row items-center gap-1">
-            <Timer size={13} color="#006673" />
+            <Timer size={13} color={colors.textSecondary} />
             <Text className="text-xs text-textSecondary">
               {stats.waitMinutes} min
             </Text>
           </View>
           <View className="flex-row items-center gap-1">
-            <Users size={13} color="#006673" />
+            <Users size={13} color={colors.textSecondary} />
             <Text className="text-xs text-textSecondary">
               {stats.activeQueueSize} na fila
             </Text>

@@ -1,5 +1,6 @@
 import { IExamOffering } from "@/src/config/entities/exam-offerings/exam-offerings.type";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getExamDateTimeFromDateAndTime } from "@/src/utils/exam-scheduling.util";
 import { CheckCircle2 } from "lucide-react-native";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
@@ -25,6 +26,7 @@ export default function ExamBookingConfirmModal({
   onConfirm,
   isConfirming,
 }: ExamBookingConfirmModalProps) {
+  const colors = useThemeColors();
   const dateTimeLabel =
     selectedDate && selectedTime
       ? getExamDateTimeFromDateAndTime(
@@ -48,53 +50,53 @@ export default function ExamBookingConfirmModal({
       onRequestClose={onClose}
     >
       <View className="flex-1 items-center justify-center bg-black/50 px-5">
-        <View className="w-full rounded-[24px] bg-white p-5">
+        <View className="w-full rounded-[24px] bg-bgThird p-5">
           <View className="mb-4 flex-row items-center gap-2">
-            <CheckCircle2 size={22} color="#008096" />
-            <Text className="text-lg font-semibold text-[#0F172A]">
+            <CheckCircle2 size={22} color={colors.textSecondary} />
+            <Text className="text-lg font-semibold text-textBlack">
               Resumo do agendamento
             </Text>
           </View>
 
           <View className="gap-3">
-            <View className="rounded-[16px] bg-[#F4FBFC] p-3">
-              <Text className="text-sm text-[#64748B]">Exame</Text>
-              <Text className="text-base font-semibold text-[#0F172A]">
+            <View className="rounded-[16px] bg-infoBg p-3">
+              <Text className="text-sm text-textFourth">Exame</Text>
+              <Text className="text-base font-semibold text-textBlack">
                 {offering?.name || "Selecionado"}
               </Text>
             </View>
-            <View className="rounded-[16px] bg-[#F4FBFC] p-3">
-              <Text className="text-sm text-[#64748B]">Clínica</Text>
-              <Text className="text-base font-semibold text-[#0F172A]">
+            <View className="rounded-[16px] bg-infoBg p-3">
+              <Text className="text-sm text-textFourth">Clínica</Text>
+              <Text className="text-base font-semibold text-textBlack">
                 {selectedUnit?.name || "Selecionada"}
               </Text>
             </View>
-            <View className="rounded-[16px] bg-[#F4FBFC] p-3">
-              <Text className="text-sm text-[#64748B]">Endereço</Text>
-              <Text className="text-base font-semibold text-[#0F172A]">
+            <View className="rounded-[16px] bg-infoBg p-3">
+              <Text className="text-sm text-textFourth">Endereço</Text>
+              <Text className="text-base font-semibold text-textBlack">
                 {selectedUnit?.address.street}, {selectedUnit?.address.number}{" "}
                 - {selectedUnit?.address.neighborhood}
               </Text>
             </View>
-            <View className="rounded-[16px] bg-[#F4FBFC] p-3">
-              <Text className="text-sm text-[#64748B]">Data e horário</Text>
-              <Text className="text-base font-semibold text-[#0F172A]">
+            <View className="rounded-[16px] bg-infoBg p-3">
+              <Text className="text-sm text-textFourth">Data e horário</Text>
+              <Text className="text-base font-semibold text-textBlack">
                 {dateTimeLabel}
               </Text>
             </View>
             {offering?.requiresPreparation && (
-              <View className="rounded-[16px] bg-[#FFF7E6] p-3">
-                <Text className="text-sm text-[#8A5A00]">
+              <View className="rounded-[16px] bg-warningBg p-3">
+                <Text className="text-sm text-warningText">
                   Orientações de preparo
                 </Text>
-                <Text className="text-sm font-semibold text-[#8A5A00]">
+                <Text className="text-sm font-semibold text-warningText">
                   {offering.preparationInstructions}
                 </Text>
               </View>
             )}
             {offering?.requiresFasting && (
-              <View className="rounded-[16px] bg-[#FFF7E6] p-3">
-                <Text className="text-sm font-semibold text-[#8A5A00]">
+              <View className="rounded-[16px] bg-warningBg p-3">
+                <Text className="text-sm font-semibold text-warningText">
                   Jejum necessário
                   {offering.fastingHours
                     ? ` de ${offering.fastingHours} horas`
@@ -103,21 +105,21 @@ export default function ExamBookingConfirmModal({
               </View>
             )}
             {typeof offering?.price === "number" && (
-              <View className="rounded-[16px] bg-[#F4FBFC] p-3">
-                <Text className="text-sm text-[#64748B]">
+              <View className="rounded-[16px] bg-infoBg p-3">
+                <Text className="text-sm text-textFourth">
                   Valor particular
                 </Text>
-                <Text className="text-base font-semibold text-[#0F172A]">
+                <Text className="text-base font-semibold text-textBlack">
                   R$ {offering.price.toFixed(2).replace(".", ",")}
                 </Text>
               </View>
             )}
             {offering && offering.acceptedInsurances.length > 0 && (
-              <View className="rounded-[16px] bg-[#F4FBFC] p-3">
-                <Text className="text-sm text-[#64748B]">
+              <View className="rounded-[16px] bg-infoBg p-3">
+                <Text className="text-sm text-textFourth">
                   Convênios aceitos
                 </Text>
-                <Text className="text-base font-semibold text-[#0F172A]">
+                <Text className="text-base font-semibold text-textBlack">
                   {offering.acceptedInsurances.join(", ")}
                 </Text>
               </View>
@@ -127,9 +129,9 @@ export default function ExamBookingConfirmModal({
           <View className="mt-5 flex-row gap-3">
             <Pressable
               onPress={onClose}
-              className="flex-1 rounded-[16px] border border-[#CBD5E1] bg-white px-4 py-3"
+              className="flex-1 rounded-[16px] border border-borderPrimary bg-bgThird px-4 py-3"
             >
-              <Text className="text-center text-sm font-semibold text-[#0F172A]">
+              <Text className="text-center text-sm font-semibold text-textBlack">
                 Cancelar
               </Text>
             </Pressable>
@@ -137,13 +139,13 @@ export default function ExamBookingConfirmModal({
               onPress={onConfirm}
               disabled={isConfirming}
               className={`flex-1 rounded-[16px] px-4 py-3 ${
-                isConfirming ? "bg-[#67B5C0]" : "bg-[#008096]"
+                isConfirming ? "bg-textThird" : "bg-bgSecondary"
               }`}
             >
               {isConfirming ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color={colors.textPrimary} />
               ) : (
-                <Text className="text-center text-sm font-semibold text-white">
+                <Text className="text-center text-sm font-semibold text-textPrimary">
                   Confirmar
                 </Text>
               )}

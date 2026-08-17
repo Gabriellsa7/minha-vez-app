@@ -9,6 +9,7 @@ import {
   IExamBooking,
   isExamResultAvailable,
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { router } from "expo-router";
 import {
@@ -32,26 +33,27 @@ const STATUS_LABEL: Record<EExamBookingStatus, string> = {
 };
 
 const STATUS_BG: Record<EExamBookingStatus, string> = {
-  [EExamBookingStatus.SCHEDULED]: "bg-[#E6F0FB]",
-  [EExamBookingStatus.CONFIRMED]: "bg-[#E6F4F4]",
-  [EExamBookingStatus.IN_PROGRESS]: "bg-[#FEF3C7]",
-  [EExamBookingStatus.COMPLETED]: "bg-[#E6F7EF]",
-  [EExamBookingStatus.CANCELED]: "bg-[#FDEAEA]",
-  [EExamBookingStatus.NO_SHOW]: "bg-[#F1F0F0]",
+  [EExamBookingStatus.SCHEDULED]: "bg-infoBg",
+  [EExamBookingStatus.CONFIRMED]: "bg-infoBg",
+  [EExamBookingStatus.IN_PROGRESS]: "bg-warningBg",
+  [EExamBookingStatus.COMPLETED]: "bg-statusSuccessBg",
+  [EExamBookingStatus.CANCELED]: "bg-statusDangerBg",
+  [EExamBookingStatus.NO_SHOW]: "bg-buttonSecondary",
 };
 
 const STATUS_TEXT: Record<EExamBookingStatus, string> = {
-  [EExamBookingStatus.SCHEDULED]: "text-[#2563EB]",
-  [EExamBookingStatus.CONFIRMED]: "text-[#08777A]",
-  [EExamBookingStatus.IN_PROGRESS]: "text-[#B45309]",
-  [EExamBookingStatus.COMPLETED]: "text-[#0F9D58]",
-  [EExamBookingStatus.CANCELED]: "text-[#BA1A1A]",
-  [EExamBookingStatus.NO_SHOW]: "text-[#6B7280]",
+  [EExamBookingStatus.SCHEDULED]: "text-accentBlue",
+  [EExamBookingStatus.CONFIRMED]: "text-textSecondary",
+  [EExamBookingStatus.IN_PROGRESS]: "text-warningText",
+  [EExamBookingStatus.COMPLETED]: "text-statusSuccessText",
+  [EExamBookingStatus.CANCELED]: "text-statusDangerText",
+  [EExamBookingStatus.NO_SHOW]: "text-textFourth",
 };
 
 type ExamsTab = "scheduled" | "results";
 
 export default function ExamsScreen() {
+  const colors = useThemeColors();
   const [tab, setTab] = useState<ExamsTab>("scheduled");
 
   const { data: user } = useGetUser();
@@ -96,7 +98,7 @@ export default function ExamsScreen() {
           onPress={() => router.push("/exam-scheduling")}
           className="mb-4 flex-row items-center justify-center gap-2 rounded-xl bg-bgSecondary py-3"
         >
-          <CalendarPlus size={18} color="#FFFFFF" />
+          <CalendarPlus size={18} color={colors.textPrimary} />
           <Text className="font-bold text-textPrimary">Agendar novo exame</Text>
         </Pressable>
 
@@ -148,7 +150,7 @@ export default function ExamsScreen() {
           <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
             {!bookings || bookings.length === 0 ? (
               <View className="items-center justify-center rounded-2xl bg-bgThird p-8">
-                <CalendarClock size={28} color="#0F766E" />
+                <CalendarClock size={28} color={colors.tabActive} />
                 <Text className="mt-3 text-center text-textFifth">
                   Você ainda não possui exames agendados.
                 </Text>
@@ -163,7 +165,7 @@ export default function ExamsScreen() {
           <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
             {!exams || exams.length === 0 ? (
               <View className="items-center justify-center rounded-2xl bg-bgThird p-8">
-                <FileText size={28} color="#0F766E" />
+                <FileText size={28} color={colors.tabActive} />
                 <Text className="mt-3 text-center text-textFifth">
                   Você ainda não possui exames disponíveis.
                 </Text>
@@ -182,7 +184,7 @@ export default function ExamsScreen() {
 
                   {exam.examDate && (
                     <View className="mt-3 flex-row items-center gap-2">
-                      <CalendarClock size={14} color="#A8A8A8" />
+                      <CalendarClock size={14} color={colors.textFourth} />
                       <Text className="text-xs text-textFourth">
                         {new Date(exam.examDate).toLocaleDateString("pt-BR")}
                       </Text>
@@ -191,7 +193,7 @@ export default function ExamsScreen() {
 
                   {exam.doctorName && (
                     <View className="mt-1 flex-row items-center gap-2">
-                      <Stethoscope size={14} color="#A8A8A8" />
+                      <Stethoscope size={14} color={colors.textFourth} />
                       <Text className="text-xs text-textFourth" numberOfLines={1}>
                         {exam.doctorName}
                       </Text>
@@ -200,7 +202,7 @@ export default function ExamsScreen() {
 
                   {exam.healthUnitName && (
                     <View className="mt-1 flex-row items-center gap-2">
-                      <MapPin size={14} color="#A8A8A8" />
+                      <MapPin size={14} color={colors.textFourth} />
                       <Text className="text-xs text-textFourth" numberOfLines={1}>
                         {exam.healthUnitName}
                       </Text>
@@ -218,6 +220,7 @@ export default function ExamsScreen() {
 
 function ExamBookingCard({ booking }: { booking: IExamBooking }) {
   const hasResult = isExamResultAvailable(booking);
+  const colors = useThemeColors();
 
   return (
     <Pressable
@@ -237,14 +240,14 @@ function ExamBookingCard({ booking }: { booking: IExamBooking }) {
       </View>
 
       <View className="mt-3 flex-row items-center gap-2">
-        <CalendarClock size={14} color="#A8A8A8" />
+        <CalendarClock size={14} color={colors.textFourth} />
         <Text className="text-xs text-textFourth">
           {formatExamDateTime(booking.scheduledAt)}
         </Text>
       </View>
 
       <View className="mt-1 flex-row items-center gap-2">
-        <MapPin size={14} color="#A8A8A8" />
+        <MapPin size={14} color={colors.textFourth} />
         <Text className="text-xs text-textFourth" numberOfLines={1}>
           {booking.healthUnitName}
         </Text>

@@ -3,6 +3,7 @@ import { useSearchHealthProfessionals } from "@/src/api/search-health-profession
 import { useSearchHealthUnits } from "@/src/api/search-health-units";
 import { useDebouncedValue } from "@/src/hooks/use-debounced-value";
 import { useRecentSearches } from "@/src/hooks/use-recent-searches";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { router } from "expo-router";
 import { ArrowLeft, Search, X } from "lucide-react-native";
 import { useState } from "react";
@@ -22,6 +23,7 @@ import { RecentSearchesList } from "./components/recent-searches-list";
 type SearchFilter = "clinica" | "especialidade";
 
 export function SearchContent() {
+  const colors = useThemeColors();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<SearchFilter>("clinica");
 
@@ -70,14 +72,14 @@ export function SearchContent() {
             hitSlop={8}
             onPress={goBack}
           >
-            <ArrowLeft size={24} color="#FFFFFF" />
+            <ArrowLeft size={24} color={colors.textPrimary} />
           </Pressable>
           <Text className="text-lg font-bold text-textPrimary">Busca</Text>
         </View>
 
         <View className="flex-row items-center gap-3">
           <View className="flex-1 flex-row items-center gap-2 rounded-2xl bg-bgThird px-4 py-3">
-            <Search size={18} color="#888" />
+            <Search size={18} color={colors.textFourth} />
             <TextInput
               autoFocus
               value={query}
@@ -87,8 +89,8 @@ export function SearchContent() {
               }
               returnKeyType="search"
               placeholder="Buscar clínica ou especialidade"
-              placeholderTextColor="#888"
-              className="flex-1 text-black"
+              placeholderTextColor={colors.textFourth}
+              className="flex-1 text-textBlack"
             />
             {query.length > 0 && (
               <Pressable
@@ -97,7 +99,7 @@ export function SearchContent() {
                 hitSlop={8}
                 onPress={() => setQuery("")}
               >
-                <X size={18} color="#888" />
+                <X size={18} color={colors.textFourth} />
               </Pressable>
             )}
           </View>
@@ -157,7 +159,7 @@ export function SearchContent() {
         ) : filter === "clinica" ? (
           isSearchingUnits ? (
             <View className="items-center pt-10">
-              <ActivityIndicator color="#008096" />
+              <ActivityIndicator color={colors.textSecondary} />
             </View>
           ) : (
             <HealthUnitResultsList
@@ -167,7 +169,7 @@ export function SearchContent() {
           )
         ) : isSearchingProfessionals ? (
           <View className="items-center pt-10">
-            <ActivityIndicator color="#008096" />
+            <ActivityIndicator color={colors.textSecondary} />
           </View>
         ) : (
           <ProfessionalResultsList

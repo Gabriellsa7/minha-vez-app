@@ -2,6 +2,7 @@ import {
   useMarkNotificationAsRead,
   useNotification,
 } from "@/src/hooks/use-notifications";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -51,6 +52,7 @@ const relatedInformation = (data?: Record<string, unknown>) => {
 };
 
 export default function NotificationDetailsScreen() {
+  const colors = useThemeColors();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: notification, isLoading, isError, refetch } = useNotification(id);
   const markAsRead = useMarkNotificationAsRead();
@@ -64,7 +66,7 @@ export default function NotificationDetailsScreen() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center gap-3 bg-bgPrimary">
-        <ActivityIndicator size="large" color="#008096" />
+        <ActivityIndicator size="large" color={colors.textSecondary} />
         <Text className="text-textFifth">Carregando notificação...</Text>
       </SafeAreaView>
     );
@@ -73,7 +75,7 @@ export default function NotificationDetailsScreen() {
   if (isError || !notification) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center gap-4 bg-bgPrimary px-6">
-        <BellRing size={30} color="#006673" />
+        <BellRing size={30} color={colors.textSecondary} />
         <Text className="text-center text-textFifth">
           Não foi possível carregar esta notificação.
         </Text>
@@ -99,7 +101,7 @@ export default function NotificationDetailsScreen() {
           hitSlop={8}
           onPress={() => router.back()}
         >
-          <ArrowLeft size={26} color="#006673" />
+          <ArrowLeft size={26} color={colors.textSecondary} />
         </Pressable>
         <Text className="text-lg font-bold text-textSecondary">Notificação</Text>
       </View>
@@ -127,9 +129,9 @@ export default function NotificationDetailsScreen() {
           </View>
           <View className="flex-row items-center gap-2">
             {notification.read ? (
-              <CheckCircle2 size={18} color="#006673" />
+              <CheckCircle2 size={18} color={colors.textSecondary} />
             ) : (
-              <Circle size={18} color="#006673" />
+              <Circle size={18} color={colors.textSecondary} />
             )}
             <Text className="font-semibold text-textBlack">
               {notification.read ? "Lida" : "Não lida"}
@@ -149,7 +151,7 @@ export default function NotificationDetailsScreen() {
             onPress={() => router.push(`/exams/${examId}`)}
             className="flex-row items-center justify-center gap-2 rounded-2xl bg-bgSecondary p-4"
           >
-            <FileText size={20} color="#FFFFFF" />
+            <FileText size={20} color={colors.textPrimary} />
             <Text className="font-bold text-textPrimary">Visualizar exame</Text>
           </Pressable>
         )}

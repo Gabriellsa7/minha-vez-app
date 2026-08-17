@@ -14,6 +14,7 @@ import { IAppointment, EAppointmentStatus } from "@/src/config/entities/appointm
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import {
@@ -40,16 +41,17 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_BG: Record<string, string> = {
-  [EAppointmentStatus.COMPLETED]: "bg-[#E6F7EF]",
-  [EAppointmentStatus.CANCELED]: "bg-[#FDEAEA]",
+  [EAppointmentStatus.COMPLETED]: "bg-statusSuccessBg",
+  [EAppointmentStatus.CANCELED]: "bg-statusDangerBg",
 };
 
 const STATUS_TEXT: Record<string, string> = {
-  [EAppointmentStatus.COMPLETED]: "text-[#0F9D58]",
-  [EAppointmentStatus.CANCELED]: "text-[#BA1A1A]",
+  [EAppointmentStatus.COMPLETED]: "text-statusSuccessText",
+  [EAppointmentStatus.CANCELED]: "text-statusDangerText",
 };
 
 export default function HistoryScreen() {
+  const colors = useThemeColors();
   const queryClient = useQueryClient();
   const [ratingAppointmentId, setRatingAppointmentId] = useState<string | null>(null);
 
@@ -130,7 +132,7 @@ export default function HistoryScreen() {
             hitSlop={8}
             onPress={() => router.back()}
           >
-            <ArrowLeft size={24} color="#006673" />
+            <ArrowLeft size={24} color={colors.textSecondary} />
           </Pressable>
           <Text className="text-xl font-semibold text-textBlack">
             Histórico
@@ -159,7 +161,7 @@ export default function HistoryScreen() {
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {history.length === 0 ? (
             <View className="items-center justify-center rounded-2xl bg-bgThird p-8">
-              <HistoryIcon size={28} color="#0F766E" />
+              <HistoryIcon size={28} color={colors.tabActive} />
               <Text className="mt-3 text-center text-textFifth">
                 Você ainda não possui consultas no histórico.
               </Text>
@@ -195,7 +197,7 @@ export default function HistoryScreen() {
           onPress={handleClearHistory}
           className="mb-4 mt-3 flex-row items-center justify-center gap-2 rounded-xl border border-borderPrimary py-3"
         >
-          <Trash2 size={16} color="#B91C1C" />
+          <Trash2 size={16} color={colors.textDanger} />
           <Text className="font-semibold text-textDanger">
             {clearHistory.isPending ? "Limpando..." : "Limpar histórico"}
           </Text>
@@ -230,6 +232,7 @@ function HistoryAppointmentCard({
   );
 
   const canRate = Boolean(eligibility?.canRateProfessional || eligibility?.canRateClinic);
+  const colors = useThemeColors();
 
   return (
     <View className="mb-3 rounded-2xl border border-borderPrimary bg-bgThird p-4">
@@ -258,7 +261,7 @@ function HistoryAppointmentCard({
       </View>
 
       <View className="mt-3 flex-row items-center gap-2">
-        <CalendarClock size={14} color="#A8A8A8" />
+        <CalendarClock size={14} color={colors.textFourth} />
         <Text className="text-xs text-textFourth">
           {formatDateTime(appointment.dateTime)}
         </Text>
@@ -266,7 +269,7 @@ function HistoryAppointmentCard({
 
       {unit?.name && (
         <View className="mt-1 flex-row items-center gap-2">
-          <MapPin size={14} color="#A8A8A8" />
+          <MapPin size={14} color={colors.textFourth} />
           <Text className="text-xs text-textFourth" numberOfLines={1}>
             {unit.name}
           </Text>
@@ -279,7 +282,7 @@ function HistoryAppointmentCard({
           onPress={onRate}
           className="mt-3 flex-row items-center justify-center gap-2 self-start rounded-full bg-bgSecondary px-4 py-2"
         >
-          <Star size={14} color="#FFFFFF" fill="#FFFFFF" />
+          <Star size={14} color={colors.textPrimary} fill={colors.textPrimary} />
           <Text className="text-xs font-semibold text-textPrimary">
             Avaliar atendimento
           </Text>

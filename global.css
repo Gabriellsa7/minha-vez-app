@@ -1,3 +1,76 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #006673;
+    --text-third: #1ec2d8;
+    --text-fourth: #a8a8a8;
+    --text-fifth: #3e494b;
+    --text-black: #191c1d;
+    --text-danger: #ba1a1a;
+    --button-primary: #3d8296;
+    --button-secondary: #e7e8e9;
+    --border-primary: #e6e6e6;
+    --bg-primary: #f3f4f5;
+    --bg-secondary: #007c8f;
+    --bg-third: #ffffff;
+    --bg-fourth: #006673;
+
+    --status-success-bg: #e6f7ef;
+    --status-success-text: #0f9d58;
+    --status-danger-bg: #fdeaea;
+    --status-danger-text: #ba1a1a;
+    --accent-star: #f5b301;
+    --skeleton-base: #e1e4e8;
+    --info-bg: #ddf4f7;
+    --info-border: #d7eef2;
+    --highlight-bg: #eaf9fb;
+    --highlight-border: #0b7a87;
+    --highlight-text: #0b7a87;
+    --warning-bg: #fef3c7;
+    --warning-border: #fde68a;
+    --warning-text: #92400e;
+    --accent-blue: #2563eb;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* textPrimary é sempre "texto claro sobre superfície de marca" (botões/headers
+         em bgSecondary, bgFourth, gradientes) — essas superfícies não invertem no dark,
+         então o token também não inverte. */
+      --text-primary: #ffffff;
+      --text-secondary: #4dd8e8;
+      --text-third: #1ec2d8;
+      --text-fourth: #8a9194;
+      --text-fifth: #c7cdd0;
+      --text-black: #f2f3f3;
+      --text-danger: #ff6b6b;
+      --button-primary: #2e6577;
+      --button-secondary: #2a2f31;
+      --border-primary: #33393b;
+      --bg-primary: #121516;
+      --bg-secondary: #045c6b;
+      --bg-third: #1b1f20;
+      --bg-fourth: #003b45;
+
+      --status-success-bg: #123626;
+      --status-success-text: #4ade80;
+      --status-danger-bg: #3a1616;
+      --status-danger-text: #ff6b6b;
+      --accent-star: #f5b301;
+      --skeleton-base: #2a2f31;
+      --info-bg: #123338;
+      --info-border: #1f4b52;
+      --highlight-bg: #103235;
+      --highlight-border: #14b8a6;
+      --highlight-text: #2dd4bf;
+      --warning-bg: #2e2410;
+      --warning-border: #5c4a1a;
+      --warning-text: #fbbf24;
+      --accent-blue: #60a5fa;
+    }
+  }
+}

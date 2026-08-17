@@ -7,6 +7,7 @@ import { useGetHealthProfessionalById } from "@/src/api/get-health-professional-
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { GET_HEALTH_UNIT_RATING_SUMMARY_KEY } from "@/src/api/get-health-unit-rating-summary";
 import { GET_PROFESSIONAL_RATING_SUMMARY_KEY } from "@/src/api/get-professional-rating-summary";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -33,6 +34,7 @@ export function RatingModal({
   visible,
   onClose,
 }: RatingModalProps) {
+  const colors = useThemeColors();
   const queryClient = useQueryClient();
 
   const [professionalStars, setProfessionalStars] = useState(0);
@@ -135,13 +137,13 @@ export function RatingModal({
               hitSlop={8}
               onPress={onClose}
             >
-              <ArrowLeft size={24} color="#006673" />
+              <ArrowLeft size={24} color={colors.textSecondary} />
             </Pressable>
           </View>
 
           {isEligibilityLoading ? (
             <View className="items-center gap-3 p-8">
-              <ActivityIndicator color="#008096" />
+              <ActivityIndicator color={colors.textSecondary} />
               <Text className="text-textFifth">Carregando...</Text>
             </View>
           ) : hasNothingToRate ? (
@@ -170,7 +172,7 @@ export function RatingModal({
                     value={professionalComment}
                     onChangeText={setProfessionalComment}
                     placeholder="Deixe um comentário (opcional)"
-                    placeholderTextColor="#888"
+                    placeholderTextColor={colors.textFourth}
                     multiline
                     className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
                   />
@@ -190,7 +192,7 @@ export function RatingModal({
                     value={clinicComment}
                     onChangeText={setClinicComment}
                     placeholder="Deixe um comentário (opcional)"
-                    placeholderTextColor="#888"
+                    placeholderTextColor={colors.textFourth}
                     multiline
                     className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
                   />
@@ -208,7 +210,7 @@ export function RatingModal({
                 className={`items-center rounded-xl py-3 ${
                   canSubmit && !createRating.isPending
                     ? "bg-bgSecondary"
-                    : "bg-[#B9DEE3]"
+                    : "bg-infoBorder"
                 }`}
               >
                 <Text className="font-bold text-textPrimary">

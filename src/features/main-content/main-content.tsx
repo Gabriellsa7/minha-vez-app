@@ -12,6 +12,7 @@ import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -29,6 +30,7 @@ interface MainContentProps {
 }
 
 export default function MainContent({ user, patient }: MainContentProps) {
+  const colors = useThemeColors();
   const { data: healthUnits } = useGetHealthUnits();
 
   const tabBarHeight = useBottomTabBarHeight();
@@ -142,7 +144,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
     >
       <View className="items-center justify-center bg-bgPrimary">
         <LinearGradient
-          colors={["#006579", "#008096"]}
+          colors={[colors.bgFourth, colors.bgSecondary]}
           style={{ width: "100%", gap: 12, paddingBottom: 20 }}
         >
           <View className="w-full gap-3 p-5">
@@ -158,7 +160,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
               !isAppointmentsLoading && (
                 <View className="w-full items-center gap-3 rounded-2xl border border-white/15 bg-white/10 p-5">
                   <View className="items-center justify-center rounded-full bg-white/15 p-3">
-                    <ListChecks size={22} color="#FFFFFF" />
+                    <ListChecks size={22} color={colors.textPrimary} />
                   </View>
                   <View className="items-center gap-1">
                     <Text className="text-textPrimary font-semibold text-base">
@@ -193,20 +195,20 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
         <View className="w-full p-5 gap-5">
           {!patient && (
-            <View className="w-full rounded-[16px] border border-[#FDE68A] bg-[#FEF3C7] p-3">
-              <Text className="text-sm font-medium text-[#92400E]">
+            <View className="w-full rounded-[16px] border border-warningBorder bg-warningBg p-3">
+              <Text className="text-sm font-medium text-warningText">
                 Complete seu cadastro para agendar consultas e acessar todos os
                 recursos.
               </Text>
             </View>
           )}
           {nextUpcomingVisit && (
-            <View className="w-full flex-row items-center justify-between bg-[#008096] px-3 py-3 rounded-lg">
+            <View className="w-full flex-row items-center justify-between bg-bgSecondary px-3 py-3 rounded-lg">
               <View className="flex-row gap-2 items-center">
                 {nextUpcomingVisit.type === "exam" ? (
-                  <TestTube size={20} color="#FFFFFF" />
+                  <TestTube size={20} color={colors.textPrimary} />
                 ) : (
-                  <Bell size={20} color="#FFFFFF" />
+                  <Bell size={20} color={colors.textPrimary} />
                 )}
                 <Text className=" text-textPrimary">
                   {nextUpcomingVisit.type === "exam"
@@ -220,7 +222,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
                     ? formatExamDateTime(nextUpcomingVisit.examBooking.scheduledAt)
                     : formatDateTime(appointment?.dateTime)}
                 </Text>
-                <Clock size={20} color="#FFFFFF" />
+                <Clock size={20} color={colors.textPrimary} />
               </View>
             </View>
           )}

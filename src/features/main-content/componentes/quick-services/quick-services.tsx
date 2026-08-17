@@ -9,6 +9,8 @@ import {
 import type { ComponentType } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
+
 interface QuickServiceItem {
   key: string;
   label: string;
@@ -50,9 +52,11 @@ const QUICK_SERVICES: QuickServiceItem[] = [
 ];
 
 export function QuickServices() {
+  const colors = useThemeColors();
+
   return (
     <View className="gap-5">
-      <Text>Serviços Rapidos</Text>
+      <Text className="text-textBlack">Serviços Rapidos</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -62,10 +66,10 @@ export function QuickServices() {
           <View key={key} className="w-20 items-center gap-2">
             <Pressable onPress={onPress}>
               <View className="rounded-lg p-6 bg-bgThird">
-                <Icon size={20} color="#008493" />
+                <Icon size={20} color={colors.textSecondary} />
               </View>
             </Pressable>
-            <Text className="text-center text-xs" numberOfLines={2}>
+            <Text className="text-center text-xs text-textBlack" numberOfLines={2}>
               {label}
             </Text>
           </View>

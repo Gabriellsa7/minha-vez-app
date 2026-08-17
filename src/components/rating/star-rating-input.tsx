@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Star } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
@@ -10,6 +11,8 @@ interface StarRatingInputProps {
 const STARS = [1, 2, 3, 4, 5];
 
 export function StarRatingInput({ value, onChange, size = 28 }: StarRatingInputProps) {
+  const colors = useThemeColors();
+
   return (
     <View className="flex-row gap-2">
       {STARS.map((star) => (
@@ -22,8 +25,8 @@ export function StarRatingInput({ value, onChange, size = 28 }: StarRatingInputP
         >
           <Star
             size={size}
-            color="#F5B301"
-            fill={star <= value ? "#F5B301" : "transparent"}
+            color={colors.accentStar}
+            fill={star <= value ? colors.accentStar : "transparent"}
           />
         </Pressable>
       ))}

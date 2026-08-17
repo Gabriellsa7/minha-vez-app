@@ -3,6 +3,7 @@ import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUploadUserImage } from "@/src/api/upload-user-image";
 import { Avatar } from "@/src/components/avatar/avatar";
 import Header from "@/src/components/header/header";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
 import { useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
@@ -30,6 +31,7 @@ export const ProfileContent = () => {
 
   const { mutate: uploadUserImage, isPending: isUploadingImage } =
     useUploadUserImage();
+  const colors = useThemeColors();
 
   const handleOpenLogoutModal = () => {
     setOpenLogoutModal(true);
@@ -96,12 +98,12 @@ export const ProfileContent = () => {
             <Pressable
               onPress={handlePickAvatar}
               disabled={isUploadingImage}
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white items-center justify-center border border-bgSecondary"
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-bgThird items-center justify-center border border-bgSecondary"
             >
               {isUploadingImage ? (
-                <ActivityIndicator size="small" color="#006673" />
+                <ActivityIndicator size="small" color={colors.textSecondary} />
               ) : (
-                <Pencil size={16} color="#006673" />
+                <Pencil size={16} color={colors.textSecondary} />
               )}
             </Pressable>
           </View>
@@ -113,26 +115,26 @@ export const ProfileContent = () => {
         </View>
         <View className="gap-4 bg-bgThird p-4 rounded-xl">
           <View className="flex-row items-center gap-4">
-            <IdCard size={24} color="#006673" />
+            <IdCard size={24} color={colors.textSecondary} />
             <Text className="text-textSecondary text-base font-bold">
               Informações do Pessoais
             </Text>
           </View>
           <View className="flex-row justify-between">
-            <Text>CPF</Text>
-            <Text>{patient?.cpf}</Text>
+            <Text className="text-textBlack">CPF</Text>
+            <Text className="text-textBlack">{patient?.cpf}</Text>
           </View>
           <View className="flex-row justify-between">
-            <Text>Telefone</Text>
-            <Text>{patient?.phone}</Text>
+            <Text className="text-textBlack">Telefone</Text>
+            <Text className="text-textBlack">{patient?.phone}</Text>
           </View>
           <View className="flex-row justify-between">
-            <Text>Email</Text>
-            <Text>{user?.email}</Text>
+            <Text className="text-textBlack">Email</Text>
+            <Text className="text-textBlack">{user?.email}</Text>
           </View>
           <View className="flex-row justify-between">
-            <Text>Data de Nascimento</Text>
-            <Text>{patient?.birthDate}</Text>
+            <Text className="text-textBlack">Data de Nascimento</Text>
+            <Text className="text-textBlack">{patient?.birthDate}</Text>
           </View>
         </View>
         <Pressable
@@ -140,34 +142,34 @@ export const ProfileContent = () => {
           className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
         >
           <View className="flex-row items-center gap-4">
-            <Edit size={24} color="#006673" />
-            <Text>Editar Perfil</Text>
+            <Edit size={24} color={colors.textSecondary} />
+            <Text className="text-textBlack">Editar Perfil</Text>
           </View>
-          <ArrowRight size={24} color="#BDC9CB" />
+          <ArrowRight size={24} color={colors.textFourth} />
         </Pressable>
         <Pressable
           onPress={() => router.push("/security-settings" as Href)}
           className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
         >
           <View className="flex-row items-center gap-4">
-            <Lock size={24} color="#006673" />
-            <Text>Configurações de Segurança</Text>
+            <Lock size={24} color={colors.textSecondary} />
+            <Text className="text-textBlack">Configurações de Segurança</Text>
           </View>
-          <ArrowRight size={24} color="#BDC9CB" />
+          <ArrowRight size={24} color={colors.textFourth} />
         </Pressable>
         <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
           <Pressable onPress={() => router.push("/notifications" as Href)}>
             <View className="flex-row items-center gap-4 justify-center">
-              <Bell size={24} color="#006673" />
+              <Bell size={24} color={colors.textSecondary} />
               <Text className="text-textSecondary font-bold">
                 VER NOTIFICAÇÕES
               </Text>
             </View>
           </Pressable>
-          <View className="h-8 border-l border-gray-300" />
+          <View className="h-8 border-l border-borderPrimary" />
           <Pressable onPress={handleOpenLogoutModal}>
             <View className="flex-row items-center gap-4 justify-center">
-              <LogOut size={24} color="#BA1A1A" />
+              <LogOut size={24} color={colors.textDanger} />
               <Text className="text-textDanger font-bold">SAIR DA CONTA</Text>
             </View>
           </Pressable>

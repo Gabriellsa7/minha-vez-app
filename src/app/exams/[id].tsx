@@ -2,6 +2,7 @@ import { useDownloadExam } from "@/src/api/download-exam";
 import { useGetExamById } from "@/src/api/get-exam-by-id";
 import Header from "@/src/components/header/header";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { File, Paths } from "expo-file-system";
 import { useLocalSearchParams } from "expo-router";
 import * as Sharing from "expo-sharing";
@@ -18,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 export default function ExamDetailScreen() {
+  const colors = useThemeColors();
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const {
@@ -99,7 +101,7 @@ export default function ExamDetailScreen() {
 
               {exam.examDate && (
                 <View className="mt-3 flex-row items-center gap-2">
-                  <CalendarClock size={16} color="#A8A8A8" />
+                  <CalendarClock size={16} color={colors.textFourth} />
                   <Text className="text-sm text-textFourth">
                     {new Date(exam.examDate).toLocaleDateString("pt-BR")}
                   </Text>
@@ -108,7 +110,7 @@ export default function ExamDetailScreen() {
 
               {exam.doctorName && (
                 <View className="mt-2 flex-row items-center gap-2">
-                  <Stethoscope size={16} color="#A8A8A8" />
+                  <Stethoscope size={16} color={colors.textFourth} />
                   <Text className="text-sm text-textFourth">
                     {exam.doctorName}
                   </Text>
@@ -117,7 +119,7 @@ export default function ExamDetailScreen() {
 
               {exam.healthUnitName && (
                 <View className="mt-2 flex-row items-center gap-2">
-                  <MapPin size={16} color="#A8A8A8" />
+                  <MapPin size={16} color={colors.textFourth} />
                   <Text className="text-sm text-textFourth">
                     {exam.healthUnitName}
                   </Text>
@@ -136,7 +138,7 @@ export default function ExamDetailScreen() {
               onPress={handleViewPdf}
               className="mt-4 flex-row items-center justify-center gap-2 rounded-xl bg-bgSecondary py-3"
             >
-              <Eye size={18} color="#FFFFFF" />
+              <Eye size={18} color={colors.textPrimary} />
               <Text className="font-bold text-textPrimary">
                 Visualizar PDF
               </Text>
@@ -148,7 +150,7 @@ export default function ExamDetailScreen() {
               onPress={handleDownloadPdf}
               className="mt-3 flex-row items-center justify-center gap-2 rounded-xl border border-borderPrimary py-3"
             >
-              <Download size={18} color="#006673" />
+              <Download size={18} color={colors.textSecondary} />
               <Text className="font-bold text-textSecondary">
                 {isDownloading ? "Baixando..." : "Baixar"}
               </Text>

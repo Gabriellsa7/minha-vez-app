@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Clock, X } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
@@ -14,9 +15,11 @@ export function RecentSearchesList({
   onRemove,
   onClear,
 }: RecentSearchesListProps) {
+  const colors = useThemeColors();
+
   if (items.length === 0) {
     return (
-      <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
+      <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
         <Text className="text-sm text-textFourth">
           Suas buscas recentes vão aparecer aqui.
         </Text>
@@ -43,7 +46,7 @@ export function RecentSearchesList({
             key={term}
             className="flex-row items-center gap-3 rounded-xl px-1 py-2.5"
           >
-            <Clock size={16} color="#A8A8A8" />
+            <Clock size={16} color={colors.textFourth} />
             <Pressable
               className="flex-1"
               accessibilityRole="button"
@@ -56,7 +59,7 @@ export function RecentSearchesList({
               hitSlop={8}
               onPress={() => onRemove(term)}
             >
-              <X size={16} color="#A8A8A8" />
+              <X size={16} color={colors.textFourth} />
             </Pressable>
           </View>
         ))}

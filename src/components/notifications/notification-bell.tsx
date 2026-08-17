@@ -1,4 +1,5 @@
 import { useUnreadNotifications } from "@/src/hooks/use-notifications";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Bell } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
@@ -9,6 +10,7 @@ interface NotificationBellProps {
 export function NotificationBell({ onPress }: NotificationBellProps) {
   const { data: unreadNotifications } = useUnreadNotifications();
   const unreadCount = unreadNotifications?.length ?? 0;
+  const colors = useThemeColors();
 
   return (
     <Pressable
@@ -22,11 +24,11 @@ export function NotificationBell({ onPress }: NotificationBellProps) {
       onPress={onPress}
       className="relative rounded-full bg-bgSecondary p-2"
     >
-      <Bell size={24} color="#FFFFFF" />
+      <Bell size={24} color={colors.textPrimary} />
       {unreadCount > 0 && (
         <View
           accessible={false}
-          className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-bgFourth bg-[#BA1A1A]"
+          className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-bgFourth bg-statusDangerText"
         />
       )}
     </Pressable>

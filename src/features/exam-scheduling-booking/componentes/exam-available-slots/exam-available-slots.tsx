@@ -1,4 +1,5 @@
 import { useGetExamSlots } from "@/src/api/get-exam-slots";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Clock3 } from "lucide-react-native";
 import {
   ActivityIndicator,
@@ -23,6 +24,7 @@ export default function ExamAvailableSlots({
   selectedTime,
   setSelectedTime,
 }: ExamAvailableSlotsProps) {
+  const colors = useThemeColors();
   const { data, isLoading } = useGetExamSlots(
     { healthUnitId, date: selectedDate },
     { enabled: Boolean(healthUnitId && selectedDate) },
@@ -32,15 +34,15 @@ export default function ExamAvailableSlots({
 
   return (
     <View className="mb-5">
-      <Text className="mb-3 text-base font-semibold text-[#0F172A]">
+      <Text className="mb-3 text-base font-semibold text-textBlack">
         Horários disponíveis
       </Text>
 
       {isLoading ? (
-        <ActivityIndicator color="#008096" />
+        <ActivityIndicator color={colors.textSecondary} />
       ) : slots.length === 0 ? (
-        <View className="rounded-2xl border border-dashed border-[#D7EEF2] bg-white p-4">
-          <Text className="text-sm text-[#64748B]">
+        <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
+          <Text className="text-sm text-textFourth">
             Nenhum horário disponível para esta data.
           </Text>
         </View>
@@ -59,17 +61,17 @@ export default function ExamAvailableSlots({
                   onPress={() => setSelectedTime(slot.time)}
                   className={`flex-row items-center gap-2 rounded-full border px-4 py-2 ${
                     isSelected
-                      ? "border-[#008096] bg-[#008096]"
-                      : "border-[#D7EEF2] bg-white"
+                      ? "border-bgSecondary bg-bgSecondary"
+                      : "border-infoBorder bg-bgThird"
                   }`}
                 >
                   <Clock3
                     size={16}
-                    color={isSelected ? "#FFFFFF" : "#008096"}
+                    color={isSelected ? colors.textPrimary : colors.textSecondary}
                   />
                   <Text
                     className={`text-sm ${
-                      isSelected ? "text-white" : "text-[#0F172A]"
+                      isSelected ? "text-textPrimary" : "text-textBlack"
                     }`}
                   >
                     {slot.time}
@@ -77,7 +79,7 @@ export default function ExamAvailableSlots({
                   {slot.remainingCapacity <= 2 && (
                     <Text
                       className={`text-xs font-medium ${
-                        isSelected ? "text-white" : "text-[#94A3B8]"
+                        isSelected ? "text-textPrimary" : "text-textFourth"
                       }`}
                     >
                       {slot.remainingCapacity} vaga

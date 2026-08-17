@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useRequestPasswordReset } from "@/src/hooks/useForgotPassword";
 import { REQUEST_CODE_SCHEMA } from "../entities/forgot-password.constants";
 import { RequestCodeSchema } from "../entities/forgot-password.types";
@@ -26,6 +27,7 @@ export function RequestCodeStep({ onSuccess }: RequestCodeStepProps) {
   });
 
   const { mutate: requestCode, isPending } = useRequestPasswordReset();
+  const colors = useThemeColors();
 
   const onSubmit = (data: RequestCodeSchema) => {
     requestCode(
@@ -42,7 +44,7 @@ export function RequestCodeStep({ onSuccess }: RequestCodeStepProps) {
       </Text>
 
       <View className="gap-2">
-        <Text>
+        <Text className="text-textBlack">
           Email <Text className="text-textDanger">*</Text>
         </Text>
         <Controller
@@ -55,13 +57,13 @@ export function RequestCodeStep({ onSuccess }: RequestCodeStepProps) {
               inputMode="email"
               autoCapitalize="none"
               onChangeText={onChange}
-              placeholderTextColor="#888"
-              className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0"
+              placeholderTextColor={colors.textFourth}
+              className="p-3 rounded-lg border-borderPrimary border-[2px] focus:outline-none focus:ring-0 text-textBlack"
             />
           )}
         />
         {errors.email && (
-          <Text className="text-red-500">{errors.email.message}</Text>
+          <Text className="text-textDanger">{errors.email.message}</Text>
         )}
       </View>
 
@@ -71,7 +73,7 @@ export function RequestCodeStep({ onSuccess }: RequestCodeStepProps) {
         disabled={isPending}
       >
         {isPending ? (
-          <ActivityIndicator size="small" color="#FFFFFF" />
+          <ActivityIndicator size="small" color={colors.textPrimary} />
         ) : (
           <Text className="text-textPrimary">Enviar código</Text>
         )}

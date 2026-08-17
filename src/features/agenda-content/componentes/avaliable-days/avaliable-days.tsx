@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getDateKey, isSameMonth, startOfDay } from "@/src/utils/util";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useMemo, useState } from "react";
@@ -17,6 +18,7 @@ export default function AvaliableDays({
   setSelectedDate,
   disabledWeekdays,
 }: AvaliableDaysProps) {
+  const colors = useThemeColors();
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
@@ -82,32 +84,30 @@ export default function AvaliableDays({
 
   return (
     <View className="mb-5">
-      <Text className="mb-3 text-base font-semibold text-[#0F172A]">
+      <Text className="mb-3 text-base font-semibold text-textBlack">
         Escolha o dia
       </Text>
-      <View className="rounded-[28px] bg-white p-5 shadow-sm">
+      <View className="rounded-[28px] bg-bgThird p-5 shadow-sm">
         <View className="mb-5 flex-row items-center justify-between">
-          <Text className="text-base font-semibold text-[#0F172A]">
+          <Text className="text-base font-semibold text-textBlack">
             {calendarMonthLabel}
           </Text>
           <View className="flex-row gap-3">
             <Pressable
               onPress={() => handleChangeCalendarMonth("previous")}
               disabled={!canGoToPreviousMonth}
-              className={`h-10 w-10 items-center justify-center rounded-full ${
-                canGoToPreviousMonth ? "bg-[#F1F5F9]" : "bg-[#F8FAFC]"
-              }`}
+              className="h-10 w-10 items-center justify-center rounded-full bg-bgPrimary"
             >
               <ChevronLeft
                 size={18}
-                color={canGoToPreviousMonth ? "#008096" : "#CBD5E1"}
+                color={canGoToPreviousMonth ? colors.textSecondary : colors.textFourth}
               />
             </Pressable>
             <Pressable
               onPress={() => handleChangeCalendarMonth("next")}
-              className="h-10 w-10 items-center justify-center rounded-full bg-[#F1F5F9]"
+              className="h-10 w-10 items-center justify-center rounded-full bg-bgPrimary"
             >
-              <ChevronRight size={18} color="#008096" />
+              <ChevronRight size={18} color={colors.textSecondary} />
             </Pressable>
           </View>
         </View>
@@ -116,7 +116,7 @@ export default function AvaliableDays({
           {["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"].map((weekday) => (
             <Text
               key={weekday}
-              className="flex-1 text-center text-[11px] font-semibold text-[#94A3B8]"
+              className="flex-1 text-center text-[11px] font-semibold text-textFourth"
             >
               {weekday}
             </Text>
@@ -164,17 +164,17 @@ export default function AvaliableDays({
                         alignItems: "center",
                         justifyContent: "center",
                         backgroundColor: isSelected
-                          ? "#008096"
+                          ? colors.bgSecondary
                           : "transparent",
                       }}
                     >
                       <Text
                         className={`text-sm ${
                           isSelected
-                            ? "font-semibold text-white"
+                            ? "font-semibold text-textPrimary"
                             : isDisabled
-                              ? "text-[#CBD5E1]"
-                              : "text-[#0F172A]"
+                              ? "text-textFourth"
+                              : "text-textBlack"
                         }`}
                       >
                         {day.getDate()}

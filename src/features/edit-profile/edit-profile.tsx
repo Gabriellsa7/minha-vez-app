@@ -5,6 +5,7 @@ import {
 import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUpdatePatient } from "@/src/api/update-patient";
 import { useUpdateUser } from "@/src/api/update-user";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatPhone } from "@/src/utils/util";
 import { isValidEmail, isValidPhone } from "@/src/utils/validation.util";
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,6 +28,7 @@ type FieldName = "name" | "email" | "phone";
 
 export function EditProfile() {
   const queryClient = useQueryClient();
+  const colors = useThemeColors();
 
   const { data: user, isLoading: isUserLoading } = useGetUser();
   const { data: patient, isLoading: isPatientLoading } = useGetPatientById(
@@ -157,7 +159,7 @@ export function EditProfile() {
   if (isUserLoading || (user?._id && isPatientLoading)) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#008096" />
+        <ActivityIndicator size="large" color={colors.textSecondary} />
       </View>
     );
   }
@@ -179,13 +181,13 @@ export function EditProfile() {
               onChangeText={setName}
               onBlur={() => handleBlur("name")}
               placeholder="Seu nome completo"
-              placeholderTextColor="#888"
-              className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 text-textBlack ${
-                showNameError ? "border-red-500" : "border-[#D7EEF2]"
+              placeholderTextColor={colors.textFourth}
+              className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                showNameError ? "border-textDanger" : "border-infoBorder"
               }`}
             />
             {showNameError && (
-              <Text className="mt-1 text-xs text-red-500">{nameError}</Text>
+              <Text className="mt-1 text-xs text-textDanger">{nameError}</Text>
             )}
           </View>
 
@@ -200,13 +202,13 @@ export function EditProfile() {
               placeholder="seu@email.com"
               keyboardType="email-address"
               autoCapitalize="none"
-              placeholderTextColor="#888"
-              className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 text-textBlack ${
-                showEmailError ? "border-red-500" : "border-[#D7EEF2]"
+              placeholderTextColor={colors.textFourth}
+              className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                showEmailError ? "border-textDanger" : "border-infoBorder"
               }`}
             />
             {showEmailError && (
-              <Text className="mt-1 text-xs text-red-500">{emailError}</Text>
+              <Text className="mt-1 text-xs text-textDanger">{emailError}</Text>
             )}
           </View>
 
@@ -221,13 +223,13 @@ export function EditProfile() {
                 onBlur={() => handleBlur("phone")}
                 placeholder="(11) 99999-9999"
                 keyboardType="numeric"
-                placeholderTextColor="#888"
-                className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 text-textBlack ${
-                  showPhoneError ? "border-red-500" : "border-[#D7EEF2]"
+                placeholderTextColor={colors.textFourth}
+                className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                  showPhoneError ? "border-textDanger" : "border-infoBorder"
                 }`}
               />
               {showPhoneError && (
-                <Text className="mt-1 text-xs text-red-500">
+                <Text className="mt-1 text-xs text-textDanger">
                   {phoneError}
                 </Text>
               )}
@@ -238,7 +240,7 @@ export function EditProfile() {
         {patient && (
           <View className="gap-4 rounded-2xl bg-bgThird p-4">
             <View className="flex-row items-center gap-2">
-              <Lock size={16} color="#A8A8A8" />
+              <Lock size={16} color={colors.textFourth} />
               <Text className="text-sm font-medium text-textFourth">
                 Esses dados não podem ser alterados
               </Text>
@@ -251,8 +253,8 @@ export function EditProfile() {
               <TextInput
                 value={patient.cpf}
                 editable={false}
-                placeholderTextColor="#888"
-                className="rounded-[16px] border border-[#E6E6E6] bg-[#F1F5F9] px-3 py-3 text-textFourth"
+                placeholderTextColor={colors.textFourth}
+                className="rounded-[16px] border border-borderPrimary bg-bgPrimary px-3 py-3 text-textFourth"
               />
             </View>
 
@@ -263,8 +265,8 @@ export function EditProfile() {
               <TextInput
                 value={patient.birthDate}
                 editable={false}
-                placeholderTextColor="#888"
-                className="rounded-[16px] border border-[#E6E6E6] bg-[#F1F5F9] px-3 py-3 text-textFourth"
+                placeholderTextColor={colors.textFourth}
+                className="rounded-[16px] border border-borderPrimary bg-bgPrimary px-3 py-3 text-textFourth"
               />
             </View>
           </View>
@@ -274,13 +276,13 @@ export function EditProfile() {
           onPress={handleSave}
           disabled={isSaving}
           className={`rounded-[20px] p-4 ${
-            isSaving ? "bg-[#67B5C0]" : "bg-[#008096]"
+            isSaving ? "bg-highlightBorder" : "bg-bgSecondary"
           }`}
         >
           {isSaving ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
+            <ActivityIndicator size="small" color={colors.textPrimary} />
           ) : (
-            <Text className="text-center text-base font-semibold text-white">
+            <Text className="text-center text-base font-semibold text-textPrimary">
               Salvar alterações
             </Text>
           )}

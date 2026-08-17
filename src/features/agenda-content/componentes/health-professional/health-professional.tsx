@@ -1,5 +1,6 @@
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Stethoscope } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
@@ -18,14 +19,16 @@ export default function HealthProfessionalsSection({
   setSelectedTime,
   selectedUnit,
 }: HealthProfessionalsSectionProps) {
+  const colors = useThemeColors();
+
   return (
     <View className="mb-5">
-      <Text className="mb-3 text-base font-semibold text-[#0F172A]">
+      <Text className="mb-3 text-base font-semibold text-textBlack">
         Profissionais disponíveis
       </Text>
       {professionalsForUnit.length === 0 ? (
-        <View className="rounded-[20px] border border-dashed border-[#D7EEF2] bg-white p-4">
-          <Text className="text-sm text-[#64748B]">
+        <View className="rounded-[20px] border border-dashed border-infoBorder bg-bgThird p-4">
+          <Text className="text-sm text-textFourth">
             Não há profissionais disponíveis para essa unidade ainda.
           </Text>
         </View>
@@ -43,30 +46,30 @@ export default function HealthProfessionalsSection({
                 }}
                 className={`rounded-[20px] border p-4 ${
                   isSelected
-                    ? "border-[#008096] bg-[#E8F8FA]"
-                    : "border-[#E2E8F0] bg-white"
+                    ? "border-bgSecondary bg-infoBg"
+                    : "border-borderPrimary bg-bgThird"
                 }`}
               >
                 <View className="flex-row items-center gap-3">
-                  <View className="rounded-full bg-[#008096]/10 p-3">
-                    <Stethoscope size={18} color="#008096" />
+                  <View className="rounded-full bg-infoBg p-3">
+                    <Stethoscope size={18} color={colors.textSecondary} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-base font-semibold text-[#0F172A]">
+                    <Text className="text-base font-semibold text-textBlack">
                       {professional.specialty}
                     </Text>
-                    <Text className="text-base font-semibold text-[#008096]">
+                    <Text className="text-base font-semibold text-textSecondary">
                       {professional.name}
                     </Text>
-                    <Text className="text-sm text-[#64748B]">
+                    <Text className="text-sm text-textFourth">
                       {selectedUnit?.name || "Unidade selecionada"}
                     </Text>
                     <View className="flex-row items-center justify-between">
-                      <Text className="text-sm text-[#64748B]">
+                      <Text className="text-sm text-textFourth">
                         {selectedUnit?.address.street || "Unidade selecionada"}{" "}
                         - {selectedUnit?.address.number}
                       </Text>
-                      <Text className="text-sm text-[#64748B]">
+                      <Text className="text-sm text-textFourth">
                         {selectedUnit?.address.city || "Unidade selecionada"} -{" "}
                         {selectedUnit?.address.state || "Unidade selecionada"}
                       </Text>

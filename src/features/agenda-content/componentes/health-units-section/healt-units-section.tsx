@@ -18,7 +18,7 @@ export default function HealthUnitsSection({
 }: HealthUnitsSectionProps) {
   return (
     <View className="mb-5">
-      <Text className="mb-3 text-base font-semibold text-[#0F172A]">
+      <Text className="mb-3 text-base font-semibold text-textBlack">
         Unidade de saúde
       </Text>
       <View className="flex-row flex-wrap gap-2">
@@ -35,12 +35,12 @@ export default function HealthUnitsSection({
               }}
               className={`rounded-full border px-4 py-2 ${
                 isActive
-                  ? "border-[#008096] bg-[#008096]"
-                  : "border-[#D7EEF2] bg-white"
+                  ? "border-bgSecondary bg-bgSecondary"
+                  : "border-infoBorder bg-bgThird"
               }`}
             >
               <Text
-                className={`text-sm ${isActive ? "text-white" : "text-[#0F172A]"}`}
+                className={`text-sm ${isActive ? "text-textPrimary" : "text-textBlack"}`}
               >
                 {unit.name}
               </Text>

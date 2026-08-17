@@ -8,6 +8,7 @@ import {
 import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IUser } from "@/src/config/entities/user/user.types";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getDateKey } from "@/src/utils/util";
 import { MapPin, CalendarDays } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
@@ -28,6 +29,7 @@ export default function HealthUnitSchedule({
   user,
   healthUnitId,
 }: HealthUnitScheduleProps) {
+  const colors = useThemeColors();
   const [selectedSpecialty, setSelectedSpecialty] = useState(
     ALL_SPECIALTIES_OPTION,
   );
@@ -135,7 +137,7 @@ export default function HealthUnitSchedule({
     <View className="bg-bgPrimary flex-1 gap-4">
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#008096" />
+          <ActivityIndicator size="large" color={colors.textSecondary} />
         </View>
       ) : (
         <ScrollView
@@ -144,15 +146,15 @@ export default function HealthUnitSchedule({
           }}
         >
           <View className="px-5 pb-4">
-            <View className="mb-5 flex-row items-center gap-3 rounded-[24px] border border-[#D7EEF2] bg-white p-4 shadow-sm">
-              <View className="rounded-xl bg-[#DDF4F7] p-2">
-                <MapPin size={20} color="#006673" />
+            <View className="mb-5 flex-row items-center gap-3 rounded-[24px] border border-infoBorder bg-bgThird p-4 shadow-sm">
+              <View className="rounded-xl bg-infoBg p-2">
+                <MapPin size={20} color={colors.textSecondary} />
               </View>
               <View className="flex-1">
-                <Text className="text-base font-semibold text-[#0F172A]">
+                <Text className="text-base font-semibold text-textBlack">
                   {healthUnit?.name}
                 </Text>
-                <Text className="text-sm text-[#64748B]">
+                <Text className="text-sm text-textFourth">
                   {healthUnit?.address.street}, {healthUnit?.address.number} -{" "}
                   {healthUnit?.address.neighborhood}
                 </Text>
@@ -160,8 +162,8 @@ export default function HealthUnitSchedule({
             </View>
 
             {!booking.patient && !booking.isPatientLoading && (
-              <View className="mb-5 rounded-[20px] border border-[#FDE68A] bg-[#FEF3C7] p-4">
-                <Text className="text-sm font-medium text-[#92400E]">
+              <View className="mb-5 rounded-[20px] border border-warningBorder bg-warningBg p-4">
+                <Text className="text-sm font-medium text-warningText">
                   Seu cadastro ainda não foi concluído. Você pode continuar
                   navegando no app, mas precisa finalizar o cadastro para
                   agendar.
@@ -212,14 +214,14 @@ export default function HealthUnitSchedule({
               onPress={booking.handleConfirmPress}
               className={`rounded-[20px] p-4 ${
                 selectedProfessional && selectedDate && selectedTime
-                  ? "bg-[#008096]"
-                  : "bg-[#CBD5E1]"
+                  ? "bg-bgSecondary"
+                  : "bg-borderPrimary"
               }`}
               disabled={!selectedProfessional || !selectedDate || !selectedTime}
             >
               <View className="flex-row items-center justify-center gap-2">
-                <CalendarDays size={18} color="#FFFFFF" />
-                <Text className="text-base font-semibold text-white">
+                <CalendarDays size={18} color={colors.textPrimary} />
+                <Text className="text-base font-semibold text-textPrimary">
                   Confirmar agendamento
                 </Text>
               </View>

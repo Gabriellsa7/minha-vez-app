@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Animated, DimensionValue, StyleProp, ViewStyle } from "react-native";
-import { SKELETON_COLOR } from "./skeleton-theme";
+
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 
 interface SkeletonBoxProps {
   width?: DimensionValue;
@@ -17,6 +18,7 @@ export function SkeletonBox({
   style,
   children,
 }: SkeletonBoxProps) {
+  const colors = useThemeColors();
   const opacity = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export function SkeletonBox({
           width,
           height,
           borderRadius,
-          backgroundColor: SKELETON_COLOR,
+          backgroundColor: colors.skeletonBase,
           opacity,
         },
         style,
