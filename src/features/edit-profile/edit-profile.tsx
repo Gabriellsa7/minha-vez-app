@@ -6,7 +6,7 @@ import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUpdatePatient } from "@/src/api/update-patient";
 import { useUpdateUser } from "@/src/api/update-user";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { formatPhone } from "@/src/utils/util";
+import { formatBirthDateForDisplay, formatPhone } from "@/src/utils/util";
 import { isValidEmail, isValidPhone } from "@/src/utils/validation.util";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -263,7 +263,7 @@ export function EditProfile() {
                 Data de Nascimento
               </Text>
               <TextInput
-                value={patient.birthDate}
+                value={formatBirthDateForDisplay(patient.birthDate)}
                 editable={false}
                 placeholderTextColor={colors.textFourth}
                 className="rounded-[16px] border border-borderPrimary bg-bgPrimary px-3 py-3 text-textFourth"

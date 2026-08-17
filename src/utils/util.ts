@@ -30,6 +30,15 @@ export const formatBirthDate = (value: string) => {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 };
 
+export const formatBirthDateForDisplay = (value?: string) => {
+  if (!value) return value ?? "";
+
+  const [year, month, day] = value.split("-");
+  if (!year || !month || !day) return value;
+
+  return `${day}/${month}/${year}`;
+};
+
 export const normalizeBirthDate = (value: string) => {
   const digits = value.replace(/\D/g, "").slice(0, 8);
   if (digits.length !== 8) return value;

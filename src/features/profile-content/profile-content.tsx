@@ -5,6 +5,7 @@ import { Avatar } from "@/src/components/avatar/avatar";
 import Header from "@/src/components/header/header";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
+import { formatBirthDateForDisplay } from "@/src/utils/util";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
@@ -147,7 +148,9 @@ export const ProfileContent = () => {
           </View>
           <View className="flex-row justify-between">
             <Text className="text-textBlack">Data de Nascimento</Text>
-            <Text className="text-textBlack">{patient?.birthDate}</Text>
+            <Text className="text-textBlack">
+              {formatBirthDateForDisplay(patient?.birthDate)}
+            </Text>
           </View>
         </View>
         <Pressable
