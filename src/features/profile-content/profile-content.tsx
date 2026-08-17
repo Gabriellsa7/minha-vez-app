@@ -5,6 +5,7 @@ import { Avatar } from "@/src/components/avatar/avatar";
 import Header from "@/src/components/header/header";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Href, useRouter } from "expo-router";
@@ -15,10 +16,18 @@ import {
   IdCard,
   Lock,
   LogOut,
+  Moon,
   Pencil,
 } from "lucide-react-native";
 import { useState } from "react";
-import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
 
 export const ProfileContent = () => {
@@ -32,6 +41,7 @@ export const ProfileContent = () => {
   const { mutate: uploadUserImage, isPending: isUploadingImage } =
     useUploadUserImage();
   const colors = useThemeColors();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const handleOpenLogoutModal = () => {
     setOpenLogoutModal(true);
@@ -89,9 +99,12 @@ export const ProfileContent = () => {
   };
 
   return (
-    <View className=" bg-bgPrimary">
+    <View className="flex-1 bg-bgPrimary">
       <Header text="Perfil do Paciente" />
-      <View className="p-6 gap-6">
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ padding: 24, gap: 24, paddingBottom: tabBarHeight + 24 }}
+      >
         <View className="flex items-center gap-4 bg-bgThird p-4 rounded-xl">
           <View className="relative">
             <Avatar uri={user?.avatar} name={user?.name} variant="lg" />
@@ -157,6 +170,16 @@ export const ProfileContent = () => {
           </View>
           <ArrowRight size={24} color={colors.textFourth} />
         </Pressable>
+        <Pressable
+          onPress={() => router.push("/appearance" as Href)}
+          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
+        >
+          <View className="flex-row items-center gap-4">
+            <Moon size={24} color={colors.textSecondary} />
+            <Text className="text-textBlack">Aparência</Text>
+          </View>
+          <ArrowRight size={24} color={colors.textFourth} />
+        </Pressable>
         <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
           <Pressable onPress={() => router.push("/notifications" as Href)}>
             <View className="flex-row items-center gap-4 justify-center">
@@ -174,7 +197,7 @@ export const ProfileContent = () => {
             </View>
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
       <Modal
         transparent
         animationType="fade"

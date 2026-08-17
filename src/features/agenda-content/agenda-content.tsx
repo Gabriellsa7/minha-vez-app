@@ -161,6 +161,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
         <AgendaSkeleton />
       ) : (
         <ScrollView
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: tabBarHeight + 8,
           }}

@@ -13,6 +13,7 @@ import Toast from "react-native-toast-message";
 import "../config/axios";
 import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
 import { useThemeColors } from "../hooks/use-theme-colors";
+import { useThemePreference } from "../hooks/use-theme-preference";
 import { queryClient } from "../lib/react-query";
 import { NotificationService } from "../services/notifications/notification.service";
 import { notificationQueryKeys } from "../hooks/use-notifications";
@@ -42,6 +43,7 @@ function navigateToNotification(data?: Record<string, unknown> | null) {
 
 export default function RootLayout() {
   const colors = useThemeColors();
+  useThemePreference();
   const [permissionModal, setPermissionModal] = useState({
     visible: false,
     canAskAgain: true,
