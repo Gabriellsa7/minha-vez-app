@@ -133,7 +133,7 @@ export default function HealthUnitInfo() {
           <View className="flex-row items-center gap-2">
             <View className="w-3 h-3 rounded-3xl bg-[#0B7A87]" />
             <Text className="text-[#0B7A87] font-bold tracking-widest uppercase text-sm">
-              Queue Pulse
+              Status da Fila
             </Text>
           </View>
 
@@ -144,7 +144,16 @@ export default function HealthUnitInfo() {
         </View>
         <View className="flex-row items-center justify-between">
           <Text className="text-lg font-bold">Serviços Oferecidos</Text>
-          <Text className="text-textSecondary font-medium">Ver todos</Text>
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/health-unit-services/[id]",
+                params: { id: healthUnit?._id ?? "" },
+              })
+            }
+          >
+            <Text className="text-textSecondary font-medium">Ver todos</Text>
+          </Pressable>
         </View>
         <View className="gap-4">
           {healthUnit?.services.map((health) => {

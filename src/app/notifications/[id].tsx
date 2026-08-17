@@ -15,7 +15,16 @@ import { useEffect } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const NOTIFICATION_TYPE_LABEL: Record<string, string> = {
+  REMINDER: "Lembrete",
+  QUEUE_NEAR: "Fila se aproximando",
+  QUEUE_NEXT: "Você é o próximo",
+  QUEUE_CALLED: "Chamada na fila",
+  EXAM_READY: "Exame pronto",
+};
+
 const notificationTypeLabel = (type: string) =>
+  NOTIFICATION_TYPE_LABEL[type] ??
   type
     .replace(/[_-]/g, " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());

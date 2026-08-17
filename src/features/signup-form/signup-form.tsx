@@ -76,7 +76,7 @@ export function SignupForm() {
       </View>
       <View className="w-[80%] gap-3">
         <Text>
-          Password <Text className="text-textDanger">*</Text>
+          Senha <Text className="text-textDanger">*</Text>
         </Text>
         <View>
           <Controller

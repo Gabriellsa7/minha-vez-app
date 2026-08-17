@@ -23,7 +23,7 @@ export default function HomeHeader({ user }: HomeHeaderProps) {
         <Avatar uri={user?.avatar} name={user?.name} variant="sm" />
         <View>
           <Text className="text-textPrimary font-bold text-lg">
-            {getGreeting()}, {user?.name || "User"}
+            {getGreeting()}, {user?.name || "Usuário"}
           </Text>
           <Text className="text-textThird">Permita-nós ajuda-lo</Text>
         </View>

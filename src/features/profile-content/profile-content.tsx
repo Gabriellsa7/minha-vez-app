@@ -123,7 +123,7 @@ export const ProfileContent = () => {
             <Text>{patient?.cpf}</Text>
           </View>
           <View className="flex-row justify-between">
-            <Text>Phone</Text>
+            <Text>Telefone</Text>
             <Text>{patient?.phone}</Text>
           </View>
           <View className="flex-row justify-between">

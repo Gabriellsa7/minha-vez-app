@@ -143,7 +143,7 @@ export default function PatientRegistrationModal({
                   value={birthDate}
                   onChangeText={setBirthDate}
                   onBlur={() => handleBlur("birthDate")}
-                  placeholder="DD/MM/YYYY"
+                  placeholder="DD/MM/AAAA"
                   keyboardType="numeric"
                   placeholderTextColor="#888"
                   className={`rounded-[16px] border bg-[#F4FBFC] px-3 py-3 ${
