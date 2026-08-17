@@ -2,7 +2,7 @@ import { Stack, router } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../../global.css";
 
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, focusManager } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -48,6 +48,22 @@ export default function RootLayout() {
     visible: false,
     canAskAgain: true,
   });
+
+  // React Query's `refetchOnWindowFocus` (on by default) normally relies on
+  // a browser `visibilitychange` listener that doesn't exist in React
+  // Native, so it silently never fires. Driving `focusManager` from
+  // AppState is the standard RN wiring for it: without this, data fetched
+  // before the app was backgrounded (e.g. health unit opening hours) stays
+  // cached even after the app returns to the foreground, since in-app
+  // navigation focus (handled per-screen via `useFocusEffect`) never fires
+  // for an OS-level background/foreground cycle.
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (status) => {
+      focusManager.setFocused(status === "active");
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     const evaluateNotificationPermission = async () => {

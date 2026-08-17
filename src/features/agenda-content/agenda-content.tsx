@@ -7,11 +7,16 @@ import { EAppointmentStatus } from "@/src/config/entities/appointments/appointme
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { getDateKey, getDateTimeFromDateAndTime } from "@/src/utils/util";
+import {
+  getDateKey,
+  getDateTimeFromDateAndTime,
+  isTimeWithinOpeningHours,
+} from "@/src/utils/util";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import { CalendarDays, Sparkles } from "lucide-react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import AppointmentConfirmModal from "./componentes/appointment-confirm-modal/appointment-confirm-modal";
 import AvaliableDays from "./componentes/avaliable-days/avaliable-days";
@@ -41,8 +46,19 @@ export default function AgendaContent({ user }: AgendaContentProps) {
 
   const [selectedTime, setSelectedTime] = useState<string>("");
 
-  const { data: healthUnits, isLoading: isHealthUnitsLoading } =
+  const { data: healthUnits, isLoading: isHealthUnitsLoading, refetch: refetchHealthUnits } =
     useGetHealthUnits();
+
+  // The Agenda tab stays mounted across tab switches (bottom-tab screens
+  // aren't remounted on focus), so react-query's default refetchOnMount
+  // never re-fires after the first visit. Without this, a clinic's opening
+  // hours edited elsewhere (e.g. in the manager app) would keep showing
+  // stale, already-fetched slots until the app is fully restarted.
+  useFocusEffect(
+    useCallback(() => {
+      refetchHealthUnits();
+    }, [refetchHealthUnits]),
+  );
 
   const { data: healthProfessionals, isLoading: isHealthProfessionalsLoading } =
     useGetHealthProfessionals();
@@ -132,10 +148,20 @@ export default function AgendaContent({ user }: AgendaContentProps) {
       selectedTime,
     );
 
-    if (bookedTimes.has(selectedTime) || selectedDateTime <= new Date()) {
+    const isOutsideOpeningHours = !isTimeWithinOpeningHours(
+      selectedUnit?.openingHours ?? [],
+      selectedDate,
+      selectedTime,
+    );
+
+    if (
+      bookedTimes.has(selectedTime) ||
+      selectedDateTime <= new Date() ||
+      isOutsideOpeningHours
+    ) {
       setSelectedTime("");
     }
-  }, [bookedTimes, selectedDate, selectedTime]);
+  }, [bookedTimes, selectedDate, selectedTime, selectedUnit]);
 
   const booking = useAppointmentBooking({
     user,
@@ -222,6 +248,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
                   isProfessionalAppointmentsLoading
                 }
                 professional={selectedProfessional}
+                openingHours={selectedUnit?.openingHours ?? []}
               />
             )}
 

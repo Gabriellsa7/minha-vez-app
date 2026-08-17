@@ -10,8 +10,9 @@ import { IHealthProfessional } from "@/src/config/entities/health-professional/h
 import { IUser } from "@/src/config/entities/user/user.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getDateKey } from "@/src/utils/util";
+import { useFocusEffect } from "@react-navigation/native";
 import { MapPin, CalendarDays } from "lucide-react-native";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import AppointmentConfirmModal from "../agenda-content/componentes/appointment-confirm-modal/appointment-confirm-modal";
 import AvaliableDays from "../agenda-content/componentes/avaliable-days/avaliable-days";
@@ -39,8 +40,18 @@ export default function HealthUnitSchedule({
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
 
-  const { data: healthUnit, isLoading: isHealthUnitLoading } =
+  const { data: healthUnit, isLoading: isHealthUnitLoading, refetch: refetchHealthUnit } =
     useGetHealthUnitById({ healthUnitId });
+
+  // This screen can stay mounted in the background (e.g. the patient
+  // switches tabs while it's pushed on the stack), so react-query's default
+  // refetchOnMount alone won't pick up opening-hours changes made elsewhere
+  // in the meantime. Refetch whenever the screen regains focus instead.
+  useFocusEffect(
+    useCallback(() => {
+      refetchHealthUnit();
+    }, [refetchHealthUnit]),
+  );
 
   const { data: healthProfessionals, isLoading: isHealthProfessionalsLoading } =
     useGetHealthProfessionals();
@@ -207,6 +218,7 @@ export default function HealthUnitSchedule({
                   isProfessionalAppointmentsLoading
                 }
                 professional={selectedProfessional}
+                openingHours={healthUnit?.openingHours ?? []}
               />
             )}
 
