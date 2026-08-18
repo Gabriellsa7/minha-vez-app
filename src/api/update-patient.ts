@@ -1,10 +1,15 @@
-import { EBloodType, IPatient } from "../config/entities/patients/patients.type";
+import {
+  EBloodType,
+  EPatientPriority,
+  IPatient,
+} from "../config/entities/patients/patients.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
 
 export interface IUpdatePatientPayload {
   patientId: string;
   phone?: string;
+  priority?: EPatientPriority;
   bloodType?: EBloodType;
   allergies?: string;
   medicalObservations?: string;
