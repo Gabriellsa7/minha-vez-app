@@ -251,6 +251,8 @@ export default function HealthUnitSchedule({
         setBirthDate={booking.setBirthDate}
         phone={booking.phone}
         setPhone={booking.setPhone}
+        priority={booking.priority}
+        setPriority={booking.setPriority}
         onSubmit={booking.handlePatientRegistrationSubmit}
         isSubmitting={booking.isCreatingPatient}
       />

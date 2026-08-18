@@ -39,6 +39,22 @@ export const formatBirthDateForDisplay = (value?: string) => {
   return `${day}/${month}/${year}`;
 };
 
+export const calculateAge = (birthDate: string): number | null => {
+  const [year, month, day] = birthDate.split("-").map(Number);
+  if (!year || !month || !day) return null;
+
+  const today = new Date();
+  let age = today.getFullYear() - year;
+
+  const hasHadBirthdayThisYear =
+    today.getMonth() + 1 > month ||
+    (today.getMonth() + 1 === month && today.getDate() >= day);
+
+  if (!hasHadBirthdayThisYear) age -= 1;
+
+  return age;
+};
+
 export const normalizeBirthDate = (value: string) => {
   const digits = value.replace(/\D/g, "").slice(0, 8);
   if (digits.length !== 8) return value;

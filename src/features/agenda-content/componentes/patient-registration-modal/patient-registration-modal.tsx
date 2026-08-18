@@ -4,11 +4,13 @@ import {
   Keyboard,
   Modal,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { Check, ChevronDown } from "lucide-react-native";
 
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import {
@@ -16,6 +18,14 @@ import {
   isValidCpf,
   isValidPhone,
 } from "@/src/utils/validation.util";
+import { calculateAge, normalizeBirthDate } from "@/src/utils/util";
+import {
+  ELDERLY_AGE_THRESHOLD,
+  PRIORITY_LABEL,
+  PRIORITY_REASON_OPTIONS,
+  PRIORITY_REASONS_REQUIRING_PROOF,
+} from "@/src/config/entities/patients/patients.constants";
+import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
 
 interface PatientRegistrationModalProps {
   visible: boolean;
@@ -26,6 +36,8 @@ interface PatientRegistrationModalProps {
   setBirthDate: (value: string) => void;
   phone: string;
   setPhone: (value: string) => void;
+  priority: EPatientPriority;
+  setPriority: (value: EPatientPriority) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
 }
@@ -41,6 +53,8 @@ export default function PatientRegistrationModal({
   setBirthDate,
   phone,
   setPhone,
+  priority,
+  setPriority,
   onSubmit,
   isSubmitting,
 }: PatientRegistrationModalProps) {
@@ -51,13 +65,22 @@ export default function PatientRegistrationModal({
     phone: false,
   });
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [showPriorityOptions, setShowPriorityOptions] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setTouched({ cpf: false, birthDate: false, phone: false });
       setSubmitAttempted(false);
+      setShowPriorityOptions(false);
     }
   }, [visible]);
+
+  const age = isValidBirthDate(birthDate)
+    ? calculateAge(normalizeBirthDate(birthDate))
+    : null;
+  const isAutoElderly = age !== null && age > ELDERLY_AGE_THRESHOLD;
+  const requiresProof =
+    !isAutoElderly && PRIORITY_REASONS_REQUIRING_PROOF.has(priority);
 
   const cpfError = !cpf.trim()
     ? "Informe o CPF"
@@ -180,6 +203,43 @@ export default function PatientRegistrationModal({
                   </Text>
                 )}
               </View>
+
+              <View>
+                <Text className="mb-1 text-sm font-medium text-textBlack">
+                  Prioridade de atendimento
+                </Text>
+
+                {isAutoElderly ? (
+                  <View className="rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3">
+                    <Text className="text-textBlack">
+                      {PRIORITY_LABEL[EPatientPriority.ELDERLY]}
+                    </Text>
+                    <Text className="mt-1 text-xs text-textFourth">
+                      Identificado automaticamente pela idade informada.
+                    </Text>
+                  </View>
+                ) : (
+                  <Pressable
+                    onPress={() => setShowPriorityOptions(true)}
+                    className="flex-row items-center justify-between rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3"
+                  >
+                    <Text className="text-textBlack">
+                      {PRIORITY_LABEL[priority]}
+                    </Text>
+                    <ChevronDown size={18} color={colors.textFourth} />
+                  </Pressable>
+                )}
+
+                {requiresProof && (
+                  <View className="mt-2 rounded-[16px] border border-warningBorder bg-warningBg p-3">
+                    <Text className="text-xs font-medium text-warningText">
+                      Leve um comprovante médico dessa condição no dia do
+                      atendimento. Em breve você também poderá anexá-lo pelo
+                      seu perfil.
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
           </TouchableWithoutFeedback>
 
@@ -210,6 +270,49 @@ export default function PatientRegistrationModal({
           </View>
         </View>
       </View>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showPriorityOptions}
+        onRequestClose={() => setShowPriorityOptions(false)}
+      >
+        <Pressable
+          className="flex-1 items-center justify-center bg-black/50 px-5"
+          onPress={() => setShowPriorityOptions(false)}
+        >
+          <View className="w-full max-h-[70%] rounded-[24px] bg-bgThird p-5">
+            <Text className="mb-3 text-lg font-semibold text-textBlack">
+              Prioridade de atendimento
+            </Text>
+            <ScrollView>
+              {PRIORITY_REASON_OPTIONS.map((option, index) => {
+                const isSelected = option === priority;
+
+                return (
+                  <Pressable
+                    key={option}
+                    onPress={() => {
+                      setPriority(option);
+                      setShowPriorityOptions(false);
+                    }}
+                    className={`flex-row items-center justify-between py-3 ${
+                      index > 0 ? "border-t border-borderPrimary" : ""
+                    }`}
+                  >
+                    <Text className="text-textBlack">
+                      {PRIORITY_LABEL[option]}
+                    </Text>
+                    {isSelected && (
+                      <Check size={18} color={colors.textSecondary} />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
     </Modal>
   );
 }

@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Bell,
   Edit,
+  HeartPulse,
   IdCard,
   Lock,
   LogOut,
@@ -160,6 +161,16 @@ export const ProfileContent = () => {
           <View className="flex-row items-center gap-4">
             <Edit size={24} color={colors.textSecondary} />
             <Text className="text-textBlack">Editar Perfil</Text>
+          </View>
+          <ArrowRight size={24} color={colors.textFourth} />
+        </Pressable>
+        <Pressable
+          onPress={() => router.push("/priority-info" as Href)}
+          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
+        >
+          <View className="flex-row items-center gap-4">
+            <HeartPulse size={24} color={colors.textSecondary} />
+            <Text className="text-textBlack">Prioridade de Atendimento</Text>
           </View>
           <ArrowRight size={24} color={colors.textFourth} />
         </Pressable>

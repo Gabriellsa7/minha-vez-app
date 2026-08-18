@@ -74,6 +74,8 @@ export function ExamSchedulingBooking({
     setBirthDate,
     phone,
     setPhone,
+    priority,
+    setPriority,
     isCreatingBooking,
     isCreatingPatient,
     handleConfirmPress,
@@ -166,6 +168,8 @@ export function ExamSchedulingBooking({
         setBirthDate={setBirthDate}
         phone={phone}
         setPhone={setPhone}
+        priority={priority}
+        setPriority={setPriority}
         onSubmit={handlePatientRegistrationSubmit}
         isSubmitting={isCreatingPatient}
       />

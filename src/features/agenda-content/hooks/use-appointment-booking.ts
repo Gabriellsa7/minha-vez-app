@@ -45,6 +45,9 @@ export function useAppointmentBooking({
   const [cpf, setCpf] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");
+  const [priority, setPriority] = useState<EPatientPriority>(
+    EPatientPriority.NORMAL,
+  );
 
   const { data: patient, isLoading: isPatientLoading } = useGetPatientById(
     { userId: user._id },
@@ -95,7 +98,7 @@ export function useAppointmentBooking({
         cpf: cpf.trim(),
         birthDate: normalizedBirthDate,
         phone: phone.trim(),
-        priority: EPatientPriority.NORMAL,
+        priority,
       },
       {
         onSuccess: () => {
@@ -199,6 +202,8 @@ export function useAppointmentBooking({
     setBirthDate: (value: string) => setBirthDate(formatBirthDate(value)),
     phone,
     setPhone: (value: string) => setPhone(formatPhone(value)),
+    priority,
+    setPriority,
     isCreatingAppointment,
     isCreatingPatient,
     handleConfirmPress,
