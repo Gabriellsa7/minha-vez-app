@@ -3,6 +3,7 @@ import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUploadUserImage } from "@/src/api/upload-user-image";
 import { Avatar } from "@/src/components/avatar/avatar";
 import Header from "@/src/components/header/header";
+import { ImageViewerModal } from "@/src/components/image-viewer/image-viewer-modal";
 import { HealthInfoCard } from "@/src/features/profile-content/health-info-card";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
@@ -33,6 +34,7 @@ import Toast from "react-native-toast-message";
 
 export const ProfileContent = () => {
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: user } = useGetUser();
@@ -108,7 +110,12 @@ export const ProfileContent = () => {
       >
         <View className="flex items-center gap-4 bg-bgThird p-4 rounded-xl">
           <View className="relative">
-            <Avatar uri={user?.avatar} name={user?.name} variant="lg" />
+            <Pressable
+              onPress={() => setIsImageViewerOpen(true)}
+              disabled={!user?.avatar}
+            >
+              <Avatar uri={user?.avatar} name={user?.name} variant="lg" />
+            </Pressable>
             <Pressable
               onPress={handlePickAvatar}
               disabled={isUploadingImage}
@@ -216,6 +223,13 @@ export const ProfileContent = () => {
           </View>
         </View>
       </Modal>
+      {user?.avatar ? (
+        <ImageViewerModal
+          visible={isImageViewerOpen}
+          uri={user.avatar}
+          onClose={() => setIsImageViewerOpen(false)}
+        />
+      ) : null}
     </View>
   );
 };

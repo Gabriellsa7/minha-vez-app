@@ -19,7 +19,9 @@ export default function Header({ text }: HeaderProps) {
         </Pressable>
         <Text className="text-textSecondary text-lg font-bold">{text}</Text>
       </View>
-      <Avatar uri={user?.avatar} name={user?.name} variant="sm" />
+      <Pressable onPress={() => router.push("/profile")}>
+        <Avatar uri={user?.avatar} name={user?.name} variant="sm" />
+      </Pressable>
     </View>
   );
 }
