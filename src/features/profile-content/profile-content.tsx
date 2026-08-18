@@ -9,6 +9,7 @@ import { logout } from "@/src/services/auth/auth.api";
 import { formatBirthDateForDisplay } from "@/src/utils/util";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useQueryClient } from "@tanstack/react-query";
+import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { Href, useRouter } from "expo-router";
 import {
@@ -179,6 +180,15 @@ export const ProfileContent = () => {
               <Text className="text-textDanger font-bold">SAIR DA CONTA</Text>
             </View>
           </Pressable>
+        </View>
+        <View className="items-center gap-1 pt-2">
+          <Text className="text-textFourth text-xs">
+            v{Constants.expoConfig?.version}
+          </Text>
+          <Text className="text-textFourth text-xs text-center">
+            Sendo feito com carinho por{"\n"}
+            <Text className="font-bold">Gabriel Santana Santos</Text>
+          </Text>
         </View>
       </ScrollView>
       <Modal
