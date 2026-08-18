@@ -44,7 +44,13 @@ export const HealthInfoCard = ({ patient }: HealthInfoCardProps) => {
           <Text className="text-xs font-bold uppercase text-statusDangerText">
             Tipo Sanguíneo
           </Text>
-          <Text className="text-2xl font-bold text-textBlack">
+          <Text
+            className={
+              patient?.bloodType
+                ? "text-2xl font-bold text-textBlack"
+                : "text-sm text-textFourth"
+            }
+          >
             {bloodTypeLabel}
           </Text>
         </View>
