@@ -1,7 +1,10 @@
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import SearchInput from "@/src/components/search-input/search-input";
-import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import {
+  EHealthUnitType,
+  IHealthUnit,
+} from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getMockClinicStats } from "@/src/features/explore/utils/mock-clinic-stats";
 import { Image } from "expo-image";
@@ -110,6 +113,23 @@ function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
               </Text>
             </View>
           )}
+        </View>
+        <View
+          className={`self-start rounded-full px-2 py-0.5 ${
+            unit.unitType === EHealthUnitType.PRIVATE
+              ? "bg-warningBg"
+              : "bg-infoBg"
+          }`}
+        >
+          <Text
+            className={`text-xs font-semibold ${
+              unit.unitType === EHealthUnitType.PRIVATE
+                ? "text-warningText"
+                : "text-highlightText"
+            }`}
+          >
+            {unit.unitType === EHealthUnitType.PRIVATE ? "Privada" : "Pública"}
+          </Text>
         </View>
         <View className="flex-row items-center gap-1">
           <MapPin size={12} color={colors.textFourth} />

@@ -1,5 +1,6 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
+import { EHealthUnitType } from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getServiceIcon } from "@/src/utils/service-icon.util";
 import { isToday, weekDayLabel } from "@/src/utils/util";
@@ -51,6 +52,27 @@ export default function HealthUnitInfo() {
             <Text className="text-3xl font-bold text-textBlack">
               {healthUnit?.name}
             </Text>
+            {healthUnit && (
+              <View
+                className={`self-start px-3 py-1 rounded-full ${
+                  healthUnit.unitType === EHealthUnitType.PRIVATE
+                    ? "bg-warningBg"
+                    : "bg-infoBg"
+                }`}
+              >
+                <Text
+                  className={`text-xs font-semibold ${
+                    healthUnit.unitType === EHealthUnitType.PRIVATE
+                      ? "text-warningText"
+                      : "text-highlightText"
+                  }`}
+                >
+                  {healthUnit.unitType === EHealthUnitType.PRIVATE
+                    ? "Unidade Privada"
+                    : "Unidade Pública"}
+                </Text>
+              </View>
+            )}
             {rating && rating.count > 0 && (
               <View className="flex-row items-center gap-1">
                 <Star size={16} color={colors.accentStar} fill={colors.accentStar} />

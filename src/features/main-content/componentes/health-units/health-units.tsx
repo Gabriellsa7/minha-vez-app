@@ -1,5 +1,8 @@
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
-import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import {
+  EHealthUnitType,
+  IHealthUnit,
+} from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -65,6 +68,26 @@ function HealthUnitHomeCard({ unit }: HealthUnitHomeCardProps) {
               contentFit="cover"
             />
           )}
+
+          <View
+            className={`absolute left-2 top-2 rounded-full px-2 py-1 ${
+              unit.unitType === EHealthUnitType.PRIVATE
+                ? "bg-warningBg"
+                : "bg-infoBg"
+            }`}
+          >
+            <Text
+              className={`text-xs font-semibold ${
+                unit.unitType === EHealthUnitType.PRIVATE
+                  ? "text-warningText"
+                  : "text-highlightText"
+              }`}
+            >
+              {unit.unitType === EHealthUnitType.PRIVATE
+                ? "Privada"
+                : "Pública"}
+            </Text>
+          </View>
 
           {rating && rating.count > 0 && (
             <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-bgThird px-2 py-1">

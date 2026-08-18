@@ -8,7 +8,13 @@ export interface IHealthUnit {
   phone: string;
   email: string;
   img?: string;
+  unitType: EHealthUnitType;
   createdAt: Date;
+}
+
+export enum EHealthUnitType {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
 }
 export interface IService {
   _id: string;
