@@ -3,6 +3,7 @@ import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUploadUserImage } from "@/src/api/upload-user-image";
 import { Avatar } from "@/src/components/avatar/avatar";
 import Header from "@/src/components/header/header";
+import { HealthInfoCard } from "@/src/features/profile-content/health-info-card";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
 import { formatBirthDateForDisplay } from "@/src/utils/util";
@@ -13,14 +14,10 @@ import { Href, useRouter } from "expo-router";
 import {
   ArrowRight,
   Bell,
-  Edit,
-  FileHeart,
-  HeartPulse,
   IdCard,
-  Lock,
   LogOut,
-  Moon,
   Pencil,
+  Settings as SettingsIcon,
 } from "lucide-react-native";
 import { useState } from "react";
 import {
@@ -155,53 +152,14 @@ export const ProfileContent = () => {
             </Text>
           </View>
         </View>
+        <HealthInfoCard patient={patient} />
         <Pressable
-          onPress={() => router.push("/edit-profile" as Href)}
+          onPress={() => router.push("/settings" as Href)}
           className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
         >
           <View className="flex-row items-center gap-4">
-            <Edit size={24} color={colors.textSecondary} />
-            <Text className="text-textBlack">Editar Perfil</Text>
-          </View>
-          <ArrowRight size={24} color={colors.textFourth} />
-        </Pressable>
-        <Pressable
-          onPress={() => router.push("/priority-info" as Href)}
-          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
-        >
-          <View className="flex-row items-center gap-4">
-            <HeartPulse size={24} color={colors.textSecondary} />
-            <Text className="text-textBlack">Prioridade de Atendimento</Text>
-          </View>
-          <ArrowRight size={24} color={colors.textFourth} />
-        </Pressable>
-        <Pressable
-          onPress={() => router.push("/medical-info" as Href)}
-          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
-        >
-          <View className="flex-row items-center gap-4">
-            <FileHeart size={24} color={colors.textSecondary} />
-            <Text className="text-textBlack">Informações de Saúde</Text>
-          </View>
-          <ArrowRight size={24} color={colors.textFourth} />
-        </Pressable>
-        <Pressable
-          onPress={() => router.push("/security-settings" as Href)}
-          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
-        >
-          <View className="flex-row items-center gap-4">
-            <Lock size={24} color={colors.textSecondary} />
-            <Text className="text-textBlack">Configurações de Segurança</Text>
-          </View>
-          <ArrowRight size={24} color={colors.textFourth} />
-        </Pressable>
-        <Pressable
-          onPress={() => router.push("/appearance" as Href)}
-          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
-        >
-          <View className="flex-row items-center gap-4">
-            <Moon size={24} color={colors.textSecondary} />
-            <Text className="text-textBlack">Aparência</Text>
+            <SettingsIcon size={24} color={colors.textSecondary} />
+            <Text className="text-textBlack">Mais Configurações</Text>
           </View>
           <ArrowRight size={24} color={colors.textFourth} />
         </Pressable>
