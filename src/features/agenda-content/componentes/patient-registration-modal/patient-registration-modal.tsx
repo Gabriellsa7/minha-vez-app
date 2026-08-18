@@ -234,8 +234,8 @@ export default function PatientRegistrationModal({
                   <View className="mt-2 rounded-[16px] border border-warningBorder bg-warningBg p-3">
                     <Text className="text-xs font-medium text-warningText">
                       Leve um comprovante médico dessa condição no dia do
-                      atendimento. Em breve você também poderá anexá-lo pelo
-                      seu perfil.
+                      atendimento. Você também pode anexá-lo pelo seu perfil,
+                      em Informações de Saúde.
                     </Text>
                   </View>
                 )}

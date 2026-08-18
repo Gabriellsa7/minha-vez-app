@@ -6,16 +6,17 @@ import {
 } from "@/src/config/entities/patients/patients.constants";
 import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
+import { Href, useRouter } from "expo-router";
 import {
   Paperclip,
   ShieldCheck,
   ShieldOff,
 } from "lucide-react-native";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 export function PriorityInfo() {
   const colors = useThemeColors();
+  const router = useRouter();
   const { data: user } = useGetUser();
   const { data: patient, isLoading } = useGetPatientById({
     userId: user?._id ?? "",
@@ -26,11 +27,7 @@ export function PriorityInfo() {
   const requiresProof = PRIORITY_REASONS_REQUIRING_PROOF.has(priority);
 
   const handleAttachProof = () => {
-    Toast.show({
-      type: "info",
-      text1: "Em breve",
-      text2: "O anexo de comprovantes será liberado em uma próxima atualização.",
-    });
+    router.push("/medical-info" as Href);
   };
 
   if (isLoading) {
@@ -82,7 +79,7 @@ export function PriorityInfo() {
           <View className="rounded-[16px] border border-warningBorder bg-warningBg p-3">
             <Text className="text-xs font-medium text-warningText">
               Leve um comprovante médico dessa condição no dia do
-              atendimento. Em breve você também poderá anexá-lo por aqui.
+              atendimento. Você também pode anexá-lo por aqui.
             </Text>
           </View>
           <Pressable
@@ -91,7 +88,7 @@ export function PriorityInfo() {
           >
             <Paperclip size={18} color={colors.textPrimary} />
             <Text className="text-center text-sm font-semibold text-textPrimary">
-              Anexar comprovante (em breve)
+              Anexar comprovante
             </Text>
           </Pressable>
         </View>

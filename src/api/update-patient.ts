@@ -1,10 +1,13 @@
-import { IPatient } from "../config/entities/patients/patients.type";
+import { EBloodType, IPatient } from "../config/entities/patients/patients.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
 
 export interface IUpdatePatientPayload {
   patientId: string;
   phone?: string;
+  bloodType?: EBloodType;
+  allergies?: string;
+  medicalObservations?: string;
 }
 
 export const UPDATE_PATIENT_KEY = "UPDATE_PATIENT_KEY";
