@@ -1,8 +1,8 @@
 import { useGetProfessionalRatingSummary } from "@/src/api/get-professional-rating-summary";
+import { Avatar } from "@/src/components/avatar/avatar";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { getUserInitials } from "@/src/utils/util";
 import { router } from "expo-router";
 import { Star } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
@@ -20,11 +20,7 @@ export function ProfessionalCard({ professional, unit }: ProfessionalCardProps) 
 
   return (
     <View className="flex-row items-center gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3">
-      <View className="h-12 w-12 items-center justify-center rounded-full bg-bgSecondary">
-        <Text className="text-base font-bold text-textPrimary">
-          {getUserInitials(professional.name)}
-        </Text>
-      </View>
+      <Avatar uri={professional.avatar} name={professional.name} variant="md" />
 
       <View className="flex-1 gap-0.5">
         <View className="flex-row items-center justify-between">

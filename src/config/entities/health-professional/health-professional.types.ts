@@ -4,6 +4,7 @@ export interface IHealthProfessional {
   healthUnitId: string;
   specialty: string;
   name: string;
+  avatar?: string;
   email: string;
   password: string;
   room: string;

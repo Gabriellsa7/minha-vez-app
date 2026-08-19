@@ -6,11 +6,12 @@ import { Text, View } from "react-native";
 interface AvatarProps {
   uri?: string | null;
   name?: string;
-  variant?: "sm" | "lg";
+  variant?: "sm" | "md" | "lg";
 }
 
-const VARIANT_CLASSES: Record<"sm" | "lg", { container: string; text: string }> = {
+const VARIANT_CLASSES: Record<"sm" | "md" | "lg", { container: string; text: string }> = {
   sm: { container: "w-10 h-10", text: "text-lg" },
+  md: { container: "w-12 h-12", text: "text-base" },
   lg: { container: "w-24 h-24", text: "text-2xl" },
 };
 
