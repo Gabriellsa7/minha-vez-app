@@ -204,19 +204,19 @@ export default function MainContent({ user, patient }: MainContentProps) {
           )}
           {nextUpcomingVisit && (
             <View className="w-full flex-row items-center justify-between bg-bgSecondary px-3 py-3 rounded-lg">
-              <View className="flex-row gap-2 items-center">
+              <View className="flex-row gap-2 items-center flex-1 mr-2">
                 {nextUpcomingVisit.type === "exam" ? (
                   <TestTube size={20} color={colors.textPrimary} />
                 ) : (
                   <Bell size={20} color={colors.textPrimary} />
                 )}
-                <Text className=" text-textPrimary">
+                <Text className="text-textPrimary flex-shrink">
                   {nextUpcomingVisit.type === "exam"
                     ? `Próximo exame: ${nextUpcomingVisit.examBooking.examOfferingName}`
                     : "Sua próxima consulta"}
                 </Text>
               </View>
-              <View className="flex-row gap-2 items-center">
+              <View className="flex-row gap-2 items-center flex-shrink-0">
                 <Text className="text-textPrimary">
                   {nextUpcomingVisit.type === "exam"
                     ? formatExamDateTime(nextUpcomingVisit.examBooking.scheduledAt)
