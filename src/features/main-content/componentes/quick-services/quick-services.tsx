@@ -4,6 +4,7 @@ import {
   Compass,
   FileText,
   History,
+  Stethoscope,
   TestTube,
 } from "lucide-react-native";
 import type { ComponentType } from "react";
@@ -48,6 +49,12 @@ const QUICK_SERVICES: QuickServiceItem[] = [
     label: "Meus Exames",
     icon: FileText,
     onPress: () => router.push("/exams"),
+  },
+  {
+    key: "minhas-consultas",
+    label: "Minhas Consultas",
+    icon: Stethoscope,
+    onPress: () => router.push("/my-appointments"),
   },
 ];
 

@@ -1,6 +1,7 @@
 import { useCancelExamBooking } from "@/src/api/cancel-exam-booking";
 import { GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY } from "@/src/api/get-exam-bookings-by-patient-id";
 import { useGetExamBookingById } from "@/src/api/get-exam-booking-by-id";
+import { useGetExamOfferingById } from "@/src/api/get-exam-offering-by-id";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import {
   EExamBookingStatus,
@@ -10,7 +11,12 @@ import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { CalendarClock, FileCheck2, MapPin } from "lucide-react-native";
+import {
+  CalendarClock,
+  Droplet,
+  FileCheck2,
+  MapPin,
+} from "lucide-react-native";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -58,6 +64,11 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
 
   const { mutate: cancelBooking, isPending: isCanceling } =
     useCancelExamBooking();
+
+  const { data: offering } = useGetExamOfferingById(
+    { id: booking?.examOfferingId ?? "" },
+    { enabled: Boolean(booking?.examOfferingId) },
+  );
 
   const canCancel =
     booking?.status === EExamBookingStatus.SCHEDULED ||
@@ -157,6 +168,23 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
           <Text className="mt-3 text-sm font-semibold text-textBlack">
             Valor: R$ {booking.priceSnapshot.toFixed(2).replace(".", ",")}
           </Text>
+        )}
+
+        {offering?.requiresFasting && (
+          <View className="mt-3 flex-row items-center gap-2">
+            <Droplet size={16} color={colors.textFourth} />
+            <Text className="text-sm text-textFourth">
+              Jejum{offering.fastingHours ? ` de ${offering.fastingHours}h` : ""}
+            </Text>
+          </View>
+        )}
+
+        {offering?.requiresPreparation && offering.preparationInstructions && (
+          <View className="mt-3 rounded-xl bg-warningBg p-3">
+            <Text className="text-xs font-semibold text-warningText">
+              Preparo: {offering.preparationInstructions}
+            </Text>
+          </View>
         )}
 
         {booking.cancelReason && (
