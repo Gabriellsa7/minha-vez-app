@@ -7,67 +7,12 @@ import { router } from "expo-router";
 import { Star } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
-interface ProfessionalsSectionProps {
-  professionals?: IHealthProfessional[];
-  healthUnits?: IHealthUnit[];
-  isLoading?: boolean;
-}
-
-export function ProfessionalsSection({
-  professionals,
-  healthUnits,
-  isLoading,
-}: ProfessionalsSectionProps) {
-  return (
-    <View className="gap-3">
-      <View>
-        <Text className="text-lg font-bold text-textBlack">
-          Especialistas Recomendados
-        </Text>
-        <Text className="text-sm text-textFourth">
-          Mais bem avaliados por pacientes
-        </Text>
-      </View>
-
-      {isLoading ? (
-        <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
-          <Text className="text-sm text-textFourth">
-            Carregando especialistas...
-          </Text>
-        </View>
-      ) : !professionals || professionals.length === 0 ? (
-        <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
-          <Text className="text-sm text-textFourth">
-            Nenhum especialista encontrado.
-          </Text>
-        </View>
-      ) : (
-        <View className="gap-3">
-          {professionals.map((professional) => {
-            const unit = healthUnits?.find(
-              (item) => item._id === professional.healthUnitId,
-            );
-
-            return (
-              <ProfessionalCard
-                key={professional._id}
-                professional={professional}
-                unit={unit}
-              />
-            );
-          })}
-        </View>
-      )}
-    </View>
-  );
-}
-
 interface ProfessionalCardProps {
   professional: IHealthProfessional;
   unit?: IHealthUnit;
 }
 
-function ProfessionalCard({ professional, unit }: ProfessionalCardProps) {
+export function ProfessionalCard({ professional, unit }: ProfessionalCardProps) {
   const { data: rating } = useGetProfessionalRatingSummary({
     professionalId: professional._id,
   });

@@ -1,5 +1,5 @@
-import { useGetExamBookingsByPatientId } from "@/src/api/get-exam-bookings-by-patient-id";
-import { useGetExamsByPatientId } from "@/src/api/get-exams-by-patient-id";
+import { useGetExamBookingsByPatientIdInfinite } from "@/src/api/get-exam-bookings-by-patient-id";
+import { useGetExamsByPatientIdInfinite } from "@/src/api/get-exams-by-patient-id";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
@@ -9,6 +9,8 @@ import {
   IExamBooking,
   isExamResultAvailable,
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
+import { IExam } from "@/src/config/entities/exams/exams.type";
+import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { router } from "expo-router";
@@ -20,7 +22,7 @@ import {
   Stethoscope,
 } from "lucide-react-native";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const STATUS_LABEL: Record<EExamBookingStatus, string> = {
@@ -63,24 +65,33 @@ export default function ExamsScreen() {
   );
 
   const {
-    data: exams,
+    data: examsPages,
     isLoading: isExamsLoading,
     isError: isExamsError,
     refetch: refetchExams,
-  } = useGetExamsByPatientId(
+    fetchNextPage: fetchNextExamsPage,
+    hasNextPage: hasNextExamsPage,
+    isFetchingNextPage: isFetchingNextExamsPage,
+  } = useGetExamsByPatientIdInfinite(
     { patientId: patient?._id ?? "" },
     { enabled: Boolean(patient?._id) },
   );
 
   const {
-    data: bookings,
+    data: bookingsPages,
     isLoading: isBookingsLoading,
     isError: isBookingsError,
     refetch: refetchBookings,
-  } = useGetExamBookingsByPatientId(
+    fetchNextPage: fetchNextBookingsPage,
+    hasNextPage: hasNextBookingsPage,
+    isFetchingNextPage: isFetchingNextBookingsPage,
+  } = useGetExamBookingsByPatientIdInfinite(
     { patientId: patient?._id ?? "" },
     { enabled: Boolean(patient?._id) },
   );
+
+  const exams = flattenPaginatedPages(examsPages);
+  const bookings = flattenPaginatedPages(bookingsPages);
 
   const isLoading =
     (tab === "scheduled" ? isBookingsLoading : isExamsLoading) &&
@@ -147,74 +158,109 @@ export default function ExamsScreen() {
             </Pressable>
           </View>
         ) : tab === "scheduled" ? (
-          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-            {!bookings || bookings.length === 0 ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={bookings}
+            keyExtractor={(booking) => booking._id}
+            onEndReached={() => {
+              if (hasNextBookingsPage && !isFetchingNextBookingsPage) {
+                fetchNextBookingsPage();
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            renderItem={({ item: booking }) => (
+              <ExamBookingCard booking={booking} />
+            )}
+            ListEmptyComponent={
               <View className="items-center justify-center rounded-2xl bg-bgThird p-8">
                 <CalendarClock size={28} color={colors.tabActive} />
                 <Text className="mt-3 text-center text-textFifth">
                   Você ainda não possui exames agendados.
                 </Text>
               </View>
-            ) : (
-              bookings.map((booking) => (
-                <ExamBookingCard key={booking._id} booking={booking} />
-              ))
-            )}
-          </ScrollView>
+            }
+            ListFooterComponent={
+              isFetchingNextBookingsPage ? (
+                <View className="items-center py-4">
+                  <ActivityIndicator color={colors.textSecondary} />
+                </View>
+              ) : null
+            }
+          />
         ) : (
-          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-            {!exams || exams.length === 0 ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={exams}
+            keyExtractor={(exam) => exam._id}
+            onEndReached={() => {
+              if (hasNextExamsPage && !isFetchingNextExamsPage) {
+                fetchNextExamsPage();
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            renderItem={({ item: exam }) => <ExamResultCard exam={exam} />}
+            ListEmptyComponent={
               <View className="items-center justify-center rounded-2xl bg-bgThird p-8">
                 <FileText size={28} color={colors.tabActive} />
                 <Text className="mt-3 text-center text-textFifth">
                   Você ainda não possui exames disponíveis.
                 </Text>
               </View>
-            ) : (
-              exams.map((exam) => (
-                <Pressable
-                  key={exam._id}
-                  accessibilityRole="button"
-                  onPress={() => router.push(`/exams/${exam._id}`)}
-                  className="mb-3 rounded-2xl border border-borderPrimary bg-bgThird p-4"
-                >
-                  <Text className="text-base font-semibold text-textBlack">
-                    {exam.examType}
-                  </Text>
-
-                  {exam.examDate && (
-                    <View className="mt-3 flex-row items-center gap-2">
-                      <CalendarClock size={14} color={colors.textFourth} />
-                      <Text className="text-xs text-textFourth">
-                        {new Date(exam.examDate).toLocaleDateString("pt-BR")}
-                      </Text>
-                    </View>
-                  )}
-
-                  {exam.doctorName && (
-                    <View className="mt-1 flex-row items-center gap-2">
-                      <Stethoscope size={14} color={colors.textFourth} />
-                      <Text className="text-xs text-textFourth" numberOfLines={1}>
-                        {exam.doctorName}
-                      </Text>
-                    </View>
-                  )}
-
-                  {exam.healthUnitName && (
-                    <View className="mt-1 flex-row items-center gap-2">
-                      <MapPin size={14} color={colors.textFourth} />
-                      <Text className="text-xs text-textFourth" numberOfLines={1}>
-                        {exam.healthUnitName}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              ))
-            )}
-          </ScrollView>
+            }
+            ListFooterComponent={
+              isFetchingNextExamsPage ? (
+                <View className="items-center py-4">
+                  <ActivityIndicator color={colors.textSecondary} />
+                </View>
+              ) : null
+            }
+          />
         )}
       </View>
     </SafeAreaView>
+  );
+}
+
+function ExamResultCard({ exam }: { exam: IExam }) {
+  const colors = useThemeColors();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={() => router.push(`/exams/${exam._id}`)}
+      className="mb-3 rounded-2xl border border-borderPrimary bg-bgThird p-4"
+    >
+      <Text className="text-base font-semibold text-textBlack">
+        {exam.examType}
+      </Text>
+
+      {exam.examDate && (
+        <View className="mt-3 flex-row items-center gap-2">
+          <CalendarClock size={14} color={colors.textFourth} />
+          <Text className="text-xs text-textFourth">
+            {new Date(exam.examDate).toLocaleDateString("pt-BR")}
+          </Text>
+        </View>
+      )}
+
+      {exam.doctorName && (
+        <View className="mt-1 flex-row items-center gap-2">
+          <Stethoscope size={14} color={colors.textFourth} />
+          <Text className="text-xs text-textFourth" numberOfLines={1}>
+            {exam.doctorName}
+          </Text>
+        </View>
+      )}
+
+      {exam.healthUnitName && (
+        <View className="mt-1 flex-row items-center gap-2">
+          <MapPin size={14} color={colors.textFourth} />
+          <Text className="text-xs text-textFourth" numberOfLines={1}>
+            {exam.healthUnitName}
+          </Text>
+        </View>
+      )}
+    </Pressable>
   );
 }
 

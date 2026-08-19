@@ -1,5 +1,8 @@
 import { useCancelAppointment } from "@/src/api/cancel-appointment";
-import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
+import {
+  GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY,
+  GET_APPOINTMENTS_BY_PATIENT_ID_KEY,
+} from "@/src/api/get-appointment-by-patient-id";
 import { GET_QUEUE_ITEMS_KEY } from "@/src/api/get-queue-item-by-patient-id";
 import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "@/src/api/get-queue-item-by-queue-id";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
@@ -36,6 +39,9 @@ export function CancelAppointmentModal({
           Toast.show({ type: "success", text1: "Consulta cancelada" });
           queryClient.invalidateQueries({
             queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
           });
           queryClient.invalidateQueries({
             queryKey: [GET_QUEUE_ITEMS_KEY],

@@ -1,6 +1,7 @@
 import {
+  GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY,
   GET_APPOINTMENTS_BY_PATIENT_ID_KEY,
-  useGetAppointmentsByPatientId,
+  useGetAppointmentsByPatientIdInfinite,
 } from "@/src/api/get-appointment-by-patient-id";
 import { useGetAppointmentRatingEligibility } from "@/src/api/get-appointment-rating-eligibility";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
@@ -13,6 +14,7 @@ import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import { IAppointment, EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
+import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,15 +27,21 @@ import {
   Star,
   Trash2,
 } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  FlatList,
   Pressable,
-  ScrollView,
   Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const HISTORY_STATUSES = [
+  EAppointmentStatus.COMPLETED,
+  EAppointmentStatus.CANCELED,
+];
 
 const STATUS_LABEL: Record<string, string> = {
   [EAppointmentStatus.COMPLETED]: "Concluída",
@@ -62,12 +70,15 @@ export default function HistoryScreen() {
   );
 
   const {
-    data: appointments,
+    data: appointmentsPages,
     isLoading: isAppointmentsLoading,
     isError,
     refetch,
-  } = useGetAppointmentsByPatientId(
-    { patientId: patient?._id ?? "" },
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetAppointmentsByPatientIdInfinite(
+    { patientId: patient?._id ?? "", status: HISTORY_STATUSES },
     { enabled: Boolean(patient?._id) },
   );
 
@@ -76,21 +87,7 @@ export default function HistoryScreen() {
 
   const clearHistory = useClearAppointmentHistory();
 
-  const history = useMemo(() => {
-    if (!appointments) return [];
-
-    return appointments
-      .filter(
-        (appointment) =>
-          appointment.status === EAppointmentStatus.COMPLETED ||
-          appointment.status === EAppointmentStatus.CANCELED,
-      )
-      .sort(
-        (first, second) =>
-          new Date(second.dateTime).getTime() -
-          new Date(first.dateTime).getTime(),
-      );
-  }, [appointments]);
+  const history = flattenPaginatedPages(appointmentsPages);
 
   const isLoading = isAppointmentsLoading && Boolean(patient?._id);
 
@@ -112,6 +109,9 @@ export default function HistoryScreen() {
                 onSuccess: () => {
                   queryClient.invalidateQueries({
                     queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
+                  });
+                  queryClient.invalidateQueries({
+                    queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
                   });
                 },
               },
@@ -158,35 +158,48 @@ export default function HistoryScreen() {
           </Pressable>
         </View>
       ) : (
-        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-          {history.length === 0 ? (
+        <FlatList
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          data={history}
+          keyExtractor={(appointment) => appointment._id}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+          }}
+          onEndReachedThreshold={0.5}
+          renderItem={({ item: appointment }) => {
+            const professional = healthProfessionals?.find(
+              (item) => item._id === appointment.professionalId,
+            );
+            const unit = healthUnits?.find(
+              (item) => item._id === appointment.healthUnitId,
+            );
+
+            return (
+              <HistoryAppointmentCard
+                appointment={appointment}
+                professional={professional}
+                unit={unit}
+                onRate={() => setRatingAppointmentId(appointment._id)}
+              />
+            );
+          }}
+          ListEmptyComponent={
             <View className="items-center justify-center rounded-2xl bg-bgThird p-8">
               <HistoryIcon size={28} color={colors.tabActive} />
               <Text className="mt-3 text-center text-textFifth">
                 Você ainda não possui consultas no histórico.
               </Text>
             </View>
-          ) : (
-            history.map((appointment) => {
-              const professional = healthProfessionals?.find(
-                (item) => item._id === appointment.professionalId,
-              );
-              const unit = healthUnits?.find(
-                (item) => item._id === appointment.healthUnitId,
-              );
-
-              return (
-                <HistoryAppointmentCard
-                  key={appointment._id}
-                  appointment={appointment}
-                  professional={professional}
-                  unit={unit}
-                  onRate={() => setRatingAppointmentId(appointment._id)}
-                />
-              );
-            })
-          )}
-        </ScrollView>
+          }
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View className="items-center py-4">
+                <ActivityIndicator color={colors.textSecondary} />
+              </View>
+            ) : null
+          }
+        />
       )}
 
       {history.length > 0 && (

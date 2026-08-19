@@ -1,5 +1,8 @@
 import { useCancelExamBooking } from "@/src/api/cancel-exam-booking";
-import { GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY } from "@/src/api/get-exam-bookings-by-patient-id";
+import {
+  GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY,
+  GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY,
+} from "@/src/api/get-exam-bookings-by-patient-id";
 import { useGetExamBookingById } from "@/src/api/get-exam-booking-by-id";
 import { useGetExamOfferingById } from "@/src/api/get-exam-offering-by-id";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
@@ -95,6 +98,9 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
                   Toast.show({ type: "success", text1: "Agendamento cancelado" });
                   queryClient.invalidateQueries({
                     queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
+                  });
+                  queryClient.invalidateQueries({
+                    queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY],
                   });
                   refetch();
                 },

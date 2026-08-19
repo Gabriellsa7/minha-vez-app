@@ -1,67 +1,87 @@
-import { useGetHealthUnits } from "@/src/api/get-health-units";
+import { useGetHealthUnitsInfinite } from "@/src/api/get-health-units";
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import SearchInput from "@/src/components/search-input/search-input";
 import {
   EHealthUnitType,
   IHealthUnit,
 } from "@/src/config/entities/health-unit/health-unit.types";
+import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
+import { useDebouncedValue } from "@/src/hooks/use-debounced-value";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getMockClinicStats } from "@/src/features/explore/utils/mock-clinic-stats";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { MapPin, Star, Timer, Users } from "lucide-react-native";
-import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 
 export function HealthUnitsList() {
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebouncedValue(searchQuery.trim(), 400);
+  const colors = useThemeColors();
 
-  const { data: healthUnits, isLoading } = useGetHealthUnits();
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetHealthUnitsInfinite({
+    search: debouncedSearch || undefined,
+  });
 
-  const normalizedQuery = searchQuery.trim().toLowerCase();
-
-  const filteredHealthUnits = useMemo(() => {
-    if (!healthUnits) return healthUnits;
-    if (!normalizedQuery) return healthUnits;
-
-    return healthUnits.filter((unit) => {
-      const haystack =
-        `${unit.name} ${unit.address.street} ${unit.address.neighborhood} ${unit.address.city}`.toLowerCase();
-
-      return haystack.includes(normalizedQuery);
-    });
-  }, [healthUnits, normalizedQuery]);
+  const healthUnits = flattenPaginatedPages(data);
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} className="bg-bgPrimary">
-      <View className="gap-5 p-5">
-        <SearchInput
-          placeholder="Buscar clínica, bairro ou cidade"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-
-        {isLoading ? (
+    <FlatList
+      className="bg-bgPrimary"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ gap: 16, padding: 20 }}
+      data={healthUnits}
+      keyExtractor={(unit) => unit._id}
+      onEndReached={() => {
+        if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+      }}
+      onEndReachedThreshold={0.5}
+      ListHeaderComponent={
+        <View className="pb-4">
+          <SearchInput
+            placeholder="Buscar clínica, bairro ou cidade"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      }
+      ListEmptyComponent={
+        isLoading ? (
           <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
             <Text className="text-sm text-textFourth">
               Carregando clínicas...
             </Text>
           </View>
-        ) : !filteredHealthUnits || filteredHealthUnits.length === 0 ? (
+        ) : (
           <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
             <Text className="text-sm text-textFourth">
               Nenhuma clínica encontrada.
             </Text>
           </View>
-        ) : (
-          <View className="gap-4">
-            {filteredHealthUnits.map((unit) => (
-              <HealthUnitListItem key={unit._id} unit={unit} />
-            ))}
+        )
+      }
+      ListFooterComponent={
+        isFetchingNextPage ? (
+          <View className="items-center py-4">
+            <ActivityIndicator color={colors.textSecondary} />
           </View>
-        )}
-      </View>
-    </ScrollView>
+        ) : null
+      }
+      renderItem={({ item: unit }) => <HealthUnitListItem unit={unit} />}
+    />
   );
 }
 

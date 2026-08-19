@@ -1,29 +1,53 @@
-import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
+import {
+  useGetHealthProfessionals,
+  useGetHealthProfessionalsInfinite,
+} from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import Header from "@/src/components/header/header";
 import SearchInput from "@/src/components/search-input/search-input";
+import { IHealthProfessional } from "@/src/config/entities/health-professional/health-professional.types";
+import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
+import { useDebouncedValue } from "@/src/hooks/use-debounced-value";
+import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React, { useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import {
   ALL_SPECIALTIES_OPTION,
   CategoriesSection,
 } from "@/src/components/specialty-filter/specialty-filter";
 import { ClinicsSection } from "./components/clinics-section";
-import { ProfessionalsSection } from "./components/professionals-section";
+import { ProfessionalCard } from "./components/professionals-section";
 
 export function ExploreContent() {
   const tabBarHeight = useBottomTabBarHeight();
+  const colors = useThemeColors();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebouncedValue(searchQuery.trim(), 400);
   const [selectedSpecialty, setSelectedSpecialty] = useState(
     ALL_SPECIALTIES_OPTION,
   );
 
   const { data: healthUnits, isLoading: isHealthUnitsLoading } =
     useGetHealthUnits();
-  const { data: healthProfessionals, isLoading: isHealthProfessionalsLoading } =
-    useGetHealthProfessionals();
+  const { data: healthProfessionals } = useGetHealthProfessionals();
+
+  const {
+    data: professionalsPages,
+    isLoading: isProfessionalsLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetHealthProfessionalsInfinite({
+    search: debouncedSearch || undefined,
+    specialty:
+      selectedSpecialty === ALL_SPECIALTIES_OPTION
+        ? undefined
+        : selectedSpecialty,
+  });
+
+  const professionals = flattenPaginatedPages(professionalsPages);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
@@ -39,6 +63,10 @@ export function ExploreContent() {
     });
   }, [healthUnits, normalizedQuery]);
 
+  const healthUnitsById = useMemo(() => {
+    return new Map((healthUnits ?? []).map((unit) => [unit._id, unit]));
+  }, [healthUnits]);
+
   const specialties = useMemo(() => {
     if (!healthProfessionals) return [];
 
@@ -47,69 +75,92 @@ export function ExploreContent() {
     ).sort();
   }, [healthProfessionals]);
 
-  const filteredProfessionals = useMemo(() => {
-    if (!healthProfessionals) return healthProfessionals;
-
-    return healthProfessionals.filter((professional) => {
-      const matchesSpecialty =
-        selectedSpecialty === ALL_SPECIALTIES_OPTION ||
-        professional.specialty === selectedSpecialty;
-
-      const matchesQuery =
-        !normalizedQuery ||
-        `${professional.name} ${professional.specialty}`
-          .toLowerCase()
-          .includes(normalizedQuery);
-
-      return matchesSpecialty && matchesQuery;
-    });
-  }, [healthProfessionals, selectedSpecialty, normalizedQuery]);
-
   return (
     <View className="flex-1">
       <Header text="Explorar" />
-      <ScrollView
+      <FlatList
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom: tabBarHeight + 20,
         }}
-      >
-        <View className="p-6 gap-8">
-          <View className="gap-2">
-            <View>
-              <Text className="text-textBlack text-2xl">
-                Encontre o cuidado{" "}
-                <Text className="text-textSecondary">que você merece</Text>.
-              </Text>
+        data={professionals}
+        keyExtractor={(professional) => professional._id}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+        }}
+        onEndReachedThreshold={0.5}
+        renderItem={({ item: professional }: { item: IHealthProfessional }) => (
+          <ProfessionalCard
+            professional={professional}
+            unit={healthUnitsById.get(professional.healthUnitId)}
+          />
+        )}
+        ItemSeparatorComponent={() => <View className="h-3" />}
+        ListHeaderComponent={
+          <View className="pt-6 gap-8">
+            <View className="gap-2">
+              <View>
+                <Text className="text-textBlack text-2xl">
+                  Encontre o cuidado{" "}
+                  <Text className="text-textSecondary">que você merece</Text>.
+                </Text>
+              </View>
+              <View>
+                <Text className="text-textFifth">
+                  Busque por clínicas, especialistas ou sintomas para iniciar seu
+                  atendimento.
+                </Text>
+              </View>
             </View>
+            <SearchInput
+              placeholder="Qual especialidade você procura"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <ClinicsSection
+              healthUnits={filteredHealthUnits}
+              isLoading={isHealthUnitsLoading}
+            />
+            <CategoriesSection
+              specialties={specialties}
+              selected={selectedSpecialty}
+              onSelect={setSelectedSpecialty}
+            />
             <View>
-              <Text className="text-textFifth">
-                Busque por clínicas, especialistas ou sintomas para iniciar seu
-                atendimento.
+              <Text className="text-lg font-bold text-textBlack">
+                Especialistas Recomendados
+              </Text>
+              <Text className="text-sm text-textFourth">
+                Mais bem avaliados por pacientes
               </Text>
             </View>
           </View>
-          <SearchInput
-            placeholder="Qual especialidade você procura"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <ClinicsSection
-            healthUnits={filteredHealthUnits}
-            isLoading={isHealthUnitsLoading}
-          />
-          <CategoriesSection
-            specialties={specialties}
-            selected={selectedSpecialty}
-            onSelect={setSelectedSpecialty}
-          />
-          <ProfessionalsSection
-            professionals={filteredProfessionals}
-            healthUnits={healthUnits}
-            isLoading={isHealthProfessionalsLoading}
-          />
-        </View>
-      </ScrollView>
+        }
+        ListHeaderComponentStyle={{ marginBottom: 12 }}
+        contentContainerClassName="px-6"
+        ListEmptyComponent={
+          isProfessionalsLoading ? (
+            <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
+              <Text className="text-sm text-textFourth">
+                Carregando especialistas...
+              </Text>
+            </View>
+          ) : (
+            <View className="rounded-2xl border border-dashed border-infoBorder bg-bgThird p-4">
+              <Text className="text-sm text-textFourth">
+                Nenhum especialista encontrado.
+              </Text>
+            </View>
+          )
+        }
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="items-center py-4">
+              <ActivityIndicator color={colors.textSecondary} />
+            </View>
+          ) : null
+        }
+      />
     </View>
   );
 }

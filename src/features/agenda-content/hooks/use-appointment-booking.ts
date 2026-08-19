@@ -1,6 +1,9 @@
 import { useCreateAppointment } from "@/src/api/create-appointment";
 import { useCreatePatient } from "@/src/api/create-patient";
-import { GET_APPOINTMENTS_BY_PATIENT_ID_KEY } from "@/src/api/get-appointment-by-patient-id";
+import {
+  GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY,
+  GET_APPOINTMENTS_BY_PATIENT_ID_KEY,
+} from "@/src/api/get-appointment-by-patient-id";
 import { GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY } from "@/src/api/get-appointments-by-professional-id";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { GET_QUEUE_ITEMS_KEY } from "@/src/api/get-queue-item-by-patient-id";
@@ -166,6 +169,9 @@ export function useAppointmentBooking({
           });
           queryClient.invalidateQueries({
             queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
           });
           queryClient.invalidateQueries({
             queryKey: [GET_APPOINTMENTS_BY_PROFESSIONAL_ID_KEY],

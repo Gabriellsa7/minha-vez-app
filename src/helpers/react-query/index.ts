@@ -1,6 +1,6 @@
 import type {
-  DefinedInitialDataInfiniteOptions,
   InfiniteData,
+  UndefinedInitialDataInfiniteOptions,
   UseMutationOptions,
   UseQueryOptions,
 } from "@tanstack/react-query";
@@ -57,7 +57,7 @@ export const generateReactQueryInfinityScroll = <
   return (
     params: TFilter,
     options?: Omit<
-      DefinedInitialDataInfiniteOptions<
+      UndefinedInitialDataInfiniteOptions<
         TReturnData,
         Error,
         InfiniteData<TReturnData>,

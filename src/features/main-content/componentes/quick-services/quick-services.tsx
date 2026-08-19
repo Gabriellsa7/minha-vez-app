@@ -1,69 +1,21 @@
 import { router } from "expo-router";
-import {
-  Calendar,
-  Compass,
-  FileText,
-  History,
-  Stethoscope,
-  TestTube,
-} from "lucide-react-native";
-import type { ComponentType } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 
-interface QuickServiceItem {
-  key: string;
-  label: string;
-  icon: ComponentType<{ size?: number; color?: string }>;
-  onPress: () => void;
-}
-
-const QUICK_SERVICES: QuickServiceItem[] = [
-  {
-    key: "agendar",
-    label: "Agendar",
-    icon: Calendar,
-    onPress: () => router.push("/agenda"),
-  },
-  {
-    key: "agendar-exame",
-    label: "Agendar Exame",
-    icon: TestTube,
-    onPress: () => router.push("/exam-scheduling"),
-  },
-  {
-    key: "historico",
-    label: "Histórico",
-    icon: History,
-    onPress: () => router.push("/history"),
-  },
-  {
-    key: "explorar",
-    label: "Explorar",
-    icon: Compass,
-    onPress: () => router.push("/explore"),
-  },
-  {
-    key: "meus-exames",
-    label: "Meus Exames",
-    icon: FileText,
-    onPress: () => router.push("/exams"),
-  },
-  {
-    key: "minhas-consultas",
-    label: "Minhas Consultas",
-    icon: Stethoscope,
-    onPress: () => router.push("/my-appointments"),
-  },
-];
+import { QUICK_SERVICES } from "./quick-services.constants";
 
 export function QuickServices() {
   const colors = useThemeColors();
 
   return (
     <View className="gap-5">
-      <Text className="text-textBlack">Serviços Rapidos</Text>
+      <View className="flex-row items-center justify-between">
+        <Text className="text-textBlack">Serviços Rapidos</Text>
+        <Pressable onPress={() => router.push("/quick-services")}>
+          <Text className="text-sm text-textThird">Ver todos</Text>
+        </Pressable>
+      </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
