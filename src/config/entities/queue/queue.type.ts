@@ -28,3 +28,9 @@ export interface IQueueWithDetails extends IQueue {
   patientCode?: string;
   estimatedWaitMinutes?: number | null;
 }
+
+export interface IHealthUnitQueueSummary {
+  hasOpenQueue: boolean;
+  waitingCount: number;
+  estimatedWaitMinutes: number | null;
+}

@@ -1,4 +1,5 @@
 import { useGetHealthUnitsInfinite } from "@/src/api/get-health-units";
+import { useGetHealthUnitQueueSummary } from "@/src/api/get-health-unit-queue-summary";
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import SearchInput from "@/src/components/search-input/search-input";
 import {
@@ -8,7 +9,6 @@ import {
 import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
 import { useDebouncedValue } from "@/src/hooks/use-debounced-value";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { getMockClinicStats } from "@/src/features/explore/utils/mock-clinic-stats";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { MapPin, Star, Timer, Users } from "lucide-react-native";
@@ -91,8 +91,10 @@ interface HealthUnitListItemProps {
 
 function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
   const colors = useThemeColors();
-  const stats = getMockClinicStats(unit._id);
   const { data: rating } = useGetHealthUnitRatingSummary({
+    healthUnitId: unit._id,
+  });
+  const { data: queueSummary } = useGetHealthUnitQueueSummary({
     healthUnitId: unit._id,
   });
 
@@ -161,20 +163,24 @@ function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
             {unit.address.neighborhood}
           </Text>
         </View>
-        <View className="flex-row items-center gap-3 mt-1">
-          <View className="flex-row items-center gap-1">
-            <Timer size={13} color={colors.textSecondary} />
-            <Text className="text-xs text-textSecondary">
-              {stats.waitMinutes} min
-            </Text>
+        {queueSummary?.hasOpenQueue && (
+          <View className="flex-row items-center gap-3 mt-1">
+            {queueSummary.estimatedWaitMinutes !== null && (
+              <View className="flex-row items-center gap-1">
+                <Timer size={13} color={colors.textSecondary} />
+                <Text className="text-xs text-textSecondary">
+                  {queueSummary.estimatedWaitMinutes} min
+                </Text>
+              </View>
+            )}
+            <View className="flex-row items-center gap-1">
+              <Users size={13} color={colors.textSecondary} />
+              <Text className="text-xs text-textSecondary">
+                {queueSummary.waitingCount} na fila
+              </Text>
+            </View>
           </View>
-          <View className="flex-row items-center gap-1">
-            <Users size={13} color={colors.textSecondary} />
-            <Text className="text-xs text-textSecondary">
-              {stats.activeQueueSize} na fila
-            </Text>
-          </View>
-        </View>
+        )}
       </View>
     </Pressable>
   );
