@@ -13,7 +13,9 @@ import { ArrowLeft } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -126,100 +128,106 @@ export function RatingModal({
       statusBarTranslucent
     >
       <SafeAreaView className="flex-1 justify-center bg-black/50 px-4">
-        <View className="max-h-[85%] rounded-2xl bg-bgThird">
-          <View className="flex-row items-center justify-between border-b border-borderPrimary px-5 py-4">
-            <Text className="text-lg font-bold text-textBlack">
-              Avalie seu atendimento
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Fechar avaliação"
-              hitSlop={8}
-              onPress={onClose}
-            >
-              <ArrowLeft size={24} color={colors.textSecondary} />
-            </Pressable>
-          </View>
-
-          {isEligibilityLoading ? (
-            <View className="items-center gap-3 p-8">
-              <ActivityIndicator color={colors.textSecondary} />
-              <Text className="text-textFifth">Carregando...</Text>
-            </View>
-          ) : hasNothingToRate ? (
-            <View className="items-center gap-3 p-8">
-              <Text className="text-center text-textFifth">
-                Não há nada para avaliar neste atendimento.
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <View className="max-h-[85%] rounded-2xl bg-bgThird">
+            <View className="flex-row items-center justify-between border-b border-borderPrimary px-5 py-4">
+              <Text className="text-lg font-bold text-textBlack">
+                Avalie seu atendimento
               </Text>
-            </View>
-          ) : (
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              className="px-5 py-4"
-            >
-              {canRateProfessional && (
-                <View className="mb-5 gap-2">
-                  <Text className="text-base font-semibold text-textBlack">
-                    {professional?.name
-                      ? `Dr(a). ${professional.name}`
-                      : "Profissional"}
-                  </Text>
-                  <StarRatingInput
-                    value={professionalStars}
-                    onChange={setProfessionalStars}
-                  />
-                  <TextInput
-                    value={professionalComment}
-                    onChangeText={setProfessionalComment}
-                    placeholder="Deixe um comentário (opcional)"
-                    placeholderTextColor={colors.textFourth}
-                    multiline
-                    className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
-                  />
-                </View>
-              )}
-
-              {canRateClinic && (
-                <View className="mb-2 gap-2">
-                  <Text className="text-base font-semibold text-textBlack">
-                    {healthUnit?.name ?? "Clínica"}
-                  </Text>
-                  <StarRatingInput
-                    value={clinicStars}
-                    onChange={setClinicStars}
-                  />
-                  <TextInput
-                    value={clinicComment}
-                    onChangeText={setClinicComment}
-                    placeholder="Deixe um comentário (opcional)"
-                    placeholderTextColor={colors.textFourth}
-                    multiline
-                    className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
-                  />
-                </View>
-              )}
-            </ScrollView>
-          )}
-
-          {!hasNothingToRate && !isEligibilityLoading && (
-            <View className="px-5 pb-5 pt-2">
               <Pressable
                 accessibilityRole="button"
-                disabled={!canSubmit || createRating.isPending}
-                onPress={handleSubmit}
-                className={`items-center rounded-xl py-3 ${
-                  canSubmit && !createRating.isPending
-                    ? "bg-bgSecondary"
-                    : "bg-infoBorder"
-                }`}
+                accessibilityLabel="Fechar avaliação"
+                hitSlop={8}
+                onPress={onClose}
               >
-                <Text className="font-bold text-textPrimary">
-                  {createRating.isPending ? "Enviando..." : "Enviar avaliação"}
-                </Text>
+                <ArrowLeft size={24} color={colors.textSecondary} />
               </Pressable>
             </View>
-          )}
-        </View>
+
+            {isEligibilityLoading ? (
+              <View className="items-center gap-3 p-8">
+                <ActivityIndicator color={colors.textSecondary} />
+                <Text className="text-textFifth">Carregando...</Text>
+              </View>
+            ) : hasNothingToRate ? (
+              <View className="items-center gap-3 p-8">
+                <Text className="text-center text-textFifth">
+                  Não há nada para avaliar neste atendimento.
+                </Text>
+              </View>
+            ) : (
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                className="px-5 py-4"
+              >
+                {canRateProfessional && (
+                  <View className="mb-5 gap-2">
+                    <Text className="text-base font-semibold text-textBlack">
+                      {professional?.name
+                        ? `Dr(a). ${professional.name}`
+                        : "Profissional"}
+                    </Text>
+                    <StarRatingInput
+                      value={professionalStars}
+                      onChange={setProfessionalStars}
+                    />
+                    <TextInput
+                      value={professionalComment}
+                      onChangeText={setProfessionalComment}
+                      placeholder="Deixe um comentário (opcional)"
+                      placeholderTextColor={colors.textFourth}
+                      multiline
+                      className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
+                    />
+                  </View>
+                )}
+
+                {canRateClinic && (
+                  <View className="mb-2 gap-2">
+                    <Text className="text-base font-semibold text-textBlack">
+                      {healthUnit?.name ?? "Clínica"}
+                    </Text>
+                    <StarRatingInput
+                      value={clinicStars}
+                      onChange={setClinicStars}
+                    />
+                    <TextInput
+                      value={clinicComment}
+                      onChangeText={setClinicComment}
+                      placeholder="Deixe um comentário (opcional)"
+                      placeholderTextColor={colors.textFourth}
+                      multiline
+                      className="min-h-[70px] rounded-xl border border-borderPrimary bg-bgPrimary p-3 text-textFourth"
+                    />
+                  </View>
+                )}
+              </ScrollView>
+            )}
+
+            {!hasNothingToRate && !isEligibilityLoading && (
+              <View className="px-5 pb-5 pt-2">
+                <Pressable
+                  accessibilityRole="button"
+                  disabled={!canSubmit || createRating.isPending}
+                  onPress={handleSubmit}
+                  className={`items-center rounded-xl py-3 ${
+                    canSubmit && !createRating.isPending
+                      ? "bg-bgSecondary"
+                      : "bg-infoBorder"
+                  }`}
+                >
+                  <Text className="font-bold text-textPrimary">
+                    {createRating.isPending
+                      ? "Enviando..."
+                      : "Enviar avaliação"}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
   );

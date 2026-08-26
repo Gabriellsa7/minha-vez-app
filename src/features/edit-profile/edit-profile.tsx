@@ -15,6 +15,8 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -165,129 +167,139 @@ export function EditProfile() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        className="bg-bgPrimary"
-        contentContainerStyle={{ padding: 24, gap: 16 }}
-      >
-        <View className="gap-4 rounded-2xl bg-bgThird p-4">
-          <View>
-            <Text className="mb-1 text-sm font-medium text-textFifth">
-              Nome
-            </Text>
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              onBlur={() => handleBlur("name")}
-              placeholder="Seu nome completo"
-              placeholderTextColor={colors.textFourth}
-              className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
-                showNameError ? "border-textDanger" : "border-infoBorder"
-              }`}
-            />
-            {showNameError && (
-              <Text className="mt-1 text-xs text-textDanger">{nameError}</Text>
-            )}
-          </View>
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          className="bg-bgPrimary"
+          contentContainerStyle={{ padding: 24, gap: 16 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View className="gap-4 rounded-2xl bg-bgThird p-4">
+            <View>
+              <Text className="mb-1 text-sm font-medium text-textFifth">
+                Nome
+              </Text>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                onBlur={() => handleBlur("name")}
+                placeholder="Seu nome completo"
+                placeholderTextColor={colors.textFourth}
+                className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                  showNameError ? "border-textDanger" : "border-infoBorder"
+                }`}
+              />
+              {showNameError && (
+                <Text className="mt-1 text-xs text-textDanger">
+                  {nameError}
+                </Text>
+              )}
+            </View>
 
-          <View>
-            <Text className="mb-1 text-sm font-medium text-textFifth">
-              Email
-            </Text>
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              onBlur={() => handleBlur("email")}
-              placeholder="seu@email.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              placeholderTextColor={colors.textFourth}
-              className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
-                showEmailError ? "border-textDanger" : "border-infoBorder"
-              }`}
-            />
-            {showEmailError && (
-              <Text className="mt-1 text-xs text-textDanger">{emailError}</Text>
+            <View>
+              <Text className="mb-1 text-sm font-medium text-textFifth">
+                Email
+              </Text>
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                onBlur={() => handleBlur("email")}
+                placeholder="seu@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                placeholderTextColor={colors.textFourth}
+                className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                  showEmailError ? "border-textDanger" : "border-infoBorder"
+                }`}
+              />
+              {showEmailError && (
+                <Text className="mt-1 text-xs text-textDanger">
+                  {emailError}
+                </Text>
+              )}
+            </View>
+
+            {patient && (
+              <View>
+                <Text className="mb-1 text-sm font-medium text-textFifth">
+                  Telefone
+                </Text>
+                <TextInput
+                  value={phone}
+                  onChangeText={(value) => setPhone(formatPhone(value))}
+                  onBlur={() => handleBlur("phone")}
+                  placeholder="(11) 99999-9999"
+                  keyboardType="numeric"
+                  placeholderTextColor={colors.textFourth}
+                  className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
+                    showPhoneError ? "border-textDanger" : "border-infoBorder"
+                  }`}
+                />
+                {showPhoneError && (
+                  <Text className="mt-1 text-xs text-textDanger">
+                    {phoneError}
+                  </Text>
+                )}
+              </View>
             )}
           </View>
 
           {patient && (
-            <View>
-              <Text className="mb-1 text-sm font-medium text-textFifth">
-                Telefone
-              </Text>
-              <TextInput
-                value={phone}
-                onChangeText={(value) => setPhone(formatPhone(value))}
-                onBlur={() => handleBlur("phone")}
-                placeholder="(11) 99999-9999"
-                keyboardType="numeric"
-                placeholderTextColor={colors.textFourth}
-                className={`rounded-[16px] border bg-infoBg px-3 py-3 text-textBlack ${
-                  showPhoneError ? "border-textDanger" : "border-infoBorder"
-                }`}
-              />
-              {showPhoneError && (
-                <Text className="mt-1 text-xs text-textDanger">
-                  {phoneError}
+            <View className="gap-4 rounded-2xl bg-bgThird p-4">
+              <View className="flex-row items-center gap-2">
+                <Lock size={16} color={colors.textFourth} />
+                <Text className="text-sm font-medium text-textFourth">
+                  Esses dados não podem ser alterados
                 </Text>
-              )}
+              </View>
+
+              <View>
+                <Text className="mb-1 text-sm font-medium text-textFifth">
+                  CPF
+                </Text>
+                <TextInput
+                  value={patient.cpf}
+                  editable={false}
+                  placeholderTextColor={colors.textFourth}
+                  className="rounded-[16px] border border-borderPrimary bg-bgPrimary px-3 py-3 text-textFourth"
+                />
+              </View>
+
+              <View>
+                <Text className="mb-1 text-sm font-medium text-textFifth">
+                  Data de Nascimento
+                </Text>
+                <TextInput
+                  value={formatBirthDateForDisplay(patient.birthDate)}
+                  editable={false}
+                  placeholderTextColor={colors.textFourth}
+                  className="rounded-[16px] border border-borderPrimary bg-bgPrimary px-3 py-3 text-textFourth"
+                />
+              </View>
             </View>
           )}
-        </View>
 
-        {patient && (
-          <View className="gap-4 rounded-2xl bg-bgThird p-4">
-            <View className="flex-row items-center gap-2">
-              <Lock size={16} color={colors.textFourth} />
-              <Text className="text-sm font-medium text-textFourth">
-                Esses dados não podem ser alterados
+          <Pressable
+            onPress={handleSave}
+            disabled={isSaving}
+            className={`rounded-[20px] p-4 ${
+              isSaving ? "bg-highlightBorder" : "bg-bgSecondary"
+            }`}
+          >
+            {isSaving ? (
+              <ActivityIndicator size="small" color={colors.textPrimary} />
+            ) : (
+              <Text className="text-center text-base font-semibold text-textPrimary">
+                Salvar alterações
               </Text>
-            </View>
-
-            <View>
-              <Text className="mb-1 text-sm font-medium text-textFifth">
-                CPF
-              </Text>
-              <TextInput
-                value={patient.cpf}
-                editable={false}
-                placeholderTextColor={colors.textFourth}
-                className="rounded-[16px] border border-borderPrimary bg-bgPrimary px-3 py-3 text-textFourth"
-              />
-            </View>
-
-            <View>
-              <Text className="mb-1 text-sm font-medium text-textFifth">
-                Data de Nascimento
-              </Text>
-              <TextInput
-                value={formatBirthDateForDisplay(patient.birthDate)}
-                editable={false}
-                placeholderTextColor={colors.textFourth}
-                className="rounded-[16px] border border-borderPrimary bg-bgPrimary px-3 py-3 text-textFourth"
-              />
-            </View>
-          </View>
-        )}
-
-        <Pressable
-          onPress={handleSave}
-          disabled={isSaving}
-          className={`rounded-[20px] p-4 ${
-            isSaving ? "bg-highlightBorder" : "bg-bgSecondary"
-          }`}
-        >
-          {isSaving ? (
-            <ActivityIndicator size="small" color={colors.textPrimary} />
-          ) : (
-            <Text className="text-center text-base font-semibold text-textPrimary">
-              Salvar alterações
-            </Text>
-          )}
-        </Pressable>
-      </ScrollView>
-    </TouchableWithoutFeedback>
+            )}
+          </Pressable>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }

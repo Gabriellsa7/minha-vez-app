@@ -33,7 +33,9 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -51,9 +53,7 @@ export function MedicalInfo() {
     { enabled: Boolean(user?._id) },
   );
 
-  const [bloodType, setBloodType] = useState<EBloodType | undefined>(
-    undefined,
-  );
+  const [bloodType, setBloodType] = useState<EBloodType | undefined>(undefined);
   const [allergies, setAllergies] = useState("");
   const [medicalObservations, setMedicalObservations] = useState("");
   const [showBloodTypeOptions, setShowBloodTypeOptions] = useState(false);
@@ -67,8 +67,7 @@ export function MedicalInfo() {
     }
   }, [patient]);
 
-  const { mutate: updatePatient, isPending: isSavingInfo } =
-    useUpdatePatient();
+  const { mutate: updatePatient, isPending: isSavingInfo } = useUpdatePatient();
   const { mutate: uploadDocument, isPending: isUploadingDocument } =
     useUploadPatientMedicalDocument();
   const { mutate: deleteDocument, isPending: isDeletingDocument } =
@@ -252,7 +251,10 @@ export function MedicalInfo() {
               {
                 onSuccess: () => {
                   invalidatePatient();
-                  Toast.show({ type: "success", text1: "Comprovante removido" });
+                  Toast.show({
+                    type: "success",
+                    text1: "Comprovante removido",
+                  });
                 },
                 onError: (error) => {
                   Toast.show({
@@ -278,210 +280,220 @@ export function MedicalInfo() {
   }
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      className="flex-1 bg-bgPrimary"
-      contentContainerStyle={{ padding: 24, gap: 16 }}
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View className="gap-4 rounded-2xl bg-bgThird p-4">
-        <View className="flex-row items-center gap-2">
-          <Droplet size={18} color={colors.textSecondary} />
-          <Text className="text-base font-bold text-textBlack">
-            Dados de saúde
-          </Text>
-        </View>
-        <Text className="text-xs text-textFourth">
-          Esses dados são opcionais, mas podem ajudar no seu atendimento.
-        </Text>
-
-        <View>
-          <Text className="mb-1 text-sm font-medium text-textFifth">
-            Tipo sanguíneo
-          </Text>
-          <Pressable
-            onPress={() => setShowBloodTypeOptions(true)}
-            className="flex-row items-center justify-between rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3"
-          >
-            <Text className="text-textBlack">
-              {bloodType ? BLOOD_TYPE_LABEL[bloodType] : "Não informado"}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className="flex-1 bg-bgPrimary"
+        contentContainerStyle={{ padding: 24, gap: 16 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="gap-4 rounded-2xl bg-bgThird p-4">
+          <View className="flex-row items-center gap-2">
+            <Droplet size={18} color={colors.textSecondary} />
+            <Text className="text-base font-bold text-textBlack">
+              Dados de saúde
             </Text>
-            <ChevronDown size={18} color={colors.textFourth} />
+          </View>
+          <Text className="text-xs text-textFourth">
+            Esses dados são opcionais, mas podem ajudar no seu atendimento.
+          </Text>
+
+          <View>
+            <Text className="mb-1 text-sm font-medium text-textFifth">
+              Tipo sanguíneo
+            </Text>
+            <Pressable
+              onPress={() => setShowBloodTypeOptions(true)}
+              className="flex-row items-center justify-between rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3"
+            >
+              <Text className="text-textBlack">
+                {bloodType ? BLOOD_TYPE_LABEL[bloodType] : "Não informado"}
+              </Text>
+              <ChevronDown size={18} color={colors.textFourth} />
+            </Pressable>
+          </View>
+
+          <View>
+            <Text className="mb-1 text-sm font-medium text-textFifth">
+              Alergias
+            </Text>
+            <TextInput
+              value={allergies}
+              onChangeText={setAllergies}
+              placeholder="Ex: alergia a dipirona, amendoim..."
+              placeholderTextColor={colors.textFourth}
+              multiline
+              numberOfLines={3}
+              className="rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3 text-textBlack"
+              style={{ minHeight: 72, textAlignVertical: "top" }}
+            />
+          </View>
+
+          <View>
+            <Text className="mb-1 text-sm font-medium text-textFifth">
+              Condições / observações médicas
+            </Text>
+            <TextInput
+              value={medicalObservations}
+              onChangeText={setMedicalObservations}
+              placeholder="Ex: hipertensão, diabetes..."
+              placeholderTextColor={colors.textFourth}
+              multiline
+              numberOfLines={3}
+              className="rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3 text-textBlack"
+              style={{ minHeight: 72, textAlignVertical: "top" }}
+            />
+          </View>
+
+          <Pressable
+            onPress={handleSaveInfo}
+            disabled={isSavingInfo || !infoChanged}
+            className={`rounded-[16px] p-3 ${
+              isSavingInfo || !infoChanged
+                ? "bg-highlightBorder"
+                : "bg-bgSecondary"
+            }`}
+          >
+            {isSavingInfo ? (
+              <ActivityIndicator size="small" color={colors.textPrimary} />
+            ) : (
+              <Text className="text-center text-sm font-semibold text-textPrimary">
+                Salvar dados de saúde
+              </Text>
+            )}
           </Pressable>
         </View>
 
-        <View>
-          <Text className="mb-1 text-sm font-medium text-textFifth">
-            Alergias
-          </Text>
-          <TextInput
-            value={allergies}
-            onChangeText={setAllergies}
-            placeholder="Ex: alergia a dipirona, amendoim..."
-            placeholderTextColor={colors.textFourth}
-            multiline
-            numberOfLines={3}
-            className="rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3 text-textBlack"
-            style={{ minHeight: 72, textAlignVertical: "top" }}
-          />
-        </View>
-
-        <View>
-          <Text className="mb-1 text-sm font-medium text-textFifth">
-            Condições / observações médicas
-          </Text>
-          <TextInput
-            value={medicalObservations}
-            onChangeText={setMedicalObservations}
-            placeholder="Ex: hipertensão, diabetes..."
-            placeholderTextColor={colors.textFourth}
-            multiline
-            numberOfLines={3}
-            className="rounded-[16px] border border-infoBorder bg-infoBg px-3 py-3 text-textBlack"
-            style={{ minHeight: 72, textAlignVertical: "top" }}
-          />
-        </View>
-
-        <Pressable
-          onPress={handleSaveInfo}
-          disabled={isSavingInfo || !infoChanged}
-          className={`rounded-[16px] p-3 ${
-            isSavingInfo || !infoChanged ? "bg-highlightBorder" : "bg-bgSecondary"
-          }`}
-        >
-          {isSavingInfo ? (
-            <ActivityIndicator size="small" color={colors.textPrimary} />
-          ) : (
-            <Text className="text-center text-sm font-semibold text-textPrimary">
-              Salvar dados de saúde
-            </Text>
-          )}
-        </Pressable>
-      </View>
-
-      <View className="gap-3 rounded-2xl bg-bgThird p-4">
-        <View className="flex-row items-center gap-2">
-          <Paperclip size={18} color={colors.textSecondary} />
-          <Text className="text-base font-bold text-textBlack">
-            Comprovantes de exame
-          </Text>
-        </View>
-        <Text className="text-xs text-textFourth">
-          Anexe PDFs ou imagens de comprovantes médicos de condições de saúde
-          que você tenha.
-        </Text>
-
-        {patient.medicalDocuments.length === 0 ? (
-          <View className="items-center rounded-[16px] border border-borderPrimary p-4">
-            <Text className="text-sm text-textFourth">
-              Nenhum comprovante anexado.
+        <View className="gap-3 rounded-2xl bg-bgThird p-4">
+          <View className="flex-row items-center gap-2">
+            <Paperclip size={18} color={colors.textSecondary} />
+            <Text className="text-base font-bold text-textBlack">
+              Comprovantes de exame
             </Text>
           </View>
-        ) : (
-          <View className="gap-2">
-            {patient.medicalDocuments.map((document) => (
-              <Pressable
-                key={document._id}
-                onPress={() => void handleOpenDocument(document._id)}
-                className="flex-row items-center justify-between rounded-[16px] border border-borderPrimary px-3 py-3"
-              >
-                <View className="flex-1 flex-row items-center gap-3">
-                  {document.mimeType === "application/pdf" ? (
-                    <FileText size={20} color={colors.textSecondary} />
-                  ) : (
-                    <FileImage size={20} color={colors.textSecondary} />
-                  )}
-                  <View className="flex-1">
-                    <Text
-                      className="text-sm font-medium text-textBlack"
-                      numberOfLines={1}
-                    >
-                      {document.fileName}
-                    </Text>
-                    <Text className="text-xs text-textFourth">
-                      {formatDateTime(document.uploadedAt)}
-                    </Text>
-                  </View>
-                </View>
-                <Pressable
-                  hitSlop={8}
-                  disabled={isDeletingDocument}
-                  onPress={() => handleDeleteDocument(document._id)}
-                >
-                  <Trash2 size={18} color={colors.textDanger} />
-                </Pressable>
-              </Pressable>
-            ))}
-          </View>
-        )}
+          <Text className="text-xs text-textFourth">
+            Anexe PDFs ou imagens de comprovantes médicos de condições de saúde
+            que você tenha.
+          </Text>
 
-        <Pressable
-          onPress={handleAddDocument}
-          disabled={isUploadingDocument || isPickingDocument}
-          className="flex-row items-center justify-center gap-2 rounded-[16px] border border-borderPrimary py-3"
-        >
-          {isUploadingDocument || isPickingDocument ? (
-            <ActivityIndicator size="small" color={colors.textSecondary} />
-          ) : (
-            <>
-              <Paperclip size={18} color={colors.textSecondary} />
-              <Text className="text-center text-sm font-semibold text-textBlack">
-                Anexar comprovante
+          {patient.medicalDocuments.length === 0 ? (
+            <View className="items-center rounded-[16px] border border-borderPrimary p-4">
+              <Text className="text-sm text-textFourth">
+                Nenhum comprovante anexado.
               </Text>
-            </>
-          )}
-        </Pressable>
-      </View>
-
-      <Modal
-        transparent
-        animationType="fade"
-        visible={showBloodTypeOptions}
-        onRequestClose={() => setShowBloodTypeOptions(false)}
-      >
-        <Pressable
-          className="flex-1 items-center justify-center bg-black/50 px-5"
-          onPress={() => setShowBloodTypeOptions(false)}
-        >
-          <View className="w-full max-h-[70%] rounded-[24px] bg-bgThird p-5">
-            <Text className="mb-3 text-lg font-semibold text-textBlack">
-              Tipo sanguíneo
-            </Text>
-            <ScrollView>
-              <Pressable
-                onPress={() => {
-                  setBloodType(undefined);
-                  setShowBloodTypeOptions(false);
-                }}
-                className="flex-row items-center justify-between py-3"
-              >
-                <Text className="text-textBlack">Não informado</Text>
-                {!bloodType && <Check size={18} color={colors.textSecondary} />}
-              </Pressable>
-              {BLOOD_TYPE_OPTIONS.map((option) => {
-                const isSelected = option === bloodType;
-
-                return (
-                  <Pressable
-                    key={option}
-                    onPress={() => {
-                      setBloodType(option);
-                      setShowBloodTypeOptions(false);
-                    }}
-                    className="flex-row items-center justify-between border-t border-borderPrimary py-3"
-                  >
-                    <Text className="text-textBlack">
-                      {BLOOD_TYPE_LABEL[option]}
-                    </Text>
-                    {isSelected && (
-                      <Check size={18} color={colors.textSecondary} />
+            </View>
+          ) : (
+            <View className="gap-2">
+              {patient.medicalDocuments.map((document) => (
+                <Pressable
+                  key={document._id}
+                  onPress={() => void handleOpenDocument(document._id)}
+                  className="flex-row items-center justify-between rounded-[16px] border border-borderPrimary px-3 py-3"
+                >
+                  <View className="flex-1 flex-row items-center gap-3">
+                    {document.mimeType === "application/pdf" ? (
+                      <FileText size={20} color={colors.textSecondary} />
+                    ) : (
+                      <FileImage size={20} color={colors.textSecondary} />
                     )}
+                    <View className="flex-1">
+                      <Text
+                        className="text-sm font-medium text-textBlack"
+                        numberOfLines={1}
+                      >
+                        {document.fileName}
+                      </Text>
+                      <Text className="text-xs text-textFourth">
+                        {formatDateTime(document.uploadedAt)}
+                      </Text>
+                    </View>
+                  </View>
+                  <Pressable
+                    hitSlop={8}
+                    disabled={isDeletingDocument}
+                    onPress={() => handleDeleteDocument(document._id)}
+                  >
+                    <Trash2 size={18} color={colors.textDanger} />
                   </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
-    </ScrollView>
+                </Pressable>
+              ))}
+            </View>
+          )}
+
+          <Pressable
+            onPress={handleAddDocument}
+            disabled={isUploadingDocument || isPickingDocument}
+            className="flex-row items-center justify-center gap-2 rounded-[16px] border border-borderPrimary py-3"
+          >
+            {isUploadingDocument || isPickingDocument ? (
+              <ActivityIndicator size="small" color={colors.textSecondary} />
+            ) : (
+              <>
+                <Paperclip size={18} color={colors.textSecondary} />
+                <Text className="text-center text-sm font-semibold text-textBlack">
+                  Anexar comprovante
+                </Text>
+              </>
+            )}
+          </Pressable>
+        </View>
+
+        <Modal
+          transparent
+          animationType="fade"
+          visible={showBloodTypeOptions}
+          onRequestClose={() => setShowBloodTypeOptions(false)}
+        >
+          <Pressable
+            className="flex-1 items-center justify-center bg-black/50 px-5"
+            onPress={() => setShowBloodTypeOptions(false)}
+          >
+            <View className="w-full max-h-[70%] rounded-[24px] bg-bgThird p-5">
+              <Text className="mb-3 text-lg font-semibold text-textBlack">
+                Tipo sanguíneo
+              </Text>
+              <ScrollView>
+                <Pressable
+                  onPress={() => {
+                    setBloodType(undefined);
+                    setShowBloodTypeOptions(false);
+                  }}
+                  className="flex-row items-center justify-between py-3"
+                >
+                  <Text className="text-textBlack">Não informado</Text>
+                  {!bloodType && (
+                    <Check size={18} color={colors.textSecondary} />
+                  )}
+                </Pressable>
+                {BLOOD_TYPE_OPTIONS.map((option) => {
+                  const isSelected = option === bloodType;
+
+                  return (
+                    <Pressable
+                      key={option}
+                      onPress={() => {
+                        setBloodType(option);
+                        setShowBloodTypeOptions(false);
+                      }}
+                      className="flex-row items-center justify-between border-t border-borderPrimary py-3"
+                    >
+                      <Text className="text-textBlack">
+                        {BLOOD_TYPE_LABEL[option]}
+                      </Text>
+                      {isSelected && (
+                        <Check size={18} color={colors.textSecondary} />
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          </Pressable>
+        </Modal>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
