@@ -1,10 +1,12 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
 import { useGetExamBookingsByPatientId } from "@/src/api/get-exam-bookings-by-patient-id";
-import { useGetHealthProfessionalByAppointmentId } from "@/src/api/get-health-professional-by-appointment-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import SearchInput from "@/src/components/search-input/search-input";
-import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
+import {
+  EAppointmentStatus,
+  IAppointment,
+} from "@/src/config/entities/appointments/appointments.types";
 import {
   EExamBookingStatus,
   IExamBooking,
@@ -55,34 +57,29 @@ export default function MainContent({ user, patient }: MainContentProps) {
       },
     );
 
-  const appointment = useMemo(() => {
+  const upcomingAppointments = useMemo(() => {
     const now = new Date();
 
-    return userAppointments
-      ?.filter(
-        (item) =>
-          item.status === EAppointmentStatus.SCHEDULED &&
-          new Date(item.dateTime) > now,
-      )
-      .sort(
-        (first, second) =>
-          new Date(first.dateTime).getTime() -
-          new Date(second.dateTime).getTime(),
-      )[0];
+    return (
+      userAppointments
+        ?.filter(
+          (item) =>
+            item.status === EAppointmentStatus.SCHEDULED &&
+            new Date(item.dateTime) > now,
+        )
+        .sort(
+          (first, second) =>
+            new Date(first.dateTime).getTime() -
+            new Date(second.dateTime).getTime(),
+        ) ?? []
+    );
   }, [userAppointments]);
+
+  const appointment = upcomingAppointments[0];
 
   if (isAppointmentsLoading) {
     console.log("Carregando appointments...");
   }
-
-  const { data: professional } = useGetHealthProfessionalByAppointmentId(
-    {
-      appointmentId: appointment?._id || "",
-    },
-    {
-      enabled: !!appointment?._id,
-    },
-  );
 
   const { data: examBookings } = useGetExamBookingsByPatientId(
     { patientId: patientId || "" },
@@ -114,11 +111,6 @@ export default function MainContent({ user, patient }: MainContentProps) {
   }, [examBookings]);
 
   const nextExamBooking = upcomingExamBookings[0];
-
-  const appointmentUnit = useMemo(
-    () => healthUnits?.find((unit) => unit._id === professional?.healthUnitId),
-    [healthUnits, professional?.healthUnitId],
-  );
 
   // The home screen surfaces whichever is soonest — a consulta or an exame
   // agendado — since a patient can have either (or both) coming up, and the
@@ -196,8 +188,12 @@ export default function MainContent({ user, patient }: MainContentProps) {
     }
   };
 
-  const handlePressAppointment = () => {
-    if (!appointmentQueueId) {
+  const handlePressAppointment = (pressedAppointment: IAppointment) => {
+    const queueId = queueItems?.find(
+      (item) => item._id === pressedAppointment.queueItemId,
+    )?.queueId;
+
+    if (!queueId) {
       Toast.show({
         type: "info",
         text1: "Fila ainda não disponível",
@@ -208,7 +204,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
     router.push({
       pathname: "/queue-info/[id]",
-      params: { id: appointmentQueueId },
+      params: { id: queueId },
     });
   };
 
@@ -330,9 +326,8 @@ export default function MainContent({ user, patient }: MainContentProps) {
             </Pressable>
           )}
           <UpcomingVisits
-            appointment={appointment}
-            professional={professional}
-            appointmentUnit={appointmentUnit}
+            appointments={upcomingAppointments}
+            healthUnits={healthUnits}
             onPressAppointment={handlePressAppointment}
             examBookings={upcomingExamBookings}
             onPressExam={handlePressExam}
