@@ -1,9 +1,9 @@
 import { useCancelExamBooking } from "@/src/api/cancel-exam-booking";
+import { useGetExamBookingById } from "@/src/api/get-exam-booking-by-id";
 import {
   GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY,
   GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY,
 } from "@/src/api/get-exam-bookings-by-patient-id";
-import { useGetExamBookingById } from "@/src/api/get-exam-booking-by-id";
 import { useGetExamOfferingById } from "@/src/api/get-exam-offering-by-id";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import {
@@ -22,33 +22,7 @@ import {
 } from "lucide-react-native";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
-
-const STATUS_LABEL: Record<EExamBookingStatus, string> = {
-  [EExamBookingStatus.SCHEDULED]: "Agendado",
-  [EExamBookingStatus.CONFIRMED]: "Confirmado",
-  [EExamBookingStatus.IN_PROGRESS]: "Em atendimento",
-  [EExamBookingStatus.COMPLETED]: "Realizado",
-  [EExamBookingStatus.CANCELED]: "Cancelado",
-  [EExamBookingStatus.NO_SHOW]: "Não compareceu",
-};
-
-const STATUS_BG: Record<EExamBookingStatus, string> = {
-  [EExamBookingStatus.SCHEDULED]: "bg-infoBg",
-  [EExamBookingStatus.CONFIRMED]: "bg-infoBg",
-  [EExamBookingStatus.IN_PROGRESS]: "bg-warningBg",
-  [EExamBookingStatus.COMPLETED]: "bg-statusSuccessBg",
-  [EExamBookingStatus.CANCELED]: "bg-statusDangerBg",
-  [EExamBookingStatus.NO_SHOW]: "bg-borderPrimary",
-};
-
-const STATUS_TEXT: Record<EExamBookingStatus, string> = {
-  [EExamBookingStatus.SCHEDULED]: "text-accentBlue",
-  [EExamBookingStatus.CONFIRMED]: "text-textSecondary",
-  [EExamBookingStatus.IN_PROGRESS]: "text-warningText",
-  [EExamBookingStatus.COMPLETED]: "text-statusSuccessText",
-  [EExamBookingStatus.CANCELED]: "text-statusDangerText",
-  [EExamBookingStatus.NO_SHOW]: "text-textFourth",
-};
+import { STATUS_BG, STATUS_LABEL, STATUS_TEXT } from "./util";
 
 interface ExamBookingDetailProps {
   bookingId: string;
@@ -95,7 +69,10 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
               { id: booking._id },
               {
                 onSuccess: () => {
-                  Toast.show({ type: "success", text1: "Agendamento cancelado" });
+                  Toast.show({
+                    type: "success",
+                    text1: "Agendamento cancelado",
+                  });
                   queryClient.invalidateQueries({
                     queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
                   });
@@ -145,15 +122,24 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
   }
 
   return (
-    <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
+    <ScrollView
+      className="flex-1 px-4 pt-4"
+      showsVerticalScrollIndicator={false}
+    >
       <View className="rounded-2xl border border-borderPrimary bg-bgThird p-4">
         <View className="flex-row items-start justify-between gap-3">
           <Text className="flex-1 text-lg font-semibold text-textBlack">
             {booking.examOfferingName}
           </Text>
-          <View className={`rounded-full px-3 py-1 ${STATUS_BG[booking.status]}`}>
-            <Text className={`text-xs font-semibold ${STATUS_TEXT[booking.status]}`}>
-              {hasResult ? "Resultado disponível" : STATUS_LABEL[booking.status]}
+          <View
+            className={`rounded-full px-3 py-1 ${STATUS_BG[booking.status]}`}
+          >
+            <Text
+              className={`text-xs font-semibold ${STATUS_TEXT[booking.status]}`}
+            >
+              {hasResult
+                ? "Resultado disponível"
+                : STATUS_LABEL[booking.status]}
             </Text>
           </View>
         </View>
@@ -167,7 +153,9 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
 
         <View className="mt-2 flex-row items-center gap-2">
           <MapPin size={16} color={colors.textFourth} />
-          <Text className="text-sm text-textFourth">{booking.healthUnitName}</Text>
+          <Text className="text-sm text-textFourth">
+            {booking.healthUnitName}
+          </Text>
         </View>
 
         {typeof booking.priceSnapshot === "number" && (
@@ -180,7 +168,8 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
           <View className="mt-3 flex-row items-center gap-2">
             <Droplet size={16} color={colors.textFourth} />
             <Text className="text-sm text-textFourth">
-              Jejum{offering.fastingHours ? ` de ${offering.fastingHours}h` : ""}
+              Jejum
+              {offering.fastingHours ? ` de ${offering.fastingHours}h` : ""}
             </Text>
           </View>
         )}

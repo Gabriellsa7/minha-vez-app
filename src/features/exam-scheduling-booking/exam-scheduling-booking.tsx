@@ -14,8 +14,6 @@ import ExamAvailableSlots from "./components/exam-available-slots/exam-available
 import ExamBookingConfirmModal from "./components/exam-booking-confirm-modal/exam-booking-confirm-modal";
 import { useExamBooking } from "./hooks/use-exam-booking";
 
-// Rule.weekday strings line up with JS's Date#getDay() index (0=Sunday..6=Saturday)
-// for any real device timezone Brazil falls in — see WEEKDAYS_BY_JS_INDEX on the backend.
 const JS_WEEKDAY_INDEX: Record<WeekDay, number> = {
   [WeekDay.SUNDAY]: 0,
   [WeekDay.MONDAY]: 1,
@@ -44,8 +42,6 @@ export function ExamSchedulingBooking({
   });
 
   const disabledWeekdays = useMemo(() => {
-    // While rules are still loading, don't disable anything — better to
-    // briefly allow every day than to flash "every day is closed".
     if (!availabilityRules) return new Set<number>();
 
     const activeWeekdays = new Set(
