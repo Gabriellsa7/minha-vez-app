@@ -100,6 +100,17 @@ export default function QueueInfoScreen() {
     const previousStatus = previousQueueItemStatusRef.current;
 
     if (
+      currentStatus === EQueueItemStatus.QUEUE_CLOSED &&
+      previousStatus !== undefined &&
+      previousStatus !== EQueueItemStatus.QUEUE_CLOSED
+    ) {
+      // The queue this screen is showing was force-closed by the professional
+      // (see QueueClosedModal in the root layout for the reason). Leave the
+      // screen automatically instead of showing a dead queue.
+      router.replace("/home");
+    }
+
+    if (
       currentStatus === EQueueItemStatus.FINISHED &&
       previousStatus !== undefined &&
       previousStatus !== EQueueItemStatus.FINISHED

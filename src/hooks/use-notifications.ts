@@ -69,8 +69,8 @@ export function useNotifications(options?: { enabled?: boolean }) {
   return usePatientNotifications("all", options);
 }
 
-export function useUnreadNotifications() {
-  return usePatientNotifications("unread");
+export function useUnreadNotifications(options?: { enabled?: boolean }) {
+  return usePatientNotifications("unread", options);
 }
 
 export function useNotification(id?: string) {

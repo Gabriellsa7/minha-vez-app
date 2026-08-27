@@ -1,4 +1,4 @@
-import { Stack, router } from "expo-router";
+import { Stack, router, usePathname } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../../global.css";
 
@@ -7,7 +7,7 @@ import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppState, Linking } from "react-native";
 import Toast from "react-native-toast-message";
 import {
@@ -26,12 +26,22 @@ import { GET_QUEUE_ITEMS_KEY } from "../api/get-queue-item-by-patient-id";
 import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "../api/get-queue-item-by-queue-id";
 import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
 import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
+import { QueueClosedModal } from "../components/queue-closed/queue-closed-modal";
 import "../config/axios";
-import { notificationQueryKeys } from "../hooks/use-notifications";
+import {
+  notificationQueryKeys,
+  useMarkNotificationAsRead,
+  useUnreadNotifications,
+} from "../hooks/use-notifications";
 import { useThemeColors } from "../hooks/use-theme-colors";
 import { useThemePreference } from "../hooks/use-theme-preference";
 import { queryClient } from "../lib/react-query";
-import { NotificationService } from "../services/notifications/notification.service";
+import {
+  NotificationItem,
+  NotificationService,
+} from "../services/notifications/notification.service";
+
+const QUEUE_CLOSED_NOTIFICATION_TYPE = "QUEUE_CLOSED";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -51,6 +61,62 @@ function navigateToNotification(data?: Record<string, unknown> | null) {
       params: { id: notificationId },
     });
   }
+}
+
+// Reads notification state via react-query hooks, so it must be rendered as
+// a descendant of <QueryClientProvider> — not inline in RootLayout's body,
+// which runs before that provider exists.
+function QueueClosedNotificationGate() {
+  const [queueClosedNotification, setQueueClosedNotification] =
+    useState<NotificationItem | null>(null);
+  // markAsRead is async: the "unread" list can still contain the
+  // just-dismissed notification for a moment after closing (the mutation's
+  // invalidation hasn't finished refetching yet), which would otherwise
+  // reopen the same modal right after it's closed. Tracking dismissed ids
+  // locally makes the close instant and final regardless of that race.
+  const dismissedNotificationIdsRef = useRef<Set<string>>(new Set());
+
+  // A previous session's token can still be valid in secure storage while
+  // the login screen is showing (index.tsx always renders /login first,
+  // regardless of a stored session) — without this guard the modal could
+  // pop up before the user actually logs in on this app run.
+  const pathname = usePathname();
+  const isPastLoginScreen = pathname !== "/" && pathname !== "/login";
+
+  const { data: unreadNotifications } = useUnreadNotifications({
+    enabled: isPastLoginScreen,
+  });
+  const markNotificationAsRead = useMarkNotificationAsRead();
+
+  useEffect(() => {
+    if (queueClosedNotification) return;
+
+    const pendingQueueClosedNotification = unreadNotifications?.find(
+      (notification) =>
+        notification.type === QUEUE_CLOSED_NOTIFICATION_TYPE &&
+        !dismissedNotificationIdsRef.current.has(notification._id),
+    );
+
+    if (pendingQueueClosedNotification) {
+      setQueueClosedNotification(pendingQueueClosedNotification);
+    }
+  }, [queueClosedNotification, unreadNotifications]);
+
+  const handleCloseQueueClosedModal = () => {
+    if (!queueClosedNotification) return;
+    const notificationId = queueClosedNotification._id;
+    dismissedNotificationIdsRef.current.add(notificationId);
+    setQueueClosedNotification(null);
+    void markNotificationAsRead.mutateAsync(notificationId);
+  };
+
+  return (
+    <QueueClosedModal
+      visible={Boolean(queueClosedNotification)}
+      message={queueClosedNotification?.message ?? ""}
+      onClose={handleCloseQueueClosedModal}
+    />
+  );
 }
 
 export default function RootLayout() {
@@ -230,6 +296,7 @@ export default function RootLayout() {
           onAllow={handleAllowNotifications}
           onDismiss={handleDismissNotifications}
         />
+        <QueueClosedNotificationGate />
         <Toast />
       </SafeAreaProvider>
     </QueryClientProvider>

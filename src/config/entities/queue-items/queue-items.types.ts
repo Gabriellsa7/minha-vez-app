@@ -25,4 +25,5 @@ export enum EQueueItemStatus {
   IN_SERVICE = "IN_SERVICE",
   FINISHED = "FINISHED",
   ABSENT = "ABSENT",
+  QUEUE_CLOSED = "QUEUE_CLOSED",
 }

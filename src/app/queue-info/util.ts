@@ -20,4 +20,5 @@ export const ITEM_STATUS_LABEL: Record<EQueueItemStatus, string> = {
   [EQueueItemStatus.IN_SERVICE]: "Em atendimento",
   [EQueueItemStatus.FINISHED]: "Finalizado",
   [EQueueItemStatus.ABSENT]: "Ausente",
+  [EQueueItemStatus.QUEUE_CLOSED]: "Fila encerrada",
 };
