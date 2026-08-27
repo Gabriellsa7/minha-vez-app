@@ -26,7 +26,7 @@ export default function ExamClinicListItem({ unit }: ExamClinicListItemProps) {
           />
         ) : (
           <Image
-            source={require("../../../assets/images/Hospital.png")}
+            source={require("../../../../../assets/images/Hospital.png")}
             style={{ width: "100%", height: "100%" }}
             contentFit="cover"
           />
