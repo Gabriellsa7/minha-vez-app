@@ -188,7 +188,7 @@ export function useAppointmentBooking({
           Toast.show({
             type: "error",
             text1: "Não foi possível salvar",
-            text2: error?.message || "Tente novamente em instantes.",
+            text2: "Você não pode marcar mais de uma consulta no mesmo dia.",
           });
         },
       },
