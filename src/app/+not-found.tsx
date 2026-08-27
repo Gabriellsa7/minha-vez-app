@@ -1,6 +1,6 @@
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NotFoundScreen() {
@@ -30,10 +30,7 @@ export default function NotFoundScreen() {
         className="mt-4 rounded-full px-6 py-3"
         style={{ backgroundColor: colors.buttonPrimary }}
       >
-        <Text
-          className="font-bold"
-          style={{ color: colors.textPrimary }}
-        >
+        <Text className="font-bold" style={{ color: colors.textPrimary }}>
           Voltar para o início
         </Text>
       </Pressable>
