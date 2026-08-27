@@ -2,6 +2,7 @@ import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-pati
 import { useGetExamBookingsByPatientId } from "@/src/api/get-exam-bookings-by-patient-id";
 import { useGetHealthProfessionalByAppointmentId } from "@/src/api/get-health-professional-by-appointment-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
+import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import SearchInput from "@/src/components/search-input/search-input";
 import {
   EExamBookingStatus,
@@ -10,9 +11,12 @@ import {
 import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
-import { formatDateTime } from "@/src/utils/format-date-time";
-import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
+import {
+  formatExamDateTime,
+  getExamComparableDate,
+} from "@/src/utils/exam-scheduling.util";
+import { formatDateTime } from "@/src/utils/format-date-time";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -81,6 +85,11 @@ export default function MainContent({ user, patient }: MainContentProps) {
     { enabled: !!patientId },
   );
 
+  const { data: queueItems } = useGetQueueItemByPatientId(
+    { patientId: patientId || "" },
+    { enabled: !!patientId },
+  );
+
   const nextExamBooking = useMemo(() => {
     const now = new Date();
 
@@ -89,7 +98,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
         (booking) =>
           (booking.status === EExamBookingStatus.SCHEDULED ||
             booking.status === EExamBookingStatus.CONFIRMED) &&
-          new Date(booking.scheduledAt) > now,
+          getExamComparableDate(booking.scheduledAt) > now,
       )
       .sort(
         (first, second) =>
@@ -107,7 +116,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
         ? new Date(appointment.dateTime)
         : null;
     const examDate = nextExamBooking
-      ? new Date(nextExamBooking.scheduledAt)
+      ? getExamComparableDate(nextExamBooking.scheduledAt)
       : null;
 
     if (appointmentDate && examDate) {
@@ -134,6 +143,31 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
     return null;
   }, [appointment, nextExamBooking]);
+
+  const appointmentQueueId = useMemo(
+    () =>
+      queueItems?.find((item) => item._id === appointment?.queueItemId)
+        ?.queueId,
+    [queueItems, appointment?.queueItemId],
+  );
+
+  const handleUpcomingVisitPress = () => {
+    if (!nextUpcomingVisit) return;
+
+    if (nextUpcomingVisit.type === "exam") {
+      router.push(
+        `/exam-scheduling/booking/${nextUpcomingVisit.examBooking._id}`,
+      );
+      return;
+    }
+
+    if (appointmentQueueId) {
+      router.push({
+        pathname: "/queue-info/[id]",
+        params: { id: appointmentQueueId },
+      });
+    }
+  };
 
   return (
     <ScrollView
@@ -203,7 +237,16 @@ export default function MainContent({ user, patient }: MainContentProps) {
             </View>
           )}
           {nextUpcomingVisit && (
-            <View className="w-full flex-row items-center justify-between bg-bgSecondary px-3 py-3 rounded-lg">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                nextUpcomingVisit.type === "exam"
+                  ? "Ver informações do exame"
+                  : "Ver informações da consulta"
+              }
+              onPress={handleUpcomingVisitPress}
+              className="w-full flex-row items-center justify-between bg-bgSecondary px-3 py-3 rounded-lg"
+            >
               <View className="flex-row gap-2 items-center flex-1 mr-2">
                 {nextUpcomingVisit.type === "exam" ? (
                   <TestTube size={20} color={colors.textPrimary} />
@@ -219,12 +262,14 @@ export default function MainContent({ user, patient }: MainContentProps) {
               <View className="flex-row gap-2 items-center flex-shrink-0">
                 <Text className="text-textPrimary">
                   {nextUpcomingVisit.type === "exam"
-                    ? formatExamDateTime(nextUpcomingVisit.examBooking.scheduledAt)
+                    ? formatExamDateTime(
+                        nextUpcomingVisit.examBooking.scheduledAt,
+                      )
                     : formatDateTime(appointment?.dateTime)}
                 </Text>
                 <Clock size={20} color={colors.textPrimary} />
               </View>
-            </View>
+            </Pressable>
           )}
           <QuickServices />
           <HealthUnits healthUnits={healthUnits} />
