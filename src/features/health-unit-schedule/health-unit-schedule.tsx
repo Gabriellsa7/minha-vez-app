@@ -52,10 +52,6 @@ export default function HealthUnitSchedule({
     refetch: refetchHealthUnit,
   } = useGetHealthUnitById({ healthUnitId });
 
-  // This screen can stay mounted in the background (e.g. the patient
-  // switches tabs while it's pushed on the stack), so react-query's default
-  // refetchOnMount alone won't pick up opening-hours changes made elsewhere
-  // in the meantime. Refetch whenever the screen regains focus instead.
   useFocusEffect(
     useCallback(() => {
       refetchHealthUnit();
