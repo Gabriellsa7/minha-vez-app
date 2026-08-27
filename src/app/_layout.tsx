@@ -47,7 +47,7 @@ function navigateToNotification(data?: Record<string, unknown> | null) {
   const notificationId = data?.notificationId;
   if (typeof notificationId === "string" && notificationId.length > 0) {
     router.push({
-      pathname: "/notifications/[id]",
+      pathname: "/notifications-details/[id]",
       params: { id: notificationId },
     });
   }
