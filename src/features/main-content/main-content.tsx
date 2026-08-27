@@ -215,11 +215,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
           <View className="w-full gap-3 p-5">
             <HomeHeader user={user!} />
             {appointment && !appointment.finishedAt ? (
-              <QueueDetails
-                patientId={patientId!}
-                professionalRoom={professional?.room}
-                appointmentDateTime={appointment.dateTime}
-              />
+              <QueueDetails patientId={patientId!} />
             ) : (
               patientId &&
               !isAppointmentsLoading && (
