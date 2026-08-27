@@ -3,15 +3,15 @@ import { useGetExamOfferingById } from "@/src/api/get-exam-offering-by-id";
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { useGetUser } from "@/src/api/get-user-me";
 import { WeekDay } from "@/src/config/entities/health-unit/health-unit.types";
-import AvaliableDays from "@/src/features/agenda-content/componentes/avaliable-days/avaliable-days";
-import PatientRegistrationModal from "@/src/features/agenda-content/componentes/patient-registration-modal/patient-registration-modal";
+import AvaliableDays from "@/src/features/agenda-content/components/avaliable-days/avaliable-days";
+import PatientRegistrationModal from "@/src/features/agenda-content/components/patient-registration-modal/patient-registration-modal";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getDateKey } from "@/src/utils/util";
 import { Clock, Droplet } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import ExamAvailableSlots from "./componentes/exam-available-slots/exam-available-slots";
-import ExamBookingConfirmModal from "./componentes/exam-booking-confirm-modal/exam-booking-confirm-modal";
+import ExamAvailableSlots from "./components/exam-available-slots/exam-available-slots";
+import ExamBookingConfirmModal from "./components/exam-booking-confirm-modal/exam-booking-confirm-modal";
 import { useExamBooking } from "./hooks/use-exam-booking";
 
 // Rule.weekday strings line up with JS's Date#getDay() index (0=Sunday..6=Saturday)
@@ -59,7 +59,9 @@ export function ExamSchedulingBooking({
     );
   }, [availabilityRules]);
 
-  const [selectedDate, setSelectedDate] = useState(() => getDateKey(new Date()));
+  const [selectedDate, setSelectedDate] = useState(() =>
+    getDateKey(new Date()),
+  );
   const [selectedTime, setSelectedTime] = useState("");
 
   const {
@@ -114,20 +116,19 @@ export function ExamSchedulingBooking({
                 <Droplet size={13} color={colors.textSecondary} />
                 <Text className="text-xs text-textSecondary">
                   Jejum
-                  {offering.fastingHours
-                    ? ` de ${offering.fastingHours}h`
-                    : ""}
+                  {offering.fastingHours ? ` de ${offering.fastingHours}h` : ""}
                 </Text>
               </View>
             )}
           </View>
-          {offering?.requiresPreparation && offering.preparationInstructions && (
-            <View className="mt-3 rounded-xl bg-warningBg p-3">
-              <Text className="text-xs font-semibold text-warningText">
-                Preparo: {offering.preparationInstructions}
-              </Text>
-            </View>
-          )}
+          {offering?.requiresPreparation &&
+            offering.preparationInstructions && (
+              <View className="mt-3 rounded-xl bg-warningBg p-3">
+                <Text className="text-xs font-semibold text-warningText">
+                  Preparo: {offering.preparationInstructions}
+                </Text>
+              </View>
+            )}
         </View>
 
         <AvaliableDays

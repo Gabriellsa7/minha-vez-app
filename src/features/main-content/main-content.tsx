@@ -3,26 +3,26 @@ import { useGetExamBookingsByPatientId } from "@/src/api/get-exam-bookings-by-pa
 import { useGetHealthProfessionalByAppointmentId } from "@/src/api/get-health-professional-by-appointment-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import SearchInput from "@/src/components/search-input/search-input";
+import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import {
   EExamBookingStatus,
   IExamBooking,
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
-import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
-import { formatDateTime } from "@/src/utils/format-date-time";
-import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
+import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
+import { formatDateTime } from "@/src/utils/format-date-time";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Bell, Clock, ListChecks, TestTube } from "lucide-react-native";
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import HomeHeader from "./componentes/header/header";
-import HealthUnits from "./componentes/health-units/health-units";
-import QueueDetails from "./componentes/queue-details/queue-details";
-import { QuickServices } from "./componentes/quick-services/quick-services";
+import HomeHeader from "./components/header/header";
+import HealthUnits from "./components/health-units/health-units";
+import QueueDetails from "./components/queue-details/queue-details";
+import { QuickServices } from "./components/quick-services/quick-services";
 
 interface MainContentProps {
   user: IUser;
@@ -219,7 +219,9 @@ export default function MainContent({ user, patient }: MainContentProps) {
               <View className="flex-row gap-2 items-center flex-shrink-0">
                 <Text className="text-textPrimary">
                   {nextUpcomingVisit.type === "exam"
-                    ? formatExamDateTime(nextUpcomingVisit.examBooking.scheduledAt)
+                    ? formatExamDateTime(
+                        nextUpcomingVisit.examBooking.scheduledAt,
+                      )
                     : formatDateTime(appointment?.dateTime)}
                 </Text>
                 <Clock size={20} color={colors.textPrimary} />

@@ -11,14 +11,20 @@ import { IUser } from "@/src/config/entities/user/user.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getDateKey } from "@/src/utils/util";
 import { useFocusEffect } from "@react-navigation/native";
-import { MapPin, CalendarDays } from "lucide-react-native";
+import { CalendarDays, MapPin } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
-import AppointmentConfirmModal from "../agenda-content/componentes/appointment-confirm-modal/appointment-confirm-modal";
-import AvaliableDays from "../agenda-content/componentes/avaliable-days/avaliable-days";
-import AvaliableTimes from "../agenda-content/componentes/avaliable-time/avaliable-time";
-import HealthProfessionalsSection from "../agenda-content/componentes/health-professional/health-professional";
-import PatientRegistrationModal from "../agenda-content/componentes/patient-registration-modal/patient-registration-modal";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import AppointmentConfirmModal from "../agenda-content/components/appointment-confirm-modal/appointment-confirm-modal";
+import AvaliableDays from "../agenda-content/components/avaliable-days/avaliable-days";
+import AvaliableTimes from "../agenda-content/components/avaliable-time/avaliable-time";
+import HealthProfessionalsSection from "../agenda-content/components/health-professional/health-professional";
+import PatientRegistrationModal from "../agenda-content/components/patient-registration-modal/patient-registration-modal";
 import { useAppointmentBooking } from "../agenda-content/hooks/use-appointment-booking";
 
 interface HealthUnitScheduleProps {
@@ -40,8 +46,11 @@ export default function HealthUnitSchedule({
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
 
-  const { data: healthUnit, isLoading: isHealthUnitLoading, refetch: refetchHealthUnit } =
-    useGetHealthUnitById({ healthUnitId });
+  const {
+    data: healthUnit,
+    isLoading: isHealthUnitLoading,
+    refetch: refetchHealthUnit,
+  } = useGetHealthUnitById({ healthUnitId });
 
   // This screen can stay mounted in the background (e.g. the patient
   // switches tabs while it's pushed on the stack), so react-query's default
@@ -83,7 +92,9 @@ export default function HealthUnitSchedule({
 
   const specialties = useMemo(() => {
     return Array.from(
-      new Set(professionalsForUnit.map((professional) => professional.specialty)),
+      new Set(
+        professionalsForUnit.map((professional) => professional.specialty),
+      ),
     ).sort();
   }, [professionalsForUnit]);
 

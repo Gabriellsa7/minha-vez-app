@@ -18,12 +18,12 @@ import { useLocalSearchParams } from "expo-router";
 import { CalendarDays, Sparkles } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import AppointmentConfirmModal from "./componentes/appointment-confirm-modal/appointment-confirm-modal";
-import AvaliableDays from "./componentes/avaliable-days/avaliable-days";
-import AvaliableTimes from "./componentes/avaliable-time/avaliable-time";
-import HealthProfessionalsSection from "./componentes/health-professional/health-professional";
-import HealthUnitsSection from "./componentes/health-units-section/healt-units-section";
-import PatientRegistrationModal from "./componentes/patient-registration-modal/patient-registration-modal";
+import AppointmentConfirmModal from "./components/appointment-confirm-modal/appointment-confirm-modal";
+import AvaliableDays from "./components/avaliable-days/avaliable-days";
+import AvaliableTimes from "./components/avaliable-time/avaliable-time";
+import HealthProfessionalsSection from "./components/health-professional/health-professional";
+import HealthUnitsSection from "./components/health-units-section/healt-units-section";
+import PatientRegistrationModal from "./components/patient-registration-modal/patient-registration-modal";
 import { useAppointmentBooking } from "./hooks/use-appointment-booking";
 
 interface AgendaContentProps {
@@ -46,8 +46,11 @@ export default function AgendaContent({ user }: AgendaContentProps) {
 
   const [selectedTime, setSelectedTime] = useState<string>("");
 
-  const { data: healthUnits, isLoading: isHealthUnitsLoading, refetch: refetchHealthUnits } =
-    useGetHealthUnits();
+  const {
+    data: healthUnits,
+    isLoading: isHealthUnitsLoading,
+    refetch: refetchHealthUnits,
+  } = useGetHealthUnits();
 
   // The Agenda tab stays mounted across tab switches (bottom-tab screens
   // aren't remounted on focus), so react-query's default refetchOnMount
