@@ -6,12 +6,14 @@ interface QueueClosedModalProps {
   visible: boolean;
   message: string;
   onClose: () => void;
+  onFindAnotherDoctor?: () => void;
 }
 
 export function QueueClosedModal({
   visible,
   message,
   onClose,
+  onFindAnotherDoctor,
 }: QueueClosedModalProps) {
   const colors = useThemeColors();
 
@@ -48,6 +50,18 @@ export function QueueClosedModal({
                 {message}
               </Text>
             </View>
+
+            {onFindAnotherDoctor && (
+              <Pressable
+                accessibilityRole="button"
+                onPress={onFindAnotherDoctor}
+                className="items-center rounded-xl bg-bgSecondary py-3"
+              >
+                <Text className="font-bold text-textPrimary">
+                  Buscar outro médico
+                </Text>
+              </Pressable>
+            )}
           </View>
         </View>
       </View>

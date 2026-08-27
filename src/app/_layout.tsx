@@ -110,11 +110,28 @@ function QueueClosedNotificationGate() {
     void markNotificationAsRead.mutateAsync(notificationId);
   };
 
+  const closedQueueHealthUnitId =
+    typeof queueClosedNotification?.data?.healthUnitId === "string"
+      ? queueClosedNotification.data.healthUnitId
+      : undefined;
+
+  const handleFindAnotherDoctor = () => {
+    if (!closedQueueHealthUnitId) return;
+    handleCloseQueueClosedModal();
+    router.push({
+      pathname: "/agenda",
+      params: { unitId: closedQueueHealthUnitId },
+    });
+  };
+
   return (
     <QueueClosedModal
       visible={Boolean(queueClosedNotification)}
       message={queueClosedNotification?.message ?? ""}
       onClose={handleCloseQueueClosedModal}
+      onFindAnotherDoctor={
+        closedQueueHealthUnitId ? handleFindAnotherDoctor : undefined
+      }
     />
   );
 }

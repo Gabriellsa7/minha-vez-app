@@ -20,7 +20,7 @@ import { formatDateTime } from "@/src/utils/format-date-time";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Bell, Clock, ListChecks, TestTube } from "lucide-react-native";
+import { Bell, Clock, HeartPulse, ListChecks, TestTube } from "lucide-react-native";
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -34,6 +34,8 @@ interface MainContentProps {
   user: IUser;
   patient?: IPatient | null;
 }
+
+const MEDICAL_INFO_REMINDER_DELAY_MS = 3 * 24 * 60 * 60 * 1000;
 
 export default function MainContent({ user, patient }: MainContentProps) {
   const colors = useThemeColors();
@@ -155,6 +157,20 @@ export default function MainContent({ user, patient }: MainContentProps) {
     return null;
   }, [appointment, nextExamBooking]);
 
+  const needsMedicalInfoReminder = useMemo(() => {
+    if (!patient) return false;
+
+    const hasFilledMedicalInfo =
+      Boolean(patient.bloodType) ||
+      Boolean(patient.allergies?.trim()) ||
+      Boolean(patient.medicalObservations?.trim());
+
+    if (hasFilledMedicalInfo) return false;
+
+    const registeredAt = new Date(patient.createdAt).getTime();
+    return Date.now() - registeredAt >= MEDICAL_INFO_REMINDER_DELAY_MS;
+  }, [patient]);
+
   const appointmentQueueId = useMemo(
     () =>
       queueItems?.find((item) => item._id === appointment?.queueItemId)
@@ -262,6 +278,21 @@ export default function MainContent({ user, patient }: MainContentProps) {
                 recursos.
               </Text>
             </View>
+          )}
+          {needsMedicalInfoReminder && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Preencher dados de saúde"
+              onPress={() => router.push("/medical-info")}
+              className="w-full flex-row items-center gap-3 rounded-[16px] border border-warningBorder bg-warningBg p-3"
+            >
+              <HeartPulse size={20} color={colors.warningText} />
+              <Text className="flex-1 text-sm font-medium text-warningText">
+                Complete seus dados de saúde (tipo sanguíneo, alergias e
+                observações médicas). Eles são importantes para o seu
+                atendimento.
+              </Text>
+            </Pressable>
           )}
           {nextUpcomingVisit && (
             <Pressable
