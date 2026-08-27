@@ -27,6 +27,7 @@ export default function HealthUnitInfo() {
   const { data: rating } = useGetHealthUnitRatingSummary({
     healthUnitId: id as string,
   });
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View className="p-4 gap-6">
@@ -75,7 +76,11 @@ export default function HealthUnitInfo() {
             )}
             {rating && rating.count > 0 && (
               <View className="flex-row items-center gap-1">
-                <Star size={16} color={colors.accentStar} fill={colors.accentStar} />
+                <Star
+                  size={16}
+                  color={colors.accentStar}
+                  fill={colors.accentStar}
+                />
                 <Text className="text-sm font-semibold text-textBlack">
                   {rating.average?.toFixed(1)}
                 </Text>
@@ -167,7 +172,9 @@ export default function HealthUnitInfo() {
           </Text>
         </View>
         <View className="flex-row items-center justify-between">
-          <Text className="text-lg font-bold text-textBlack">Serviços Oferecidos</Text>
+          <Text className="text-lg font-bold text-textBlack">
+            Serviços Oferecidos
+          </Text>
           <Pressable
             onPress={() =>
               router.push({
