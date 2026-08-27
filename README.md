@@ -26,8 +26,8 @@ O **Minha Vez** é o app do paciente dentro de um ecossistema maior de gestão d
 | Repositório | Papel |
 |---|---|
 | 📱 **minha-vez-app** (este repo) | App mobile do paciente — busca unidades, agenda exames, entra na fila e acompanha em tempo real |
-| ⚙️ [minhavez-backend](../minhavez-backend) | API que centraliza filas, agendamentos, notificações e autenticação |
-| 🖥️ [minha-vez-manager](../minha-vez-manager) | Painel web usado pelas unidades de saúde para gerenciar filas, profissionais e exames |
+| ⚙️ [minhavez-backend] | API que centraliza filas, agendamentos, notificações e autenticação |
+| 🖥️ [minha-vez-manager] | Painel web usado pelas unidades de saúde para gerenciar filas, profissionais e exames |
 
 ## ✨ Funcionalidades
 
