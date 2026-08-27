@@ -8,7 +8,13 @@ import {
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { router } from "expo-router";
-import { ArrowLeft, BellRing, CheckCheck, RefreshCw, Trash2 } from "lucide-react-native";
+import {
+  ArrowLeft,
+  BellRing,
+  CheckCheck,
+  RefreshCw,
+  Trash2,
+} from "lucide-react-native";
 import {
   ActivityIndicator,
   Alert,
@@ -22,8 +28,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NotificationsScreen() {
   const colors = useThemeColors();
-  const { data: notifications, isLoading, isError, refetch, isRefetching } =
-    useNotifications();
+  const {
+    data: notifications,
+    isLoading,
+    isError,
+    refetch,
+    isRefetching,
+  } = useNotifications();
   const { data: unreadNotifications } = useUnreadNotifications();
   const markAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
@@ -53,7 +64,7 @@ export default function NotificationsScreen() {
     try {
       await markAsRead.mutateAsync(id);
     } finally {
-      router.push({ pathname: "/notifications/[id]", params: { id } });
+      router.push({ pathname: "/notifications-details/[id]", params: { id } });
     }
   };
 
@@ -69,7 +80,9 @@ export default function NotificationsScreen() {
           >
             <ArrowLeft size={24} color={colors.textSecondary} />
           </Pressable>
-          <Text className="text-xl font-semibold text-textBlack">Notificações</Text>
+          <Text className="text-xl font-semibold text-textBlack">
+            Notificações
+          </Text>
         </View>
         <Text className="text-sm text-textFifth">{unreadCount} não lidas</Text>
       </View>
@@ -126,9 +139,13 @@ export default function NotificationsScreen() {
                         {item.read ? "Lida" : "Não lida"}
                       </Text>
                     </View>
-                    <Text className="mt-1 text-sm text-textFifth">{item.message}</Text>
+                    <Text className="mt-1 text-sm text-textFifth">
+                      {item.message}
+                    </Text>
                   </View>
-                  {!item.read && <CheckCheck size={18} color={colors.tabActive} />}
+                  {!item.read && (
+                    <CheckCheck size={18} color={colors.tabActive} />
+                  )}
                 </View>
                 <Text className="mt-3 text-xs text-textFourth">
                   {formatDateTime(item.createdAt)}
@@ -162,7 +179,9 @@ export default function NotificationsScreen() {
           >
             <Trash2 size={16} color={colors.textDanger} />
             <Text className="font-semibold text-textDanger">
-              {clearNotifications.isPending ? "Limpando..." : "Limpar notificações"}
+              {clearNotifications.isPending
+                ? "Limpando..."
+                : "Limpar notificações"}
             </Text>
           </Pressable>
         </View>

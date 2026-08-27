@@ -1,6 +1,7 @@
-import { ArrowRight, Smile } from "lucide-react-native";
-import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import { Image } from "expo-image";
 import { router } from "expo-router";
+import { ArrowRight } from "lucide-react-native";
+import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
@@ -94,9 +95,20 @@ export default function QueueDetails({
                     className="w-[90%] flex-row items-center justify-between bg-bgSecondary p-3 rounded-t-xl"
                   >
                     <View className="flex-row items-center gap-2">
-                      <View className="rounded-full bg-bgSecondary p-2">
-                        {/* Clinic Image */}
-                        <Smile color={colors.textPrimary} size={24} />
+                      <View className="rounded-full overflow-hidden w-12 h-12">
+                        {item.healthUnitImage ? (
+                          <Image
+                            source={{ uri: item.healthUnitImage }}
+                            style={{ width: "100%", height: "100%" }}
+                            contentFit="cover"
+                          />
+                        ) : (
+                          <Image
+                            source={require("../../../../../assets/images/Hospital.png")}
+                            style={{ width: "100%", height: "100%" }}
+                            contentFit="cover"
+                          />
+                        )}
                       </View>
                       <View className="gap-1">
                         <Text className="text-textPrimary">
@@ -110,7 +122,7 @@ export default function QueueDetails({
                           Dia da consulta: {formatDateTime(appointmentDateTime)}
                         </Text>
                         <Text className="text-textPrimary text-sm opacity-50">
-                          {professionalRoom || "N/A"}
+                          Sala: {professionalRoom || "N/A"}
                         </Text>
                       </View>
                     </View>

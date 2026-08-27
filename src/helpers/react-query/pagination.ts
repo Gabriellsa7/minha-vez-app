@@ -13,7 +13,10 @@ export const generatePaginatedInfiniteQuery = <TItem, TFilter>(
     number
   >(queryKey, (filter, page) => fn(filter, page ?? 1));
 
-  return (params: TFilter, options?: Parameters<typeof useBase>[1]) =>
+  return (
+    params: TFilter,
+    options?: Partial<Parameters<typeof useBase>[1]>,
+  ) =>
     useBase(params, {
       initialPageParam: 1,
       getNextPageParam: (lastPage) =>

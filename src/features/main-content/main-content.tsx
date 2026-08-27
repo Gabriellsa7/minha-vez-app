@@ -4,11 +4,11 @@ import { useGetHealthProfessionalByAppointmentId } from "@/src/api/get-health-pr
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import SearchInput from "@/src/components/search-input/search-input";
+import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import {
   EExamBookingStatus,
   IExamBooking,
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
-import { EAppointmentStatus } from "@/src/config/entities/appointments/appointments.types";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
@@ -23,10 +23,12 @@ import { router } from "expo-router";
 import { Bell, Clock, ListChecks, TestTube } from "lucide-react-native";
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import HomeHeader from "./componentes/header/header";
-import HealthUnits from "./componentes/health-units/health-units";
-import QueueDetails from "./componentes/queue-details/queue-details";
-import { QuickServices } from "./componentes/quick-services/quick-services";
+import Toast from "react-native-toast-message";
+import HomeHeader from "./components/header/header";
+import HealthUnits from "./components/health-units/health-units";
+import QueueDetails from "./components/queue-details/queue-details";
+import { QuickServices } from "./components/quick-services/quick-services";
+import UpcomingVisits from "./components/upcoming-visits/upcoming-visits";
 
 interface MainContentProps {
   user: IUser;
@@ -90,22 +92,31 @@ export default function MainContent({ user, patient }: MainContentProps) {
     { enabled: !!patientId },
   );
 
-  const nextExamBooking = useMemo(() => {
+  const upcomingExamBookings = useMemo(() => {
     const now = new Date();
 
-    return examBookings
-      ?.filter(
-        (booking) =>
-          (booking.status === EExamBookingStatus.SCHEDULED ||
-            booking.status === EExamBookingStatus.CONFIRMED) &&
-          getExamComparableDate(booking.scheduledAt) > now,
-      )
-      .sort(
-        (first, second) =>
-          new Date(first.scheduledAt).getTime() -
-          new Date(second.scheduledAt).getTime(),
-      )[0];
+    return (
+      examBookings
+        ?.filter(
+          (booking) =>
+            (booking.status === EExamBookingStatus.SCHEDULED ||
+              booking.status === EExamBookingStatus.CONFIRMED) &&
+            getExamComparableDate(booking.scheduledAt) > now,
+        )
+        .sort(
+          (first, second) =>
+            new Date(first.scheduledAt).getTime() -
+            new Date(second.scheduledAt).getTime(),
+        ) ?? []
+    );
   }, [examBookings]);
+
+  const nextExamBooking = upcomingExamBookings[0];
+
+  const appointmentUnit = useMemo(
+    () => healthUnits?.find((unit) => unit._id === professional?.healthUnitId),
+    [healthUnits, professional?.healthUnitId],
+  );
 
   // The home screen surfaces whichever is soonest — a consulta or an exame
   // agendado — since a patient can have either (or both) coming up, and the
@@ -167,6 +178,26 @@ export default function MainContent({ user, patient }: MainContentProps) {
         params: { id: appointmentQueueId },
       });
     }
+  };
+
+  const handlePressAppointment = () => {
+    if (!appointmentQueueId) {
+      Toast.show({
+        type: "info",
+        text1: "Fila ainda não disponível",
+        text2: "A fila desta consulta será aberta no dia do atendimento.",
+      });
+      return;
+    }
+
+    router.push({
+      pathname: "/queue-info/[id]",
+      params: { id: appointmentQueueId },
+    });
+  };
+
+  const handlePressExam = (examBooking: IExamBooking) => {
+    router.push(`/exam-scheduling/booking/${examBooking._id}`);
   };
 
   return (
@@ -271,6 +302,14 @@ export default function MainContent({ user, patient }: MainContentProps) {
               </View>
             </Pressable>
           )}
+          <UpcomingVisits
+            appointment={appointment}
+            professional={professional}
+            appointmentUnit={appointmentUnit}
+            onPressAppointment={handlePressAppointment}
+            examBookings={upcomingExamBookings}
+            onPressExam={handlePressExam}
+          />
           <QuickServices />
           <HealthUnits healthUnits={healthUnits} />
         </View>

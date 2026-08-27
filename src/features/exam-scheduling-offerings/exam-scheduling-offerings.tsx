@@ -3,7 +3,7 @@ import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { FlaskConical, MapPin } from "lucide-react-native";
 import { ScrollView, Text, View } from "react-native";
-import { ExamOfferingCard } from "./componentes/exam-offering-card/exam-offering-card";
+import { ExamOfferingCard } from "./components/exam-offering-card/exam-offering-card";
 
 interface ExamSchedulingOfferingsProps {
   healthUnitId: string;

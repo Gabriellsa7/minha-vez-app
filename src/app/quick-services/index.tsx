@@ -3,7 +3,7 @@ import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { QUICK_SERVICES } from "@/src/features/main-content/componentes/quick-services/quick-services.constants";
+import { QUICK_SERVICES } from "@/src/features/main-content/components/quick-services/quick-services.constants";
 
 export default function QuickServicesPage() {
   const colors = useThemeColors();
@@ -24,7 +24,10 @@ export default function QuickServicesPage() {
                 <Icon size={20} color={colors.textSecondary} />
               </View>
             </Pressable>
-            <Text className="text-center text-xs text-textBlack" numberOfLines={2}>
+            <Text
+              className="text-center text-xs text-textBlack"
+              numberOfLines={2}
+            >
               {label}
             </Text>
           </View>

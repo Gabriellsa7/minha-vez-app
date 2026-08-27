@@ -10,16 +10,6 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { AppState, Linking } from "react-native";
 import Toast from "react-native-toast-message";
-import "../config/axios";
-import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
-import { useThemeColors } from "../hooks/use-theme-colors";
-import { useThemePreference } from "../hooks/use-theme-preference";
-import { queryClient } from "../lib/react-query";
-import { NotificationService } from "../services/notifications/notification.service";
-import { notificationQueryKeys } from "../hooks/use-notifications";
-import { GET_QUEUE_ITEMS_KEY } from "../api/get-queue-item-by-patient-id";
-import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "../api/get-queue-item-by-queue-id";
-import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
 import {
   GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY,
   GET_APPOINTMENTS_BY_PATIENT_ID_KEY,
@@ -32,6 +22,16 @@ import {
   GET_EXAMS_BY_PATIENT_ID_INFINITE_KEY,
   GET_EXAMS_BY_PATIENT_ID_KEY,
 } from "../api/get-exams-by-patient-id";
+import { GET_QUEUE_ITEMS_KEY } from "../api/get-queue-item-by-patient-id";
+import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "../api/get-queue-item-by-queue-id";
+import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
+import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
+import "../config/axios";
+import { notificationQueryKeys } from "../hooks/use-notifications";
+import { useThemeColors } from "../hooks/use-theme-colors";
+import { useThemePreference } from "../hooks/use-theme-preference";
+import { queryClient } from "../lib/react-query";
+import { NotificationService } from "../services/notifications/notification.service";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -46,7 +46,10 @@ Notifications.setNotificationHandler({
 function navigateToNotification(data?: Record<string, unknown> | null) {
   const notificationId = data?.notificationId;
   if (typeof notificationId === "string" && notificationId.length > 0) {
-    router.push({ pathname: "/notifications/[id]", params: { id: notificationId } });
+    router.push({
+      pathname: "/notifications-details/[id]",
+      params: { id: notificationId },
+    });
   }
 }
 
@@ -58,14 +61,6 @@ export default function RootLayout() {
     canAskAgain: true,
   });
 
-  // React Query's `refetchOnWindowFocus` (on by default) normally relies on
-  // a browser `visibilitychange` listener that doesn't exist in React
-  // Native, so it silently never fires. Driving `focusManager` from
-  // AppState is the standard RN wiring for it: without this, data fetched
-  // before the app was backgrounded (e.g. health unit opening hours) stays
-  // cached even after the app returns to the foreground, since in-app
-  // navigation focus (handled per-screen via `useFocusEffect`) never fires
-  // for an OS-level background/foreground cycle.
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (status) => {
       focusManager.setFocused(status === "active");
@@ -86,7 +81,9 @@ export default function RootLayout() {
     };
 
     if (Constants.appOwnership === "expo") {
-      console.warn("[push] remote push is unavailable in Expo Go; use the development build");
+      console.warn(
+        "[push] remote push is unavailable in Expo Go; use the development build",
+      );
     } else {
       void evaluateNotificationPermission();
     }
@@ -99,12 +96,16 @@ export default function RootLayout() {
       invalidateNotifications,
     );
 
-    const appStateSubscription = AppState.addEventListener("change", (state) => {
-      if (state !== "active" || Constants.appOwnership === "expo") return;
-      void evaluateNotificationPermission();
-    });
+    const appStateSubscription = AppState.addEventListener(
+      "change",
+      (state) => {
+        if (state !== "active" || Constants.appOwnership === "expo") return;
+        void evaluateNotificationPermission();
+      },
+    );
 
-    const tokenRotationUnsubscribe = NotificationService.registerTokenRotationListener();
+    const tokenRotationUnsubscribe =
+      NotificationService.registerTokenRotationListener();
 
     const receivedSubscription = Notifications.addNotificationReceivedListener(
       (notification) => {
@@ -117,6 +118,7 @@ export default function RootLayout() {
         invalidateNotifications();
       },
     );
+
     const responseSubscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const payload = response.notification.request.content.data as
@@ -128,47 +130,47 @@ export default function RootLayout() {
         });
         navigateToNotification(payload);
       });
-    const droppedSubscription = Notifications.addNotificationsDroppedListener(() => {
-      console.warn("[push] notifications dropped by the OS/provider");
-    });
-    const unsubscribeSocket = NotificationService.subscribeToSocket((payload) => {
-      console.log("[realtime] invalidating queue and notification cache", {
-        payload,
-      });
-      invalidateNotifications();
-      void queryClient.invalidateQueries({ queryKey: [GET_QUEUE_ITEMS_KEY] });
-      void queryClient.invalidateQueries({
-        queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: [GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY],
-      });
-      // A patient being called/finished/marked absent changes their
-      // appointment's status too (e.g. to COMPLETED once attended), and the
-      // home screen decides whether to keep showing the queue card based on
-      // that appointment, not just the queue/queue-item data.
-      void queryClient.invalidateQueries({
-        queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
-      });
-      // Exam-booking status changes (staff marking in-progress/completed,
-      // linking a result) and new result uploads both need to refresh the
-      // "Meus Exames" screen, whichever tab the patient is on.
-      void queryClient.invalidateQueries({
-        queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: [GET_EXAMS_BY_PATIENT_ID_KEY],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: [GET_EXAMS_BY_PATIENT_ID_INFINITE_KEY],
-      });
-    });
+
+    const droppedSubscription = Notifications.addNotificationsDroppedListener(
+      () => {
+        console.warn("[push] notifications dropped by the OS/provider");
+      },
+    );
+
+    const unsubscribeSocket = NotificationService.subscribeToSocket(
+      (payload) => {
+        console.log("[realtime] invalidating queue and notification cache", {
+          payload,
+        });
+        invalidateNotifications();
+        void queryClient.invalidateQueries({ queryKey: [GET_QUEUE_ITEMS_KEY] });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
+        });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY],
+        });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
+        });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
+        });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
+        });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY],
+        });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_EXAMS_BY_PATIENT_ID_KEY],
+        });
+        void queryClient.invalidateQueries({
+          queryKey: [GET_EXAMS_BY_PATIENT_ID_INFINITE_KEY],
+        });
+      },
+    );
+
     const stopSocket = NotificationService.startNotificationsSocket();
 
     const lastResponse = Notifications.getLastNotificationResponse();
