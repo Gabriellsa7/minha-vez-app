@@ -13,9 +13,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { Href, useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import {
   ArrowRight,
   Bell,
+  HelpCircle,
   IdCard,
   LogOut,
   Pencil,
@@ -31,6 +33,8 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
+
+const APP_DOCS_URL = "https://minha-vez-docs.vercel.app/app/primeiros-passos";
 
 export const ProfileContent = () => {
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
@@ -48,6 +52,10 @@ export const ProfileContent = () => {
 
   const handleOpenLogoutModal = () => {
     setOpenLogoutModal(true);
+  };
+
+  const handleOpenDocs = () => {
+    WebBrowser.openBrowserAsync(APP_DOCS_URL);
   };
 
   const handlePickAvatar = async () => {
@@ -168,6 +176,16 @@ export const ProfileContent = () => {
           <View className="flex-row items-center gap-4">
             <SettingsIcon size={24} color={colors.textSecondary} />
             <Text className="text-textBlack">Mais Configurações</Text>
+          </View>
+          <ArrowRight size={24} color={colors.textFourth} />
+        </Pressable>
+        <Pressable
+          onPress={handleOpenDocs}
+          className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl"
+        >
+          <View className="flex-row items-center gap-4">
+            <HelpCircle size={24} color={colors.textSecondary} />
+            <Text className="text-textBlack">Como usar o app</Text>
           </View>
           <ArrowRight size={24} color={colors.textFourth} />
         </Pressable>
