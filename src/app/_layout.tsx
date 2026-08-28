@@ -1,3 +1,4 @@
+import { StatusScreen } from "@/src/components/status-screen/status-screen";
 import { Stack, router, usePathname } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../../global.css";
@@ -42,6 +43,22 @@ import {
 } from "../services/notifications/notification.service";
 
 const QUEUE_CLOSED_NOTIFICATION_TYPE = "QUEUE_CLOSED";
+
+// Capturado pelo expo-router quando algum componente da árvore lança durante
+// a renderização — mensagem propositalmente amena para não assustar o
+// usuário (evitar termos como "erro crítico"/detalhes técnicos na tela).
+export function ErrorBoundary({ retry }: { retry: () => void }) {
+  return (
+    <SafeAreaProvider style={{ flex: 1 }}>
+      <StatusScreen
+        title="Algo não saiu como esperado"
+        message="Já estamos de olho nisso. Tente novamente em instantes."
+        actionLabel="Tentar novamente"
+        onAction={retry}
+      />
+    </SafeAreaProvider>
+  );
+}
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
