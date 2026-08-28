@@ -1,4 +1,4 @@
-import { removeToken } from "@/src/services/auth/auth.storage";
+import { getToken, removeToken } from "@/src/services/auth/auth.storage";
 import { AxiosError, AxiosResponse } from "axios";
 import Toast from "react-native-toast-message";
 
@@ -27,6 +27,10 @@ export const handleErrorResponse = async (error: AxiosError<ApiErrorResponse>) =
   if (error.response) {
     const status = error.response.status;
     const data = error.response.data;
+
+    if (status === 401 && !(await getToken())) {
+      return Promise.reject(error);
+    }
 
     Toast.show({
       type: "error",
