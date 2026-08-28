@@ -189,21 +189,33 @@ export const ProfileContent = () => {
           </View>
           <ArrowRight size={24} color={colors.textFourth} />
         </Pressable>
-        <View className="flex-row justify-between items-center bg-bgThird p-4 rounded-xl">
-          <Pressable onPress={() => router.push("/notifications" as Href)}>
-            <View className="flex-row items-center gap-4 justify-center">
-              <Bell size={24} color={colors.textSecondary} />
-              <Text className="text-textSecondary font-bold">
-                VER NOTIFICAÇÕES
-              </Text>
-            </View>
+        <View className="flex-row items-stretch bg-bgThird p-2 rounded-xl">
+          <Pressable
+            onPress={() => router.push("/notifications" as Href)}
+            className="flex-1 flex-row items-center justify-center gap-2 p-3"
+          >
+            <Bell size={22} color={colors.textSecondary} />
+            <Text
+              className="text-textSecondary font-bold text-sm"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              VER NOTIFICAÇÕES
+            </Text>
           </Pressable>
-          <View className="h-8 border-l border-borderPrimary" />
-          <Pressable onPress={handleOpenLogoutModal}>
-            <View className="flex-row items-center gap-4 justify-center">
-              <LogOut size={24} color={colors.textDanger} />
-              <Text className="text-textDanger font-bold">SAIR DA CONTA</Text>
-            </View>
+          <View className="w-px my-2 border-l border-borderPrimary" />
+          <Pressable
+            onPress={handleOpenLogoutModal}
+            className="flex-1 flex-row items-center justify-center gap-2 p-3"
+          >
+            <LogOut size={22} color={colors.textDanger} />
+            <Text
+              className="text-textDanger font-bold text-sm"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              SAIR DA CONTA
+            </Text>
           </Pressable>
         </View>
         <View className="items-center gap-1 pt-2">
