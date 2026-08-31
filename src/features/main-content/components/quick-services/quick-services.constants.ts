@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import {
   Calendar,
+  ClipboardList,
   Compass,
   FileText,
   History,
@@ -52,5 +53,11 @@ export const QUICK_SERVICES: QuickServiceItem[] = [
     label: "Minhas Consultas",
     icon: Stethoscope,
     onPress: () => router.push("/my-appointments"),
+  },
+  {
+    key: "minhas-receitas",
+    label: "Minhas Receitas",
+    icon: ClipboardList,
+    onPress: () => router.push("/prescriptions"),
   },
 ];
