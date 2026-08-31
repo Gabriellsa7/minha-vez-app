@@ -3,9 +3,11 @@ import { useCreatePatient } from "@/src/api/create-patient";
 import {
   GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY,
   GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY,
+  useGetExamBookingsByPatientId,
 } from "@/src/api/get-exam-bookings-by-patient-id";
 import { GET_EXAM_SLOTS_KEY } from "@/src/api/get-exam-slots";
 import { useGetPatientById } from "@/src/api/get-patient-by-id";
+import { EExamBookingStatus } from "@/src/config/entities/exam-bookings/exam-bookings.type";
 import { IExamOffering } from "@/src/config/entities/exam-offerings/exam-offerings.type";
 import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
@@ -53,6 +55,11 @@ export function useExamBooking({
   const { data: patient, isLoading: isPatientLoading } = useGetPatientById(
     { userId: user._id },
     { enabled: Boolean(user._id), retry: false },
+  );
+
+  const { data: existingBookings } = useGetExamBookingsByPatientId(
+    { patientId: patient?._id ?? "" },
+    { enabled: Boolean(patient?._id) },
   );
 
   const { mutate: createExamBooking, isPending: isCreatingBooking } =
@@ -139,6 +146,34 @@ export function useExamBooking({
         text2: "Escolha um horário futuro para agendar.",
       });
       setSelectedTime("");
+      return;
+    }
+
+    const hasConflictWithAnotherBooking = (existingBookings ?? []).some(
+      (booking) => {
+        const isActive =
+          booking.status === EExamBookingStatus.SCHEDULED ||
+          booking.status === EExamBookingStatus.CONFIRMED;
+
+        if (!isActive) return false;
+
+        return (
+          Math.abs(
+            new Date(booking.scheduledAt).getTime() -
+              selectedDateTime.getTime(),
+          ) <
+          2 * 60 * 60 * 1000
+        );
+      },
+    );
+
+    if (hasConflictWithAnotherBooking) {
+      Toast.show({
+        type: "error",
+        text1: "Horário muito próximo de outro exame",
+        text2:
+          "Escolha um horário com pelo menos 2 horas de diferença dos seus outros exames marcados.",
+      });
       return;
     }
 
