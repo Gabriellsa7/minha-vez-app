@@ -128,9 +128,10 @@ export default function PrescriptionDetailScreen() {
                 <Pressable
                   accessibilityRole="button"
                   onPress={() =>
-                    router.push(
-                      `/exam-scheduling/${prescription.healthUnitId}/${exam.examOfferingId}`,
-                    )
+                    router.push({
+                      pathname: "/exam-scheduling/select-clinic",
+                      params: { examName: exam.examOfferingName },
+                    })
                   }
                   className="flex-row items-center justify-center gap-2 rounded-xl bg-bgSecondary py-2.5"
                 >

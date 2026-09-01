@@ -18,9 +18,10 @@ export function PrescriptionCard({ prescription }: PrescriptionCardProps) {
 
   const handleScheduleExam = () => {
     if (prescription.exams.length === 1) {
-      router.push(
-        `/exam-scheduling/${prescription.healthUnitId}/${prescription.exams[0].examOfferingId}`,
-      );
+      router.push({
+        pathname: "/exam-scheduling/select-clinic",
+        params: { examName: prescription.exams[0].examOfferingName },
+      });
       return;
     }
 

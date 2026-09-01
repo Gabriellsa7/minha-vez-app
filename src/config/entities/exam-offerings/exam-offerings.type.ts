@@ -1,3 +1,5 @@
+import { IHealthUnitAddress } from "../health-unit/health-unit.types";
+
 export interface IExamOffering {
   _id: string;
   healthUnitId: string;
@@ -17,4 +19,10 @@ export interface IExamOffering {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface IExamOfferingWithHealthUnit extends IExamOffering {
+  healthUnitName: string;
+  healthUnitAddress: IHealthUnitAddress;
+  healthUnitImg?: string;
 }
