@@ -19,6 +19,7 @@ interface AppointmentCardProps {
   healthUnits?: IHealthUnit[];
   now: Date;
   onPress: (appointment: IAppointment) => void;
+  fullWidth?: boolean;
 }
 
 export default function AppointmentCard({
@@ -26,6 +27,7 @@ export default function AppointmentCard({
   healthUnits,
   now,
   onPress,
+  fullWidth,
 }: AppointmentCardProps) {
   const colors = useThemeColors();
 
@@ -45,8 +47,8 @@ export default function AppointmentCard({
       accessibilityRole="button"
       accessibilityLabel="Ver informações da consulta"
       onPress={() => onPress(appointment)}
-      style={{ width: CARD_WIDTH }}
-      className="rounded-2xl border border-borderPrimary bg-bgThird p-3"
+      style={fullWidth ? undefined : { width: CARD_WIDTH }}
+      className={`rounded-2xl border border-borderPrimary bg-bgThird p-3 ${fullWidth ? "w-full" : ""}`}
     >
       <View className="flex-row items-start justify-between gap-2">
         <View className="flex-1 flex-row items-center gap-2">
