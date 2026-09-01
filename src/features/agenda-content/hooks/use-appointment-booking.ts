@@ -19,6 +19,7 @@ import {
   normalizeBirthDate,
 } from "@/src/utils/util";
 import { useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
 
@@ -161,7 +162,7 @@ export function useAppointmentBooking({
         notes: "Agendamento realizado pelo app MinhaVez",
       },
       {
-        onSuccess: () => {
+        onSuccess: (appointment) => {
           Toast.show({
             type: "success",
             text1: "Agendamento confirmado",
@@ -183,6 +184,10 @@ export function useAppointmentBooking({
             queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
           });
           setShowConfirmModal(false);
+          router.replace({
+            pathname: "/appointment-confirmation/[id]",
+            params: { id: appointment._id, dateTime: appointment.dateTime },
+          });
         },
         onError: (error: Error) => {
           Toast.show({

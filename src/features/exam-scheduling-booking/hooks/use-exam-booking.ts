@@ -19,6 +19,7 @@ import {
   normalizeBirthDate,
 } from "@/src/utils/util";
 import { useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
 
@@ -185,7 +186,7 @@ export function useExamBooking({
         notes: "Agendamento realizado pelo app MinhaVez",
       },
       {
-        onSuccess: () => {
+        onSuccess: (booking) => {
           Toast.show({
             type: "success",
             text1: "Exame agendado",
@@ -201,6 +202,10 @@ export function useExamBooking({
             queryKey: [GET_EXAM_SLOTS_KEY],
           });
           setShowConfirmModal(false);
+          router.replace({
+            pathname: "/exam-scheduling/booking/[id]",
+            params: { id: booking._id, fromBooking: "1" },
+          });
         },
         onError: (error: Error) => {
           Toast.show({
