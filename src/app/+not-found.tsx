@@ -7,9 +7,6 @@ export default function NotFoundScreen() {
       router.back();
       return;
     }
-
-    // Não usar "/", pois index.tsx sempre redireciona para "/login" —
-    // isso derrubaria de volta pro login um usuário já autenticado.
     router.replace("/home");
   };
 
