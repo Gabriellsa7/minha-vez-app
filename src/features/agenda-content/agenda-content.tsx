@@ -12,9 +12,8 @@ import {
   getDateTimeFromDateAndTime,
   isTimeWithinOpeningHours,
 } from "@/src/utils/util";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useFocusEffect } from "@react-navigation/native";
-import { useLocalSearchParams } from "expo-router";
+import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { CalendarDays, Sparkles } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";

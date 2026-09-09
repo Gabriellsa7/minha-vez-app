@@ -10,7 +10,7 @@ import { IHealthProfessional } from "@/src/config/entities/health-professional/h
 import { IUser } from "@/src/config/entities/user/user.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getDateKey } from "@/src/utils/util";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { CalendarDays, MapPin } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {

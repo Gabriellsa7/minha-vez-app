@@ -46,7 +46,7 @@ export function NotificationModal({ visible, onClose }: NotificationModalProps) 
     try {
       await markAsRead.mutateAsync(id);
     } finally {
-      router.push({ pathname: "/notifications/[id]", params: { id } });
+      router.push({ pathname: "/notifications-details/[id]", params: { id } });
     }
   };
 

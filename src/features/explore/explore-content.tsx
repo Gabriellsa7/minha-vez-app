@@ -9,7 +9,7 @@ import { IHealthProfessional } from "@/src/config/entities/health-professional/h
 import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
 import { useDebouncedValue } from "@/src/hooks/use-debounced-value";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import {

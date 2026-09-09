@@ -8,7 +8,7 @@ import { HealthInfoCard } from "@/src/features/profile-content/health-info-card"
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
 import { formatBirthDateForDisplay } from "@/src/utils/util";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
 import { useQueryClient } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";

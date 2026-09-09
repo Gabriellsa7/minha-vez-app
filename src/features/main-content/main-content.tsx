@@ -19,7 +19,7 @@ import {
   getExamComparableDate,
 } from "@/src/utils/exam-scheduling.util";
 import { formatDateTime } from "@/src/utils/format-date-time";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Bell, Clock, HeartPulse, ListChecks, TestTube } from "lucide-react-native";
