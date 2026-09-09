@@ -9,6 +9,7 @@ import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { LinearGradient } from "expo-linear-gradient";
 import {
+  AlertTriangle,
   CalendarClock,
   Hash,
   MapPin,
@@ -145,6 +146,16 @@ export default function QueueInfoSection({
       </LinearGradient>
 
       <View className="gap-4 p-5">
+        <View className="flex-row gap-3 rounded-2xl border border-warningBorder bg-warningBg p-4">
+          <AlertTriangle size={18} color={colors.warningText} />
+          <Text className="flex-1 text-xs font-medium text-warningText">
+            Sua posição na fila pode mudar a qualquer momento. Pacientes com
+            prioridade (idosos, gestantes, pessoas com deficiência ou
+            condição de saúde), encaixes e ausências de outros pacientes
+            podem alterar a ordem de atendimento.
+          </Text>
+        </View>
+
         {isMyTurn && (
           <View className="rounded-2xl border border-borderPrimary bg-statusSuccessBg p-4">
             <Text className="font-bold text-statusSuccessText">
