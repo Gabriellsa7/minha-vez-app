@@ -23,6 +23,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { StarRatingInput } from "./star-rating-input";
 
 interface RatingModalProps {
@@ -114,6 +115,13 @@ export function RatingModal({
             queryKey: [GET_APPOINTMENT_RATING_ELIGIBILITY_KEY],
           });
           onClose();
+        },
+        onError: (error: Error) => {
+          Toast.show({
+            type: "error",
+            text1: "Não foi possível enviar",
+            text2: error?.message || "Tente novamente em instantes.",
+          });
         },
       },
     );

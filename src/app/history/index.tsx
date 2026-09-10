@@ -25,6 +25,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import HistoryAppointmentCard from "./components/history-appointment-card/history-appointment-card";
 import { HISTORY_STATUSES } from "./util";
 
@@ -84,6 +85,13 @@ export default function HistoryScreen() {
                   });
                   queryClient.invalidateQueries({
                     queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
+                  });
+                },
+                onError: (error: Error) => {
+                  Toast.show({
+                    type: "error",
+                    text1: "Não foi possível limpar o histórico",
+                    text2: error?.message || "Tente novamente em instantes.",
                   });
                 },
               },
