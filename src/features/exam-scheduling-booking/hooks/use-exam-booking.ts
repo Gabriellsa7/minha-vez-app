@@ -208,6 +208,11 @@ export function useExamBooking({
           });
         },
         onError: (error: Error) => {
+          // The native <Modal> below renders above everything else,
+          // including the app's root-level Toast — closing it first is
+          // what actually makes the error visible instead of hidden behind
+          // the confirmation dialog.
+          setShowConfirmModal(false);
           Toast.show({
             type: "error",
             text1: "Não foi possível agendar",

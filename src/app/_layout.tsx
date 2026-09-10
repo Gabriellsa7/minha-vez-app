@@ -1,6 +1,9 @@
 import { StatusScreen } from "@/src/components/status-screen/status-screen";
 import { Stack, router, usePathname } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import "../../global.css";
 
 import { QueryClientProvider, focusManager } from "@tanstack/react-query";
@@ -28,6 +31,7 @@ import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "../api/get-queue-item-by-queue-
 import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
 import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
 import { QueueClosedModal } from "../components/queue-closed/queue-closed-modal";
+import { useToastConfig } from "../components/toast/toast-config";
 import "../config/axios";
 import {
   notificationQueryKeys,
@@ -151,6 +155,18 @@ function QueueClosedNotificationGate() {
       }
     />
   );
+}
+
+// Rendered as a descendant of <SafeAreaProvider> (unlike RootLayout itself,
+// which creates that provider) so the top offset can clear the status
+// bar/notch instead of the library's fixed 40px default, which otherwise
+// left the toast's text cramped right against that corner on devices with
+// a notch or Dynamic Island.
+function AppToast() {
+  const insets = useSafeAreaInsets();
+  const toastConfig = useToastConfig();
+
+  return <Toast config={toastConfig} topOffset={insets.top + 12} />;
 }
 
 export default function RootLayout() {
@@ -331,7 +347,7 @@ export default function RootLayout() {
           onDismiss={handleDismissNotifications}
         />
         <QueueClosedNotificationGate />
-        <Toast />
+        <AppToast />
       </SafeAreaProvider>
     </QueryClientProvider>
   );
