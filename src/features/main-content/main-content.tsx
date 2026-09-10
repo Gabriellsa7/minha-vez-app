@@ -1,5 +1,6 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
 import { useGetExamBookingsByPatientId } from "@/src/api/get-exam-bookings-by-patient-id";
+import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import SearchInput from "@/src/components/search-input/search-input";
@@ -12,6 +13,7 @@ import {
   IExamBooking,
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
+import { EQueueItemStatus } from "@/src/config/entities/queue-items/queue-items.types";
 import { IUser } from "@/src/config/entities/user/user.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import {
@@ -20,9 +22,9 @@ import {
 } from "@/src/utils/exam-scheduling.util";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { CHECK_IN_GRACE_MS } from "@/src/utils/visit-urgency";
-import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
 import {
   Bell,
   Clock,
@@ -30,7 +32,7 @@ import {
   ListChecks,
   TestTube,
 } from "lucide-react-native";
-import React, { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import HomeHeader from "./components/header/header";
@@ -111,6 +113,21 @@ export default function MainContent({ user, patient }: MainContentProps) {
     { enabled: !!patientId, refetchInterval: 5000 },
   );
 
+  const hasRevealedActiveQueueItem = useMemo(
+    () =>
+      queueItems?.some(
+        (item) =>
+          item.status === EQueueItemStatus.IN_SERVICE ||
+          (item.status === EQueueItemStatus.WAITING && item.position != null),
+      ) ?? false,
+    [queueItems],
+  );
+
+  const { data: appointmentHealthUnit } = useGetHealthUnitById(
+    { healthUnitId: appointment?.healthUnitId ?? "" },
+    { enabled: Boolean(appointment?.healthUnitId) },
+  );
+
   const upcomingExamBookings = useMemo(() => {
     const now = new Date();
 
@@ -166,18 +183,33 @@ export default function MainContent({ user, patient }: MainContentProps) {
     return null;
   }, [appointment, nextExamBooking]);
 
-  const needsMedicalInfoReminder = useMemo(() => {
-    if (!patient) return false;
+  const [needsMedicalInfoReminder, setNeedsMedicalInfoReminder] =
+    useState(false);
 
-    const hasFilledMedicalInfo =
-      Boolean(patient.bloodType) ||
-      Boolean(patient.allergies?.trim()) ||
-      Boolean(patient.medicalObservations?.trim());
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!patient) {
+        setNeedsMedicalInfoReminder(false);
+        return;
+      }
 
-    if (hasFilledMedicalInfo) return false;
+      const hasFilledMedicalInfo =
+        Boolean(patient.bloodType) ||
+        Boolean(patient.allergies?.trim()) ||
+        Boolean(patient.medicalObservations?.trim());
 
-    const registeredAt = new Date(patient.createdAt).getTime();
-    return Date.now() - registeredAt >= MEDICAL_INFO_REMINDER_DELAY_MS;
+      if (hasFilledMedicalInfo) {
+        setNeedsMedicalInfoReminder(false);
+        return;
+      }
+
+      const registeredAt = new Date(patient.createdAt).getTime();
+      setNeedsMedicalInfoReminder(
+        Date.now() - registeredAt >= MEDICAL_INFO_REMINDER_DELAY_MS,
+      );
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [patient]);
 
   const appointmentQueueId = useMemo(
@@ -243,8 +275,29 @@ export default function MainContent({ user, patient }: MainContentProps) {
         >
           <View className="w-full gap-3 p-5">
             <HomeHeader user={user!} />
-            {hasScheduledAppointment ? (
+            {hasRevealedActiveQueueItem ? (
               <QueueDetails patientId={patientId!} />
+            ) : hasScheduledAppointment && appointment ? (
+              <View className="w-full items-center gap-3 rounded-2xl border border-white/15 bg-white/10 p-5">
+                <View className="items-center justify-center rounded-full bg-white/15 p-3">
+                  <Clock size={22} color={colors.textPrimary} />
+                </View>
+                <View className="items-center gap-1">
+                  <Text className="text-textPrimary font-semibold text-base">
+                    Sua consulta está agendada
+                  </Text>
+                  <Text className="text-textPrimary text-center text-sm opacity-70">
+                    {appointmentHealthUnit?.name
+                      ? `${appointmentHealthUnit.name} · `
+                      : ""}
+                    {formatDateTime(appointment.dateTime)}
+                  </Text>
+                  <Text className="text-textPrimary text-center text-sm opacity-70">
+                    A fila será aberta e sua posição calculada quando faltarem 2
+                    horas para o horário marcado.
+                  </Text>
+                </View>
+              </View>
             ) : (
               patientId &&
               !isAppointmentsLoading && (
@@ -297,7 +350,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
               accessibilityRole="button"
               accessibilityLabel="Preencher dados de saúde"
               onPress={() => router.push("/medical-info")}
-              className="w-full flex-row items-center gap-3 rounded-[16px] border border-warningBorder bg-warningBg p-3"
+              className="w-full flex-row gap-3 rounded-[16px] border border-warningBorder bg-warningBg p-3 items-center"
             >
               <HeartPulse size={20} color={colors.warningText} />
               <Text className="flex-1 text-sm font-medium text-warningText">

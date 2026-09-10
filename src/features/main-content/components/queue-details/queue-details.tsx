@@ -67,8 +67,14 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
       );
 
       if (!patientQueueItem) return false;
+      if (FINISHED_ITEM_STATUSES.includes(patientQueueItem.status)) {
+        return false;
+      }
 
-      return !FINISHED_ITEM_STATUSES.includes(patientQueueItem.status);
+      return (
+        patientQueueItem.status === EQueueItemStatus.IN_SERVICE ||
+        patientQueueItem.position != null
+      );
     })
     .sort((a, b) => {
       return new Date(a.queueDate).getTime() - new Date(b.queueDate).getTime();

@@ -4,6 +4,8 @@ import {
   EQueueStatus,
 } from "@/src/config/entities/queue/queue.type";
 
+export const POSITION_WINDOW_MS = 2 * 60 * 60 * 1000;
+
 export const QUEUE_STATUS_LABEL: Record<EQueueStatus, string> = {
   [EQueueStatus.OPEN]: "Aberta",
   [EQueueStatus.IN_PROGRESS]: "Em andamento",

@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import {
   ITEM_STATUS_LABEL,
+  POSITION_WINDOW_MS,
   QUEUE_SHIFT_LABEL,
   QUEUE_STATUS_LABEL,
 } from "../../util";
@@ -84,6 +85,14 @@ export default function QueueInfoSection({
       .length ?? 0;
 
   const isMyTurn = patientQueueItem?.status === EQueueItemStatus.IN_SERVICE;
+  const isWaitingWithoutPosition =
+    patientQueueItem?.status === EQueueItemStatus.WAITING &&
+    patientQueueItem.position == null;
+  const positionRevealTime = appointment
+    ? formatDateTime(
+        new Date(new Date(appointment.dateTime).getTime() - POSITION_WINDOW_MS),
+      ).split(" ")[1]
+    : null;
 
   const appointmentDuration = professional?.schedule?.appointmentDuration ?? 0;
   const estimatedWaitMinutes =
@@ -144,12 +153,20 @@ export default function QueueInfoSection({
             </Text>
           </View>
           <View className="h-32 w-32 items-center justify-center rounded-full border-4 border-white/40 bg-white/10">
-            <Text className="text-5xl font-bold text-textPrimary">
+            <Text
+              className={
+                isWaitingWithoutPosition
+                  ? "text-3xl font-bold text-textPrimary"
+                  : "text-5xl font-bold text-textPrimary"
+              }
+            >
               {isMyTurn
                 ? "😀"
-                : patientQueueItem?.status === EQueueItemStatus.WAITING
-                  ? patientQueueItem.position
-                  : "—"}
+                : isWaitingWithoutPosition
+                  ? "⏳"
+                  : patientQueueItem?.status === EQueueItemStatus.WAITING
+                    ? patientQueueItem.position
+                    : "—"}
             </Text>
           </View>
           <Text className="text-textPrimary opacity-80">
@@ -173,10 +190,11 @@ export default function QueueInfoSection({
         <View className="flex-row gap-3 rounded-2xl border border-warningBorder bg-warningBg p-4">
           <AlertTriangle size={18} color={colors.warningText} />
           <Text className="flex-1 text-xs font-medium text-warningText">
-            Sua posição na fila pode mudar a qualquer momento. Pacientes com
-            prioridade (idosos, gestantes, pessoas com deficiência ou condição
-            de saúde), encaixes e ausências de outros pacientes podem alterar a
-            ordem de atendimento.
+            {isWaitingWithoutPosition
+              ? `Sua posição na fila só será calculada quando faltarem 2 horas para sua consulta${
+                  positionRevealTime ? `, a partir das ${positionRevealTime}` : ""
+                }. Volte a esta tela perto do horário para acompanhar sua vez.`
+              : "Sua posição na fila pode mudar a qualquer momento. Pacientes com prioridade (idosos, gestantes, pessoas com deficiência ou condição de saúde), encaixes e ausências de outros pacientes podem alterar a ordem de atendimento."}
           </Text>
         </View>
 

@@ -377,6 +377,10 @@ export default function RootLayout() {
           <Stack.Screen name="notifications/[id]" />
           <Stack.Screen name="queue-info/[id]" />
           <Stack.Screen name="search" options={{ presentation: "modal" }} />
+          <Stack.Screen
+            name="appointment-confirmation/[id]"
+            options={{ presentation: "modal" }}
+          />
           <Stack.Screen name="(tabs)" />
         </Stack>
         <StatusBar style="auto" />
