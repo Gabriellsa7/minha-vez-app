@@ -11,6 +11,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import {
   AlertTriangle,
   CalendarClock,
+  CheckCircle2,
+  Clock,
   Hash,
   MapPin,
   Megaphone,
@@ -227,6 +229,44 @@ export default function QueueInfoSection({
             </View>
           </View>
         </View>
+
+        {patientQueueItem && (
+          <View
+            className={`flex-row items-center gap-3 rounded-2xl border p-4 ${
+              patientQueueItem.checkInTime
+                ? "border-borderPrimary bg-statusSuccessBg"
+                : "border-warningBorder bg-warningBg"
+            }`}
+          >
+            {patientQueueItem.checkInTime ? (
+              <CheckCircle2 size={18} color={colors.statusSuccessText} />
+            ) : (
+              <Clock size={18} color={colors.warningText} />
+            )}
+            <View className="flex-1">
+              <Text
+                className={`text-xs ${
+                  patientQueueItem.checkInTime
+                    ? "text-statusSuccessText"
+                    : "text-warningText"
+                }`}
+              >
+                Check-in
+              </Text>
+              <Text
+                className={`text-base font-semibold ${
+                  patientQueueItem.checkInTime
+                    ? "text-statusSuccessText"
+                    : "text-warningText"
+                }`}
+              >
+                {patientQueueItem.checkInTime
+                  ? `Confirmado às ${formatDateTime(patientQueueItem.checkInTime).split(" ")[1]}`
+                  : "Confirme sua presença na recepção da unidade"}
+              </Text>
+            </View>
+          </View>
+        )}
 
         {patientQueueItem?.code && (
           <View className="flex-row items-center gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-4">
