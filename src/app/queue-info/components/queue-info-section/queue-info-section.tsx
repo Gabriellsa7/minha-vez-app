@@ -269,7 +269,7 @@ export default function QueueInfoSection({
               >
                 {patientQueueItem.checkInTime
                   ? `Confirmado às ${formatDateTime(patientQueueItem.checkInTime).split(" ")[1]}`
-                  : "Confirme sua presença na recepção da unidade"}
+                  : "Confirme sua presença na recepção da unidade a partir de 20 minutos antes da consulta (tolerância de até 5 minutos de atraso)"}
               </Text>
             </View>
           </View>
