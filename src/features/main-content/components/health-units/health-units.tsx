@@ -53,7 +53,6 @@ function HealthUnitHomeCard({ unit }: HealthUnitHomeCardProps) {
       className="w-56 h-auto bg-bgThird rounded-xl"
     >
       <View className="w-64 h-56 bg-bgThird rounded-xl p-4">
-        {/* add a default image, this image is on figma */}
         <View className="mb-3 h-32 w-full overflow-hidden rounded-xl bg-borderPrimary">
           {unit.img ? (
             <Image
@@ -91,7 +90,11 @@ function HealthUnitHomeCard({ unit }: HealthUnitHomeCardProps) {
 
           {rating && rating.count > 0 && (
             <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-bgThird px-2 py-1">
-              <Star size={12} color={colors.accentStar} fill={colors.accentStar} />
+              <Star
+                size={12}
+                color={colors.accentStar}
+                fill={colors.accentStar}
+              />
               <Text className="text-xs font-semibold text-textBlack">
                 {rating.average?.toFixed(1)}
               </Text>

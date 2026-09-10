@@ -51,11 +51,6 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     refetch: refetchHealthUnits,
   } = useGetHealthUnits();
 
-  // The Agenda tab stays mounted across tab switches (bottom-tab screens
-  // aren't remounted on focus), so react-query's default refetchOnMount
-  // never re-fires after the first visit. Without this, a clinic's opening
-  // hours edited elsewhere (e.g. in the manager app) would keep showing
-  // stale, already-fetched slots until the app is fully restarted.
   useFocusEffect(
     useCallback(() => {
       refetchHealthUnits();

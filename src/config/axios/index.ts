@@ -11,7 +11,7 @@ httpClient.interceptors.request.use(async (config) => {
 
   return config;
 });
-// interceptors
+
 httpClient.interceptors.response.use(
   handleSuccessResponse,
   handleErrorResponse,

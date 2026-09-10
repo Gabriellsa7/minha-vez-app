@@ -1,12 +1,5 @@
 #!/usr/bin/env node
-/**
- * Bumps the app's semantic version (app.json "expo.version" + package.json
- * "version") and commits the change, so every real build ships with a
- * unique, incrementing version number (e.g. 1.0.6 -> 1.0.7).
- *
- * Usage: node scripts/bump-version.js [patch|minor|major]
- * Defaults to "patch", matching the "npm version" convention.
- */
+
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");

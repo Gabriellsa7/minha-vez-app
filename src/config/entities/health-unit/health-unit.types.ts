@@ -20,7 +20,7 @@ export interface IService {
   _id: string;
   name: string;
   description?: string;
-  duration?: number; //minutes
+  duration?: number;
   price?: number;
   createdAt?: Date;
   updatedAt?: Date;

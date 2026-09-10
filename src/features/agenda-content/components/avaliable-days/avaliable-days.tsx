@@ -8,7 +8,7 @@ interface AvaliableDaysProps {
   selectedDate: string;
   setSelectedTime: (time: string) => void;
   setSelectedDate: (date: string) => void;
-  /** JS day-of-week indexes (0=Sunday..6=Saturday) with no availability at all, greyed out like past days. Omit to allow every weekday (default, used by the consulta flow). */
+
   disabledWeekdays?: Set<number>;
 }
 
@@ -52,10 +52,6 @@ export default function AvaliableDays({
     });
   }, [calendarMonth]);
 
-  // Chunked into explicit 7-day rows instead of relying on flex-wrap with a
-  // "100/7%" cell width — on React Native Web that percentage rounds just
-  // enough to only fit 6 cells per line, silently dropping the 7th (Saturday)
-  // column and shifting every following day left by one position.
   const calendarWeeks = useMemo(() => {
     const weeks: Date[][] = [];
     for (let index = 0; index < calendarDays.length; index += 7) {
@@ -100,7 +96,11 @@ export default function AvaliableDays({
             >
               <ChevronLeft
                 size={18}
-                color={canGoToPreviousMonth ? colors.textSecondary : colors.textFourth}
+                color={
+                  canGoToPreviousMonth
+                    ? colors.textSecondary
+                    : colors.textFourth
+                }
               />
             </Pressable>
             <Pressable

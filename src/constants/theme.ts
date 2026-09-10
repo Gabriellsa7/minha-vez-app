@@ -1,6 +1,3 @@
-// Espelho JS dos tokens definidos em `global.css` (`:root` / `prefers-color-scheme: dark`).
-// Necessário porque `color=`/`style={{}}` não passam pelo NativeWind — mantenha os dois em sincronia.
-
 export type ThemeColors = Record<
   | "textPrimary"
   | "textSecondary"
@@ -73,9 +70,6 @@ export const LightColors: ThemeColors = {
 };
 
 export const DarkColors: ThemeColors = {
-  // textPrimary é sempre "texto claro sobre superfície de marca" (botões/headers em
-  // bgSecondary, bgFourth, gradientes) — essas superfícies não invertem no dark, então
-  // o token também não inverte.
   textPrimary: "#FFFFFF",
   textSecondary: "#4DD8E8",
   textThird: "#1EC2D8",

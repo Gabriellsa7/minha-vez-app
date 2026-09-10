@@ -1,5 +1,3 @@
-//'/queues/patient/:patientId/details'
-
 import { IQueueWithDetails } from "../config/entities/queue/queue.type";
 import { generateReactQuery } from "../helpers/react-query";
 import { httpClient } from "../services/api";

@@ -6,14 +6,6 @@ type ApiErrorResponse = {
   message?: string;
 };
 
-// Mutating requests (POST/PUT/PATCH/DELETE) are always user-triggered
-// actions whose caller already shows its own specific error toast via
-// react-query's onError (see e.g. use-appointment-booking.ts) — letting the
-// interceptor also toast here just stacks a second, generic card behind/on
-// top of that one, which react-native-toast-message renders as a glitchy,
-// text-less card frozen until manually dismissed. Only GET requests
-// (background reads with no per-call error handling) still get this
-// fallback toast.
 const METHODS_WITH_OWN_ERROR_HANDLING = ["post", "put", "patch", "delete"];
 
 export const handleSuccessResponse = async (response: AxiosResponse) => {
@@ -38,7 +30,9 @@ export const handleSuccessResponse = async (response: AxiosResponse) => {
   return response;
 };
 
-export const handleErrorResponse = async (error: AxiosError<ApiErrorResponse>) => {
+export const handleErrorResponse = async (
+  error: AxiosError<ApiErrorResponse>,
+) => {
   const method = error.config?.method?.toLowerCase();
   const hasOwnErrorHandling =
     !!method && METHODS_WITH_OWN_ERROR_HANDLING.includes(method);

@@ -11,12 +11,15 @@ interface ToastCardProps extends ToastConfigParams<unknown> {
   Icon: ComponentType<{ size?: number; color?: string }>;
 }
 
-// Custom cards for react-native-toast-message: the library's default
-// BaseToast clips text1/text2 to a single line each (unreadable for longer
-// backend error messages) and has no close affordance beyond a swipe
-// gesture. This renders the full message and an explicit, padded close
-// button instead.
-function ToastCard({ text1, text2, hide, bg, border, accent, Icon }: ToastCardProps) {
+function ToastCard({
+  text1,
+  text2,
+  hide,
+  bg,
+  border,
+  accent,
+  Icon,
+}: ToastCardProps) {
   return (
     <View
       className="mx-4 w-[92%] flex-row items-start gap-3 rounded-2xl border px-4 py-3 shadow-sm"

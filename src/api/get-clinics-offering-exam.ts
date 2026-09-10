@@ -8,9 +8,6 @@ export interface IGetClinicsOfferingExamParams {
   examName: string;
 }
 
-// encodeURIComponent leaves !'()* unescaped (they're "unreserved marks" per RFC2396),
-// but the backend's OpenAPI validator rejects them as unencoded reserved characters —
-// so exam names like "Hemograma (Completo)" need this extra pass.
 const encodeQueryValue = (value: string) =>
   encodeURIComponent(value).replace(
     /[!'()*]/g,

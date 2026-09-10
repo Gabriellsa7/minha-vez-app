@@ -53,10 +53,6 @@ export function CancelAppointmentModal({
           onCanceled?.();
         },
         onError: (error: Error) => {
-          // The native <Modal> below renders above everything else,
-          // including the app's root-level Toast — closing it first is
-          // what actually makes the error visible instead of hidden behind
-          // the confirmation dialog.
           onClose();
           Toast.show({
             type: "error",
@@ -95,8 +91,8 @@ export function CancelAppointmentModal({
 
           <View className="gap-4 px-5 py-5">
             <Text className="text-base text-textFifth">
-              Tem certeza que deseja cancelar esta consulta? Essa ação não
-              pode ser desfeita.
+              Tem certeza que deseja cancelar esta consulta? Essa ação não pode
+              ser desfeita.
             </Text>
 
             <Pressable
@@ -104,7 +100,9 @@ export function CancelAppointmentModal({
               disabled={isCanceling}
               onPress={handleConfirm}
               className={`items-center rounded-xl py-3 ${
-                isCanceling ? "bg-statusDangerText opacity-60" : "bg-statusDangerText"
+                isCanceling
+                  ? "bg-statusDangerText opacity-60"
+                  : "bg-statusDangerText"
               }`}
             >
               {isCanceling ? (
