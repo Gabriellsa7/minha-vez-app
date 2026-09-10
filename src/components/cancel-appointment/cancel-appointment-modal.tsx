@@ -53,10 +53,15 @@ export function CancelAppointmentModal({
           onCanceled?.();
         },
         onError: (error: Error) => {
+          // The native <Modal> below renders above everything else,
+          // including the app's root-level Toast — closing it first is
+          // what actually makes the error visible instead of hidden behind
+          // the confirmation dialog.
+          onClose();
           Toast.show({
             type: "error",
             text1: "Não foi possível cancelar",
-            text2: error?.message,
+            text2: error?.message || "Tente novamente em instantes.",
           });
         },
       },
