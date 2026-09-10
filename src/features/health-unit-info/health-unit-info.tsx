@@ -1,4 +1,5 @@
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
+import { useGetHealthUnitQueueSummary } from "@/src/api/get-health-unit-queue-summary";
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import { EHealthUnitType } from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
@@ -25,6 +26,10 @@ export default function HealthUnitInfo() {
   });
 
   const { data: rating } = useGetHealthUnitRatingSummary({
+    healthUnitId: id as string,
+  });
+
+  const { data: queueSummary } = useGetHealthUnitQueueSummary({
     healthUnitId: id as string,
   });
 
@@ -158,19 +163,25 @@ export default function HealthUnitInfo() {
             </View>
           </View>
         </View>
-        <View className="bg-infoBg border border-infoBorder rounded-2xl p-5 gap-3">
-          <View className="flex-row items-center gap-2">
-            <View className="w-3 h-3 rounded-3xl bg-highlightBorder" />
-            <Text className="text-highlightText font-bold tracking-widest uppercase text-sm">
-              Status da Fila
+        {queueSummary?.hasOpenQueue && (
+          <View className="bg-infoBg border border-infoBorder rounded-2xl p-5 gap-3">
+            <View className="flex-row items-center gap-2">
+              <View className="w-3 h-3 rounded-3xl bg-highlightBorder" />
+              <Text className="text-highlightText font-bold tracking-widest uppercase text-sm">
+                Status da Fila
+              </Text>
+            </View>
+
+            <Text className="text-base text-textBlack">
+              Tempo médio de espera:{" "}
+              <Text className="font-bold text-highlightText">
+                {queueSummary.estimatedWaitMinutes !== null
+                  ? `${queueSummary.estimatedWaitMinutes} min`
+                  : "Indisponível"}
+              </Text>
             </Text>
           </View>
-
-          <Text className="text-base text-textBlack">
-            Tempo médio de espera:{" "}
-            <Text className="font-bold text-highlightText">15 min</Text>
-          </Text>
-        </View>
+        )}
         <View className="flex-row items-center justify-between">
           <Text className="text-lg font-bold text-textBlack">
             Serviços Oferecidos

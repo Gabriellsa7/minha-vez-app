@@ -67,7 +67,14 @@ export default function QueueInfoSection({
       .length ?? 0;
 
   const isMyTurn = patientQueueItem?.status === EQueueItemStatus.IN_SERVICE;
-  const estimatedWaitMinutes = queue?.estimatedWaitMinutes ?? null;
+  // Whoever's ahead in line still takes at least one full appointment slot
+  // to be attended, so the clinic/professional's configured duration is the
+  // floor for the estimate — never show less than that while still waiting.
+  const appointmentDuration = professional?.schedule?.appointmentDuration ?? 0;
+  const estimatedWaitMinutes =
+    queue?.estimatedWaitMinutes != null
+      ? Math.max(queue.estimatedWaitMinutes, appointmentDuration)
+      : null;
 
   return (
     <ScrollView

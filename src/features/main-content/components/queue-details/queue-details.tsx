@@ -143,6 +143,18 @@ function QueueCard({
     { enabled: !!queue.professionalId },
   );
 
+  const isMyTurn = patientQueueItem?.status === EQueueItemStatus.IN_SERVICE;
+  // Whoever's ahead in line still takes at least one full appointment slot
+  // to be attended, so the clinic/professional's configured duration is the
+  // floor for the estimate — never show less than that while still waiting.
+  const estimatedWaitMinutes =
+    typeof queue.estimatedWaitMinutes === "number" && !isMyTurn
+      ? Math.max(
+          queue.estimatedWaitMinutes,
+          professional?.schedule?.appointmentDuration ?? 0,
+        )
+      : queue.estimatedWaitMinutes;
+
   return (
     <View style={{ width }}>
       <Pressable
@@ -196,12 +208,12 @@ function QueueCard({
           <Text className="text-textFourth text-sm">
             Código #{patientQueueItem?.code || null}
           </Text>
-          {typeof queue.estimatedWaitMinutes === "number" && (
+          {typeof estimatedWaitMinutes === "number" && (
             <Text className="text-textFourth text-sm">
               Espera estimada:{" "}
-              {queue.estimatedWaitMinutes === 0
+              {estimatedWaitMinutes === 0
                 ? "Agora"
-                : `${queue.estimatedWaitMinutes} min`}
+                : `${estimatedWaitMinutes} min`}
             </Text>
           )}
         </View>
