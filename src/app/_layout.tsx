@@ -47,10 +47,8 @@ import {
 } from "../services/notifications/notification.service";
 
 const QUEUE_CLOSED_NOTIFICATION_TYPE = "QUEUE_CLOSED";
+const CHECK_IN_MISSED_NOTIFICATION_TYPE = "APPOINTMENT_AUTO_CANCELED";
 
-// Capturado pelo expo-router quando algum componente da árvore lança durante
-// a renderização — mensagem propositalmente amena para não assustar o
-// usuário (evitar termos como "erro crítico"/detalhes técnicos na tela).
 export function ErrorBoundary({ retry }: { retry: () => void }) {
   return (
     <SafeAreaProvider style={{ flex: 1 }}>
@@ -84,23 +82,12 @@ function navigateToNotification(data?: Record<string, unknown> | null) {
   }
 }
 
-// Reads notification state via react-query hooks, so it must be rendered as
-// a descendant of <QueryClientProvider> — not inline in RootLayout's body,
-// which runs before that provider exists.
 function QueueClosedNotificationGate() {
   const [queueClosedNotification, setQueueClosedNotification] =
     useState<NotificationItem | null>(null);
-  // markAsRead is async: the "unread" list can still contain the
-  // just-dismissed notification for a moment after closing (the mutation's
-  // invalidation hasn't finished refetching yet), which would otherwise
-  // reopen the same modal right after it's closed. Tracking dismissed ids
-  // locally makes the close instant and final regardless of that race.
+
   const dismissedNotificationIdsRef = useRef<Set<string>>(new Set());
 
-  // A previous session's token can still be valid in secure storage while
-  // the login screen is showing (index.tsx always renders /login first,
-  // regardless of a stored session) — without this guard the modal could
-  // pop up before the user actually logs in on this app run.
   const pathname = usePathname();
   const isPastLoginScreen = pathname !== "/" && pathname !== "/login";
 
@@ -157,11 +144,66 @@ function QueueClosedNotificationGate() {
   );
 }
 
-// Rendered as a descendant of <SafeAreaProvider> (unlike RootLayout itself,
-// which creates that provider) so the top offset can clear the status
-// bar/notch instead of the library's fixed 40px default, which otherwise
-// left the toast's text cramped right against that corner on devices with
-// a notch or Dynamic Island.
+function CheckInMissedNotificationGate() {
+  const [checkInMissedNotification, setCheckInMissedNotification] =
+    useState<NotificationItem | null>(null);
+  const dismissedNotificationIdsRef = useRef<Set<string>>(new Set());
+
+  const pathname = usePathname();
+  const isPastLoginScreen = pathname !== "/" && pathname !== "/login";
+
+  const { data: unreadNotifications } = useUnreadNotifications({
+    enabled: isPastLoginScreen,
+  });
+  const markNotificationAsRead = useMarkNotificationAsRead();
+
+  useEffect(() => {
+    if (checkInMissedNotification) return;
+
+    const pendingNotification = unreadNotifications?.find(
+      (notification) =>
+        notification.type === CHECK_IN_MISSED_NOTIFICATION_TYPE &&
+        !dismissedNotificationIdsRef.current.has(notification._id),
+    );
+
+    if (pendingNotification) {
+      setCheckInMissedNotification(pendingNotification);
+    }
+  }, [checkInMissedNotification, unreadNotifications]);
+
+  const handleClose = () => {
+    if (!checkInMissedNotification) return;
+    const notificationId = checkInMissedNotification._id;
+    dismissedNotificationIdsRef.current.add(notificationId);
+    setCheckInMissedNotification(null);
+    void markNotificationAsRead.mutateAsync(notificationId);
+  };
+
+  const healthUnitId =
+    typeof checkInMissedNotification?.data?.healthUnitId === "string"
+      ? checkInMissedNotification.data.healthUnitId
+      : undefined;
+
+  const handleFindAnotherDoctor = () => {
+    if (!healthUnitId) return;
+    handleClose();
+    router.push({
+      pathname: "/agenda",
+      params: { unitId: healthUnitId },
+    });
+  };
+
+  return (
+    <QueueClosedModal
+      visible={Boolean(checkInMissedNotification)}
+      title="Check-in não identificado"
+      message={checkInMissedNotification?.message ?? ""}
+      onClose={handleClose}
+      onFindAnotherDoctor={healthUnitId ? handleFindAnotherDoctor : undefined}
+    />
+  );
+}
+
 function AppToast() {
   const insets = useSafeAreaInsets();
   const toastConfig = useToastConfig();
@@ -238,8 +280,7 @@ export default function RootLayout() {
     const responseSubscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const payload = response.notification.request.content.data as
-          | Record<string, unknown>
-          | undefined;
+          Record<string, unknown> | undefined;
         console.log("[push] user clicked notification", {
           actionIdentifier: response.actionIdentifier,
           payload,
@@ -292,8 +333,7 @@ export default function RootLayout() {
     const lastResponse = Notifications.getLastNotificationResponse();
     if (lastResponse) {
       const payload = lastResponse.notification.request.content.data as
-        | Record<string, unknown>
-        | undefined;
+        Record<string, unknown> | undefined;
       console.log("[push] app opened from notification", { payload });
       navigateToNotification(payload);
     }
@@ -347,6 +387,7 @@ export default function RootLayout() {
           onDismiss={handleDismissNotifications}
         />
         <QueueClosedNotificationGate />
+        <CheckInMissedNotificationGate />
         <AppToast />
       </SafeAreaProvider>
     </QueryClientProvider>

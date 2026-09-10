@@ -3,14 +3,13 @@ import { IAppointment } from "@/src/config/entities/appointments/appointments.ty
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
-import {
-  CalendarClock,
-  MapPin,
-  Stethoscope,
-  User,
-} from "lucide-react-native";
+import { CalendarClock, MapPin, Stethoscope, User } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
-import { getVisitUrgency, UrgencyBadge } from "./visit-urgency";
+import {
+  CheckInUrgencyBanner,
+  getVisitUrgency,
+  UrgencyBadge,
+} from "./visit-urgency";
 
 const CARD_WIDTH = 260;
 
@@ -86,6 +85,7 @@ export default function AppointmentCard({
           </Text>
         </View>
       )}
+      <CheckInUrgencyBanner urgency={urgency} />
     </Pressable>
   );
 }

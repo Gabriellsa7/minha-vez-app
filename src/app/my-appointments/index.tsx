@@ -13,11 +13,13 @@ import {
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { router } from "expo-router";
 import { Stethoscope } from "lucide-react-native";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import AppointmentCard from "./components/appointment-card/appointment-card";
+
+const RECENT_CANCELLATION_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export default function MyAppointmentsScreen() {
   const colors = useThemeColors();
@@ -35,7 +37,7 @@ export default function MyAppointmentsScreen() {
     refetch,
   } = useGetAppointmentsByPatientId(
     { patientId: patient?._id ?? "" },
-    { enabled: Boolean(patient?._id) },
+    { enabled: Boolean(patient?._id), refetchInterval: 5000 },
   );
 
   const { data: patientQueueItems } = useGetQueueItemByPatientId(
@@ -48,21 +50,47 @@ export default function MyAppointmentsScreen() {
 
   const isLoading = isAppointmentsLoading && Boolean(patient?._id);
 
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const upcomingAppointments = useMemo(() => {
     if (!appointments) return [];
 
+    const nowMs = now.getTime();
+
     return appointments
-      .filter(
-        (appointment) => appointment.status === EAppointmentStatus.SCHEDULED,
-      )
+      .filter((appointment) => {
+        if (appointment.status === EAppointmentStatus.SCHEDULED) return true;
+        if (appointment.status === EAppointmentStatus.CANCELED) {
+          return (
+            nowMs - new Date(appointment.dateTime).getTime() <
+            RECENT_CANCELLATION_WINDOW_MS
+          );
+        }
+        return false;
+      })
       .sort(
         (first, second) =>
           new Date(first.dateTime).getTime() -
           new Date(second.dateTime).getTime(),
       );
-  }, [appointments]);
+  }, [appointments, now]);
 
   const handleOpenQueue = (appointment: IAppointment) => {
+    if (appointment.status === EAppointmentStatus.CANCELED) {
+      Toast.show({
+        type: "info",
+        text1: "Consulta cancelada",
+        text2:
+          "Esta consulta foi cancelada. Confira o motivo na tela de notificações.",
+      });
+      return;
+    }
+
     const queueItem = patientQueueItems?.find(
       (item) => item._id === appointment.queueItemId,
     );
@@ -125,6 +153,7 @@ export default function MyAppointmentsScreen() {
                     appointment={appointment}
                     professional={professional}
                     unit={unit}
+                    now={now}
                     onPress={() => handleOpenQueue(appointment)}
                   />
                 );

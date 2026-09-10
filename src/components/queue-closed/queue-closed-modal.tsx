@@ -4,6 +4,7 @@ import { Modal, Pressable, Text, View } from "react-native";
 
 interface QueueClosedModalProps {
   visible: boolean;
+  title?: string;
   message: string;
   onClose: () => void;
   onFindAnotherDoctor?: () => void;
@@ -11,6 +12,7 @@ interface QueueClosedModalProps {
 
 export function QueueClosedModal({
   visible,
+  title = "Fila encerrada",
   message,
   onClose,
   onFindAnotherDoctor,
@@ -28,9 +30,7 @@ export function QueueClosedModal({
       <View className="flex-1 items-center justify-center bg-black/50 px-5">
         <View className="w-full rounded-2xl bg-bgThird">
           <View className="flex-row items-center justify-between border-b border-borderPrimary px-5 py-4">
-            <Text className="text-lg font-bold text-textBlack">
-              Fila encerrada
-            </Text>
+            <Text className="text-lg font-bold text-textBlack">{title}</Text>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Fechar"
@@ -46,9 +46,7 @@ export function QueueClosedModal({
               <View className="h-10 w-10 items-center justify-center rounded-full bg-warningBg">
                 <AlertTriangle size={20} color={colors.warningText} />
               </View>
-              <Text className="flex-1 text-base text-textFifth">
-                {message}
-              </Text>
+              <Text className="flex-1 text-base text-textFifth">{message}</Text>
             </View>
 
             {onFindAnotherDoctor && (

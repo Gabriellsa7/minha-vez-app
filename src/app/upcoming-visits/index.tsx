@@ -19,6 +19,7 @@ import ExamBookingCard from "@/src/features/main-content/components/upcoming-vis
 import { getVisibleVisits } from "@/src/features/main-content/components/upcoming-visits/upcoming-visits.util";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getExamComparableDate } from "@/src/utils/exam-scheduling.util";
+import { CHECK_IN_GRACE_MS } from "@/src/utils/visit-urgency";
 import { router } from "expo-router";
 import { CalendarClock } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
@@ -61,11 +62,14 @@ export default function UpcomingVisitsScreen() {
 
     return (
       appointments
-        ?.filter(
-          (item) =>
-            item.status === EAppointmentStatus.SCHEDULED &&
-            new Date(item.dateTime) > nowSnapshot,
-        )
+        ?.filter((item) => {
+          if (item.status !== EAppointmentStatus.SCHEDULED) return false;
+
+          const cutoffMs = item.checkInAt
+            ? new Date(item.dateTime).getTime()
+            : new Date(item.dateTime).getTime() + CHECK_IN_GRACE_MS;
+          return cutoffMs > nowSnapshot.getTime();
+        })
         .sort(
           (first, second) =>
             new Date(first.dateTime).getTime() -

@@ -104,9 +104,14 @@ export default function QueueInfoScreen() {
       previousStatus !== undefined &&
       previousStatus !== EQueueItemStatus.QUEUE_CLOSED
     ) {
-      // The queue this screen is showing was force-closed by the professional
-      // (see QueueClosedModal in the root layout for the reason). Leave the
-      // screen automatically instead of showing a dead queue.
+      router.replace("/home");
+    }
+
+    if (
+      currentStatus === EQueueItemStatus.ABSENT &&
+      previousStatus !== undefined &&
+      previousStatus !== EQueueItemStatus.ABSENT
+    ) {
       router.replace("/home");
     }
 
@@ -164,6 +169,7 @@ export default function QueueInfoScreen() {
           queueItems={queueItems}
           queue={queue}
           patientQueueItem={patientQueueItem}
+          appointment={currentAppointment}
           handleRefresh={handleRefresh}
         />
       )}

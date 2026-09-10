@@ -22,13 +22,14 @@ const NOTIFICATION_TYPE_LABEL: Record<string, string> = {
   QUEUE_NEXT: "Você é o próximo",
   QUEUE_CALLED: "Chamada na fila",
   EXAM_READY: "Exame pronto",
+  QUEUE_CLOSED: "Fila encerrada",
+  CHECK_IN_REMINDER: "Lembrete de check-in",
+  APPOINTMENT_AUTO_CANCELED: "Cancelamento automático",
 };
 
 const notificationTypeLabel = (type: string) =>
   NOTIFICATION_TYPE_LABEL[type] ??
-  type
-    .replace(/[_-]/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  type.replace(/[_-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 const relatedInformation = (data?: Record<string, unknown>) => {
   if (!data) return [];
@@ -54,7 +55,12 @@ const relatedInformation = (data?: Record<string, unknown>) => {
 export default function NotificationDetailsScreen() {
   const colors = useThemeColors();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: notification, isLoading, isError, refetch } = useNotification(id);
+  const {
+    data: notification,
+    isLoading,
+    isError,
+    refetch,
+  } = useNotification(id);
   const markAsRead = useMarkNotificationAsRead();
 
   useEffect(() => {
@@ -79,7 +85,10 @@ export default function NotificationDetailsScreen() {
         <Text className="text-center text-textFifth">
           Não foi possível carregar esta notificação.
         </Text>
-        <Pressable onPress={() => refetch()} className="rounded-lg bg-bgSecondary px-4 py-3">
+        <Pressable
+          onPress={() => refetch()}
+          className="rounded-lg bg-bgSecondary px-4 py-3"
+        >
           <Text className="font-bold text-textPrimary">Tentar novamente</Text>
         </Pressable>
       </SafeAreaView>
@@ -103,12 +112,16 @@ export default function NotificationDetailsScreen() {
         >
           <ArrowLeft size={26} color={colors.textSecondary} />
         </Pressable>
-        <Text className="text-lg font-bold text-textSecondary">Notificação</Text>
+        <Text className="text-lg font-bold text-textSecondary">
+          Notificação
+        </Text>
       </View>
 
       <View className="gap-6 p-5">
         <View className="rounded-2xl bg-bgThird p-5">
-          <Text className="text-xl font-bold text-textBlack">{notification.title}</Text>
+          <Text className="text-xl font-bold text-textBlack">
+            {notification.title}
+          </Text>
           <Text className="mt-4 text-base leading-6 text-textFifth">
             {notification.message}
           </Text>
@@ -140,7 +153,9 @@ export default function NotificationDetailsScreen() {
           {details.map((detail) => (
             <View key={detail.label}>
               <Text className="text-sm text-textFourth">{detail.label}</Text>
-              <Text className="mt-1 font-semibold text-textBlack">{detail.value}</Text>
+              <Text className="mt-1 font-semibold text-textBlack">
+                {detail.value}
+              </Text>
             </View>
           ))}
         </View>

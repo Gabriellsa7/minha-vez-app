@@ -19,10 +19,17 @@ import {
   getExamComparableDate,
 } from "@/src/utils/exam-scheduling.util";
 import { formatDateTime } from "@/src/utils/format-date-time";
+import { CHECK_IN_GRACE_MS } from "@/src/utils/visit-urgency";
 import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Bell, Clock, HeartPulse, ListChecks, TestTube } from "lucide-react-native";
+import {
+  Bell,
+  Clock,
+  HeartPulse,
+  ListChecks,
+  TestTube,
+} from "lucide-react-native";
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -54,6 +61,8 @@ export default function MainContent({ user, patient }: MainContentProps) {
       },
       {
         enabled: !!patientId,
+
+        refetchInterval: 5000,
       },
     );
 
@@ -62,11 +71,14 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
     return (
       userAppointments
-        ?.filter(
-          (item) =>
-            item.status === EAppointmentStatus.SCHEDULED &&
-            new Date(item.dateTime) > now,
-        )
+        ?.filter((item) => {
+          if (item.status !== EAppointmentStatus.SCHEDULED) return false;
+
+          const cutoffMs = item.checkInAt
+            ? new Date(item.dateTime).getTime()
+            : new Date(item.dateTime).getTime() + CHECK_IN_GRACE_MS;
+          return cutoffMs > now.getTime();
+        })
         .sort(
           (first, second) =>
             new Date(first.dateTime).getTime() -
@@ -77,13 +89,6 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
   const appointment = upcomingAppointments[0];
 
-  // Deliberately not the same as `upcomingAppointments`: that one requires
-  // dateTime > now (used for the "próxima consulta" banner/list, where a
-  // past time makes no sense). The queue tracking widget needs the opposite
-  // — a SCHEDULED appointment whose time has already arrived is exactly
-  // when the patient is sitting in the queue, so excluding it here hid the
-  // widget the moment the appointment's clock time passed, even though the
-  // queue was still active (waiting/in progress).
   const hasScheduledAppointment = useMemo(
     () =>
       userAppointments?.some(
@@ -103,7 +108,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
   const { data: queueItems } = useGetQueueItemByPatientId(
     { patientId: patientId || "" },
-    { enabled: !!patientId },
+    { enabled: !!patientId, refetchInterval: 5000 },
   );
 
   const upcomingExamBookings = useMemo(() => {
@@ -127,9 +132,6 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
   const nextExamBooking = upcomingExamBookings[0];
 
-  // The home screen surfaces whichever is soonest — a consulta or an exame
-  // agendado — since a patient can have either (or both) coming up, and the
-  // banner must say which one it is instead of always calling it a "exame".
   const nextUpcomingVisit = useMemo(() => {
     const appointmentDate =
       appointment && !appointment.finishedAt

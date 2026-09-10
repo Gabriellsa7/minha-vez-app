@@ -1,5 +1,6 @@
 import { useGetHealthProfessionalById } from "@/src/api/get-health-professional-by-id";
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
+import { IAppointment } from "@/src/config/entities/appointments/appointments.types";
 import {
   EQueueItemStatus,
   IQueueItem,
@@ -7,6 +8,7 @@ import {
 import { IQueueWithDetails } from "@/src/config/entities/queue/queue.type";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
+import { getVisitUrgency } from "@/src/utils/visit-urgency";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   AlertTriangle,
@@ -21,6 +23,7 @@ import {
   Stethoscope,
   Users,
 } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import {
   ITEM_STATUS_LABEL,
@@ -32,6 +35,7 @@ interface QueueInfoSectionProps {
   queueItems?: IQueueItem[];
   queue: IQueueWithDetails;
   patientQueueItem?: IQueueItem | null;
+  appointment?: IAppointment | null;
   handleRefresh: () => void;
 }
 
@@ -39,9 +43,22 @@ export default function QueueInfoSection({
   queueItems,
   queue,
   patientQueueItem,
+  appointment,
   handleRefresh,
 }: QueueInfoSectionProps) {
   const colors = useThemeColors();
+
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const checkInUrgency =
+    appointment && !patientQueueItem?.checkInTime
+      ? getVisitUrgency(new Date(appointment.dateTime), now)
+      : null;
+  const isCheckInDeadlineNear = checkInUrgency?.stage === "checkin";
 
   const { data: professional } = useGetHealthProfessionalById(
     { professionalId: queue?.professionalId ?? "" },
@@ -67,9 +84,7 @@ export default function QueueInfoSection({
       .length ?? 0;
 
   const isMyTurn = patientQueueItem?.status === EQueueItemStatus.IN_SERVICE;
-  // Whoever's ahead in line still takes at least one full appointment slot
-  // to be attended, so the clinic/professional's configured duration is the
-  // floor for the estimate — never show less than that while still waiting.
+
   const appointmentDuration = professional?.schedule?.appointmentDuration ?? 0;
   const estimatedWaitMinutes =
     queue?.estimatedWaitMinutes != null
@@ -159,9 +174,9 @@ export default function QueueInfoSection({
           <AlertTriangle size={18} color={colors.warningText} />
           <Text className="flex-1 text-xs font-medium text-warningText">
             Sua posição na fila pode mudar a qualquer momento. Pacientes com
-            prioridade (idosos, gestantes, pessoas com deficiência ou
-            condição de saúde), encaixes e ausências de outros pacientes
-            podem alterar a ordem de atendimento.
+            prioridade (idosos, gestantes, pessoas com deficiência ou condição
+            de saúde), encaixes e ausências de outros pacientes podem alterar a
+            ordem de atendimento.
           </Text>
         </View>
 
@@ -242,20 +257,31 @@ export default function QueueInfoSection({
             className={`flex-row items-center gap-3 rounded-2xl border p-4 ${
               patientQueueItem.checkInTime
                 ? "border-borderPrimary bg-statusSuccessBg"
-                : "border-warningBorder bg-warningBg"
+                : isCheckInDeadlineNear
+                  ? "border-statusDangerText bg-statusDangerBg"
+                  : "border-warningBorder bg-warningBg"
             }`}
           >
             {patientQueueItem.checkInTime ? (
               <CheckCircle2 size={18} color={colors.statusSuccessText} />
             ) : (
-              <Clock size={18} color={colors.warningText} />
+              <Clock
+                size={18}
+                color={
+                  isCheckInDeadlineNear
+                    ? colors.statusDangerText
+                    : colors.warningText
+                }
+              />
             )}
             <View className="flex-1">
               <Text
                 className={`text-xs ${
                   patientQueueItem.checkInTime
                     ? "text-statusSuccessText"
-                    : "text-warningText"
+                    : isCheckInDeadlineNear
+                      ? "text-statusDangerText"
+                      : "text-warningText"
                 }`}
               >
                 Check-in
@@ -264,12 +290,16 @@ export default function QueueInfoSection({
                 className={`text-base font-semibold ${
                   patientQueueItem.checkInTime
                     ? "text-statusSuccessText"
-                    : "text-warningText"
+                    : isCheckInDeadlineNear
+                      ? "text-statusDangerText"
+                      : "text-warningText"
                 }`}
               >
                 {patientQueueItem.checkInTime
                   ? `Confirmado às ${formatDateTime(patientQueueItem.checkInTime).split(" ")[1]}`
-                  : "Confirme sua presença na recepção da unidade a partir de 20 minutos antes da consulta (tolerância de até 5 minutos de atraso)"}
+                  : isCheckInDeadlineNear && checkInUrgency
+                    ? `Faça check-in agora — restam ${checkInUrgency.countdownLabel} antes do cancelamento automático`
+                    : "Confirme sua presença na recepção da unidade a partir de 20 minutos antes da consulta (tolerância de até 5 minutos de atraso)"}
               </Text>
             </View>
           </View>

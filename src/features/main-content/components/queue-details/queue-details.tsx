@@ -39,6 +39,8 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
     },
     {
       enabled: !!patientId,
+
+      refetchInterval: 5000,
     },
   );
 
@@ -48,6 +50,7 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
     },
     {
       enabled: !!patientId,
+      refetchInterval: 5000,
     },
   );
 
@@ -57,8 +60,6 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
 
   const activeQueues = queueDetails
     .filter((queue) => {
-      // A Queue nasce com status CLOSED até o profissional abri-la; closedAt só é
-      // preenchido quando ele efetivamente encerra o atendimento (queue.service.ts).
       if (queue.closedAt) return false;
 
       const patientQueueItem = queueItem.find(
@@ -144,9 +145,7 @@ function QueueCard({
   );
 
   const isMyTurn = patientQueueItem?.status === EQueueItemStatus.IN_SERVICE;
-  // Whoever's ahead in line still takes at least one full appointment slot
-  // to be attended, so the clinic/professional's configured duration is the
-  // floor for the estimate — never show less than that while still waiting.
+
   const estimatedWaitMinutes =
     typeof queue.estimatedWaitMinutes === "number" && !isMyTurn
       ? Math.max(
