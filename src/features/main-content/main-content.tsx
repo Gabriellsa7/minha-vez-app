@@ -77,6 +77,21 @@ export default function MainContent({ user, patient }: MainContentProps) {
 
   const appointment = upcomingAppointments[0];
 
+  // Deliberately not the same as `upcomingAppointments`: that one requires
+  // dateTime > now (used for the "próxima consulta" banner/list, where a
+  // past time makes no sense). The queue tracking widget needs the opposite
+  // — a SCHEDULED appointment whose time has already arrived is exactly
+  // when the patient is sitting in the queue, so excluding it here hid the
+  // widget the moment the appointment's clock time passed, even though the
+  // queue was still active (waiting/in progress).
+  const hasScheduledAppointment = useMemo(
+    () =>
+      userAppointments?.some(
+        (item) => item.status === EAppointmentStatus.SCHEDULED,
+      ) ?? false,
+    [userAppointments],
+  );
+
   if (isAppointmentsLoading) {
     console.log("Carregando appointments...");
   }
@@ -226,7 +241,7 @@ export default function MainContent({ user, patient }: MainContentProps) {
         >
           <View className="w-full gap-3 p-5">
             <HomeHeader user={user!} />
-            {appointment && !appointment.finishedAt ? (
+            {hasScheduledAppointment ? (
               <QueueDetails patientId={patientId!} />
             ) : (
               patientId &&
