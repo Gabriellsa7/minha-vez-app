@@ -20,7 +20,7 @@ export default function HomeHeader({ user }: HomeHeaderProps) {
   return (
     <View className="flex-row items-center justify-between pb-2">
       <View className="gap-3 flex-row items-center">
-        <Pressable onPress={() => router.push("/profile")}>
+        <Pressable onPress={() => router.push("/profile")} hitSlop={12}>
           <Avatar uri={user?.avatar} name={user?.name} variant="sm" />
         </Pressable>
         <View>

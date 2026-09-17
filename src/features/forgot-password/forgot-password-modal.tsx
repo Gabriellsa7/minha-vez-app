@@ -18,6 +18,7 @@ import { ForgotPasswordStep } from "./entities/forgot-password.types";
 interface ForgotPasswordModalProps {
   visible: boolean;
   onClose: () => void;
+  initialEmail?: string;
 }
 
 const STEP_TITLES: Record<ForgotPasswordStep, string> = {
@@ -29,6 +30,7 @@ const STEP_TITLES: Record<ForgotPasswordStep, string> = {
 export function ForgotPasswordModal({
   visible,
   onClose,
+  initialEmail,
 }: ForgotPasswordModalProps) {
   const [step, setStep] = useState<ForgotPasswordStep>("REQUEST_CODE");
   const [email, setEmail] = useState("");
@@ -72,6 +74,8 @@ export function ForgotPasswordModal({
             <View className="p-5">
               {step === "REQUEST_CODE" && (
                 <RequestCodeStep
+                  visible={visible}
+                  initialEmail={initialEmail}
                   onSuccess={(requestedEmail) => {
                     setEmail(requestedEmail);
                     setStep("VERIFY_CODE");

@@ -3,7 +3,7 @@
     "name": "minha-vez-app",
     "slug": "minha-vez-app",
     "version": "1.2.3",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/logo.png",
     "scheme": "minhavezapp",
     "userInterfaceStyle": "automatic",

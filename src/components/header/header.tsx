@@ -17,12 +17,13 @@ export default function Header({ text, backHref }: HeaderProps) {
       <View className="flex-row items-center gap-4">
         <Pressable
           onPress={() => (backHref ? router.replace(backHref) : router.back())}
+          hitSlop={12}
         >
           <ArrowLeft size={26} color={colors.textSecondary} />
         </Pressable>
         <Text className="text-textSecondary text-lg font-bold">{text}</Text>
       </View>
-      <Pressable onPress={() => router.push("/profile")}>
+      <Pressable onPress={() => router.push("/profile")} hitSlop={12}>
         <Avatar uri={user?.avatar} name={user?.name} variant="sm" />
       </Pressable>
     </View>

@@ -127,6 +127,7 @@ export const ProfileContent = () => {
             <Pressable
               onPress={handlePickAvatar}
               disabled={isUploadingImage}
+              hitSlop={8}
               className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-bgThird items-center justify-center border border-bgSecondary"
             >
               {isUploadingImage ? (

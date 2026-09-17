@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -15,16 +16,30 @@ import { RequestCodeSchema } from "../entities/forgot-password.types";
 
 interface RequestCodeStepProps {
   onSuccess: (email: string) => void;
+  initialEmail?: string;
+  visible: boolean;
 }
 
-export function RequestCodeStep({ onSuccess }: RequestCodeStepProps) {
+export function RequestCodeStep({
+  onSuccess,
+  initialEmail,
+  visible,
+}: RequestCodeStepProps) {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<RequestCodeSchema>({
     resolver: zodResolver(REQUEST_CODE_SCHEMA),
+    defaultValues: { email: initialEmail ?? "" },
   });
+
+  useEffect(() => {
+    if (visible) {
+      reset({ email: initialEmail ?? "" });
+    }
+  }, [visible, initialEmail, reset]);
 
   const { mutate: requestCode, isPending } = useRequestPasswordReset();
   const colors = useThemeColors();

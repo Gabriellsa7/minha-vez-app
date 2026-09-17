@@ -92,6 +92,7 @@ export default function AvaliableDays({
             <Pressable
               onPress={() => handleChangeCalendarMonth("previous")}
               disabled={!canGoToPreviousMonth}
+              hitSlop={6}
               className="h-10 w-10 items-center justify-center rounded-full bg-bgPrimary"
             >
               <ChevronLeft
@@ -105,6 +106,7 @@ export default function AvaliableDays({
             </Pressable>
             <Pressable
               onPress={() => handleChangeCalendarMonth("next")}
+              hitSlop={6}
               className="h-10 w-10 items-center justify-center rounded-full bg-bgPrimary"
             >
               <ChevronRight size={18} color={colors.textSecondary} />
@@ -157,6 +159,7 @@ export default function AvaliableDays({
                       }}
                       disabled={isDisabled}
                       activeOpacity={0.75}
+                      hitSlop={4}
                       style={{
                         width: 40,
                         height: 40,

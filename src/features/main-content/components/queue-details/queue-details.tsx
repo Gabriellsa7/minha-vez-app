@@ -1,7 +1,13 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
-import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 import { useGetHealthProfessionalById } from "@/src/api/get-health-professional-by-id";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
@@ -29,7 +35,7 @@ export default function QueueDetails({ patientId }: QueueDetailsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const colors = useThemeColors();
 
-  const { width } = Dimensions.get("window");
+  const { width } = useWindowDimensions();
 
   const CARD_WIDTH = width * 0.9;
 

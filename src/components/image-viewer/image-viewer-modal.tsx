@@ -1,6 +1,12 @@
 import { Image } from "expo-image";
 import { X } from "lucide-react-native";
-import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import {
   Gesture,
   GestureDetector,
@@ -18,10 +24,10 @@ interface ImageViewerModalProps {
   onClose: () => void;
 }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const DOUBLE_TAP_SCALE = 2.5;
 
 export function ImageViewerModal({ visible, uri, onClose }: ImageViewerModalProps) {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const translateX = useSharedValue(0);
@@ -110,7 +116,7 @@ export function ImageViewerModal({ visible, uri, onClose }: ImageViewerModalProp
             <Animated.View style={[styles.imageWrapper, animatedImageStyle]}>
               <Image
                 source={{ uri }}
-                style={styles.image}
+                style={{ width: screenWidth, height: screenHeight }}
                 contentFit="contain"
                 transition={150}
               />
@@ -130,9 +136,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  image: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
   },
 });

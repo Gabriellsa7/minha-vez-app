@@ -19,10 +19,13 @@ export function LoginForm() {
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(LOGIN_FORM_SCHEMA),
   });
+
+  const emailValue = watch("email");
 
   const { mutate: loginUser } = useLogin();
 
@@ -107,6 +110,7 @@ export function LoginForm() {
       <ForgotPasswordModal
         visible={isForgotPasswordVisible}
         onClose={() => setIsForgotPasswordVisible(false)}
+        initialEmail={emailValue}
       />
     </View>
   );
