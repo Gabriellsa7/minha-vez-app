@@ -1,14 +1,9 @@
-import {
-  GET_PATIENT_BY_ID_KEY,
-  useGetPatientById,
-} from "@/src/api/get-patient-by-id";
-import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUpdatePatient } from "@/src/api/update-patient";
 import { useUpdateUser } from "@/src/api/update-user";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatBirthDateForDisplay, formatPhone } from "@/src/utils/util";
 import { isValidEmail, isValidPhone } from "@/src/utils/validation.util";
-import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Lock } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -29,14 +24,9 @@ import Toast from "react-native-toast-message";
 type FieldName = "name" | "email" | "phone";
 
 export function EditProfile() {
-  const queryClient = useQueryClient();
   const colors = useThemeColors();
 
-  const { data: user, isLoading: isUserLoading } = useGetUser();
-  const { data: patient, isLoading: isPatientLoading } = useGetPatientById(
-    { userId: user?._id ?? "" },
-    { enabled: Boolean(user?._id) },
-  );
+  const { user, patient, isLoading } = useCurrentPatient();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -66,8 +56,9 @@ export function EditProfile() {
     }
   }, [patient]);
 
-  const { mutate: updateUser, isPending: isUpdatingUser } = useUpdateUser();
-  const { mutate: updatePatient, isPending: isUpdatingPatient } =
+  const { mutateAsync: updateUser, isPending: isUpdatingUser } =
+    useUpdateUser();
+  const { mutateAsync: updatePatient, isPending: isUpdatingPatient } =
     useUpdatePatient();
 
   const isSaving = isUpdatingUser || isUpdatingPatient;
@@ -114,34 +105,22 @@ export function EditProfile() {
 
     if (nameChanged || emailChanged) {
       requests.push(
-        new Promise((resolve, reject) => {
-          updateUser(
-            {
-              userId: user._id,
-              ...(nameChanged && { name: name.trim() }),
-              ...(emailChanged && { email: email.trim() }),
-            },
-            { onSuccess: resolve, onError: reject },
-          );
+        updateUser({
+          userId: user._id,
+          ...(nameChanged && { name: name.trim() }),
+          ...(emailChanged && { email: email.trim() }),
         }),
       );
     }
 
     if (patient && phoneChanged) {
       requests.push(
-        new Promise((resolve, reject) => {
-          updatePatient(
-            { patientId: patient._id, phone: phone.trim() },
-            { onSuccess: resolve, onError: reject },
-          );
-        }),
+        updatePatient({ patientId: patient._id, phone: phone.trim() }),
       );
     }
 
     Promise.all(requests)
       .then(() => {
-        queryClient.invalidateQueries({ queryKey: [GET_USER_ME_KEY] });
-        queryClient.invalidateQueries({ queryKey: [GET_PATIENT_BY_ID_KEY] });
         Toast.show({
           type: "success",
           text1: "Perfil atualizado",
@@ -158,7 +137,7 @@ export function EditProfile() {
       });
   };
 
-  if (isUserLoading || (user?._id && isPatientLoading)) {
+  if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color={colors.textSecondary} />

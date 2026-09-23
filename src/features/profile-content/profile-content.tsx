@@ -1,15 +1,13 @@
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
-import { GET_USER_ME_KEY, useGetUser } from "@/src/api/get-user-me";
 import { useUploadUserImage } from "@/src/api/upload-user-image";
 import { Avatar } from "@/src/components/avatar/avatar";
 import Header from "@/src/components/header/header";
 import { ImageViewerModal } from "@/src/components/image-viewer/image-viewer-modal";
 import { HealthInfoCard } from "@/src/features/profile-content/health-info-card";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
 import { formatBirthDateForDisplay } from "@/src/utils/util";
 import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
-import { useQueryClient } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { Href, useRouter } from "expo-router";
@@ -40,10 +38,7 @@ export const ProfileContent = () => {
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const { data: user } = useGetUser();
-
-  const { data: patient } = useGetPatientById({ userId: user?._id ?? "" });
+  const { user, patient } = useCurrentPatient();
 
   const { mutate: uploadUserImage, isPending: isUploadingImage } =
     useUploadUserImage();
@@ -92,7 +87,6 @@ export const ProfileContent = () => {
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: [GET_USER_ME_KEY] });
           Toast.show({
             type: "success",
             text1: "Foto de perfil atualizada",

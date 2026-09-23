@@ -1,5 +1,4 @@
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
-import { useGetUser } from "@/src/api/get-user-me";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 import {
   NotificationItem,
   NotificationService,
@@ -16,16 +15,6 @@ export const notificationQueryKeys = {
 
 const NOTIFICATIONS_STALE_TIME = 30_000;
 
-function useCurrentPatient() {
-  const userQuery = useGetUser();
-  const patientQuery = useGetPatientById(
-    { userId: userQuery.data?._id ?? "" },
-    { enabled: Boolean(userQuery.data?._id), retry: false },
-  );
-
-  return { userQuery, patientQuery, patientId: patientQuery.data?._id };
-}
-
 function filterNotificationsByPatient(
   notifications: NotificationItem[],
   patientId: string,
@@ -37,7 +26,11 @@ function usePatientNotifications(
   queryType: "all" | "unread",
   options?: { enabled?: boolean },
 ) {
-  const { userQuery, patientQuery, patientId } = useCurrentPatient();
+  const {
+    patientId,
+    isLoading: isPatientLoading,
+    isError: isPatientError,
+  } = useCurrentPatient();
   const isEnabled = Boolean(patientId) && (options?.enabled ?? true);
   const query = useQuery<NotificationItem[], Error>({
     queryKey:
@@ -59,8 +52,8 @@ function usePatientNotifications(
   return {
     ...query,
     data: query.data ?? [],
-    isLoading: userQuery.isLoading || patientQuery.isLoading || query.isLoading,
-    isError: userQuery.isError || patientQuery.isError || query.isError,
+    isLoading: isPatientLoading || query.isLoading,
+    isError: isPatientError || query.isError,
     patientId,
   };
 }
@@ -97,14 +90,6 @@ export function useMarkNotificationAsRead() {
           ),
       );
       queryClient.invalidateQueries({ queryKey: notificationQueryKeys.all });
-      if (patientId) {
-        queryClient.invalidateQueries({
-          queryKey: notificationQueryKeys.unread(patientId),
-        });
-        queryClient.invalidateQueries({
-          queryKey: notificationQueryKeys.detail(patientId, id),
-        });
-      }
     },
   });
 }
@@ -140,8 +125,4 @@ export function useClearNotifications() {
       queryClient.invalidateQueries({ queryKey: notificationQueryKeys.all });
     },
   });
-}
-
-export function invalidateNotificationQueries(queryClient: ReturnType<typeof useQueryClient>) {
-  return queryClient.invalidateQueries({ queryKey: notificationQueryKeys.all });
 }

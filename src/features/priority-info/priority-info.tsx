@@ -1,7 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { GET_PATIENT_BY_ID_KEY, useGetPatientById } from "@/src/api/get-patient-by-id";
-import { useGetUser } from "@/src/api/get-user-me";
 import { useUpdatePatient } from "@/src/api/update-patient";
 import {
   ELDERLY_AGE_THRESHOLD,
@@ -10,6 +7,7 @@ import {
   PRIORITY_REASONS_REQUIRING_PROOF,
 } from "@/src/config/entities/patients/patients.constants";
 import { EPatientPriority } from "@/src/config/entities/patients/patients.type";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { calculateAge } from "@/src/utils/util";
 import { Href, useRouter } from "expo-router";
@@ -33,11 +31,7 @@ import Toast from "react-native-toast-message";
 export function PriorityInfo() {
   const colors = useThemeColors();
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const { data: user } = useGetUser();
-  const { data: patient, isLoading } = useGetPatientById({
-    userId: user?._id ?? "",
-  });
+  const { patient, isLoading } = useCurrentPatient();
 
   const [selectedPriority, setSelectedPriority] = useState<EPatientPriority>(
     EPatientPriority.NORMAL,
@@ -72,7 +66,6 @@ export function PriorityInfo() {
       { patientId: patient._id, priority: selectedPriority },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: [GET_PATIENT_BY_ID_KEY] });
           Toast.show({ type: "success", text1: "Prioridade atualizada" });
         },
         onError: (error) => {
