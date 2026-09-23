@@ -1,22 +1,17 @@
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetPrescriptionsByPatientId } from "@/src/api/get-prescriptions-by-patient-id";
-import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { ClipboardList } from "lucide-react-native";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PrescriptionCard } from "./components/prescription-card/prescription-card";
+import { PrescriptionCard } from "@/src/features/prescriptions/components/prescription-card";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 
 export default function PrescriptionsScreen() {
   const colors = useThemeColors();
 
-  const { data: user } = useGetUser();
-  const { data: patient } = useGetPatientById(
-    { userId: user?._id ?? "" },
-    { enabled: Boolean(user?._id) },
-  );
+  const { patient } = useCurrentPatient();
 
   const {
     data: prescriptions,

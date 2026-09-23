@@ -1,7 +1,5 @@
 import { useGetExamBookingsByPatientIdInfinite } from "@/src/api/get-exam-bookings-by-patient-id";
 import { useGetExamsByPatientIdInfinite } from "@/src/api/get-exams-by-patient-id";
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
-import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
@@ -17,8 +15,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ExamBookingCard } from "./components/exam-booking-card/exam-booking-card";
-import ExamResultCard from "./components/exam-result-card/exam-result-card";
+import { ExamBookingCard } from "@/src/features/exams/components/exam-booking-card";
+import ExamResultCard from "@/src/features/exams/components/exam-result-card";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 
 type ExamsTab = "scheduled" | "results";
 
@@ -26,11 +25,7 @@ export default function ExamsScreen() {
   const colors = useThemeColors();
   const [tab, setTab] = useState<ExamsTab>("scheduled");
 
-  const { data: user } = useGetUser();
-  const { data: patient } = useGetPatientById(
-    { userId: user?._id ?? "" },
-    { enabled: Boolean(user?._id) },
-  );
+  const { patient } = useCurrentPatient();
 
   const {
     data: examsPages,

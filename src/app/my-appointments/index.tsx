@@ -1,9 +1,7 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
-import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import {
@@ -17,18 +15,15 @@ import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import AppointmentCard from "./components/appointment-card/appointment-card";
+import AppointmentCard from "@/src/features/my-appointments/components/appointment-card";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 
 const RECENT_CANCELLATION_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export default function MyAppointmentsScreen() {
   const colors = useThemeColors();
 
-  const { data: user } = useGetUser();
-  const { data: patient } = useGetPatientById(
-    { userId: user?._id ?? "" },
-    { enabled: Boolean(user?._id) },
-  );
+  const { patient } = useCurrentPatient();
 
   const {
     data: appointments,

@@ -1,6 +1,4 @@
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetPrescriptionsByPatientId } from "@/src/api/get-prescriptions-by-patient-id";
-import { useGetUser } from "@/src/api/get-user-me";
 import Header from "@/src/components/header/header";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
@@ -14,16 +12,13 @@ import {
 } from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 
 export default function PrescriptionDetailScreen() {
   const colors = useThemeColors();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data: user } = useGetUser();
-  const { data: patient } = useGetPatientById(
-    { userId: user?._id ?? "" },
-    { enabled: Boolean(user?._id) },
-  );
+  const { patient } = useCurrentPatient();
 
   const {
     data: prescriptions,
