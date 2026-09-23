@@ -7,7 +7,7 @@ import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
 import { router } from "expo-router";
 import { CalendarClock, MapPin } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
-import { STATUS_BG, STATUS_LABEL, STATUS_TEXT } from "../../util";
+import { STATUS_BG, STATUS_LABEL, STATUS_TEXT } from "@/src/features/exams/exams.util";
 
 interface ExamBookingCardProps {
   booking: IExamBooking;

@@ -10,7 +10,7 @@ import { getVisitUrgency } from "@/src/utils/visit-urgency";
 import { CalendarClock, MapPin } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 import { CheckInUrgencyBanner } from "@/src/features/main-content/components/upcoming-visits/visit-urgency";
-import { STATUS_BG, STATUS_LABEL, STATUS_TEXT } from "@/src/app/history/util";
+import { STATUS_BG, STATUS_LABEL, STATUS_TEXT } from "@/src/features/history/history.util";
 
 interface AppointmentCardProps {
   appointment: IAppointment;

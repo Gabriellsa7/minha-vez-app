@@ -9,7 +9,7 @@ import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatDateTime } from "@/src/utils/format-date-time";
 import { CalendarClock, MapPin, Star } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
-import { STATUS_BG, STATUS_LABEL, STATUS_TEXT } from "../../util";
+import { STATUS_BG, STATUS_LABEL, STATUS_TEXT } from "@/src/features/history/history.util";
 
 interface HistoryAppointmentCardProps {
   appointment: IAppointment;
