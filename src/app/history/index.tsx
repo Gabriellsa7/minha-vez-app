@@ -1,18 +1,12 @@
 import { useClearAppointmentHistory } from "@/src/api/clear-appointment-history";
-import {
-  GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY,
-  GET_APPOINTMENTS_BY_PATIENT_ID_KEY,
-  useGetAppointmentsByPatientIdInfinite,
-} from "@/src/api/get-appointment-by-patient-id";
+import { useGetAppointmentsByPatientIdInfinite } from "@/src/api/get-appointment-by-patient-id";
 import { useGetHealthProfessionals } from "@/src/api/get-health-professionals";
 import { useGetHealthUnits } from "@/src/api/get-health-units";
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
-import { useGetUser } from "@/src/api/get-user-me";
 import { RatingModal } from "@/src/components/rating/rating-modal";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ArrowLeft, History as HistoryIcon, Trash2 } from "lucide-react-native";
 import { useState } from "react";
@@ -26,21 +20,16 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import HistoryAppointmentCard from "./components/history-appointment-card/history-appointment-card";
-import { HISTORY_STATUSES } from "./util";
+import HistoryAppointmentCard from "@/src/features/history/components/history-appointment-card";
+import { HISTORY_STATUSES } from "@/src/features/history/history.util";
 
 export default function HistoryScreen() {
   const colors = useThemeColors();
-  const queryClient = useQueryClient();
   const [ratingAppointmentId, setRatingAppointmentId] = useState<string | null>(
     null,
   );
 
-  const { data: user } = useGetUser();
-  const { data: patient } = useGetPatientById(
-    { userId: user?._id ?? "" },
-    { enabled: Boolean(user?._id) },
-  );
+  const { patient } = useCurrentPatient();
 
   const {
     data: appointmentsPages,
@@ -79,14 +68,6 @@ export default function HistoryScreen() {
             clearHistory.mutate(
               { patientId: patient._id },
               {
-                onSuccess: () => {
-                  queryClient.invalidateQueries({
-                    queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
-                  });
-                  queryClient.invalidateQueries({
-                    queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
-                  });
-                },
                 onError: (error: Error) => {
                   Toast.show({
                     type: "error",

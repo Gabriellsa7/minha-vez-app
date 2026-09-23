@@ -1,14 +1,8 @@
 import { useCreateAppointmentRating } from "@/src/api/create-appointment-rating";
-import {
-  GET_APPOINTMENT_RATING_ELIGIBILITY_KEY,
-  useGetAppointmentRatingEligibility,
-} from "@/src/api/get-appointment-rating-eligibility";
+import { useGetAppointmentRatingEligibility } from "@/src/api/get-appointment-rating-eligibility";
 import { useGetHealthProfessionalById } from "@/src/api/get-health-professional-by-id";
 import { useGetHealthUnitById } from "@/src/api/get-health-unit-by-id";
-import { GET_HEALTH_UNIT_RATING_SUMMARY_KEY } from "@/src/api/get-health-unit-rating-summary";
-import { GET_PROFESSIONAL_RATING_SUMMARY_KEY } from "@/src/api/get-professional-rating-summary";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
@@ -38,7 +32,6 @@ export function RatingModal({
   onClose,
 }: RatingModalProps) {
   const colors = useThemeColors();
-  const queryClient = useQueryClient();
 
   const [professionalStars, setProfessionalStars] = useState(0);
   const [professionalComment, setProfessionalComment] = useState("");
@@ -104,18 +97,7 @@ export function RatingModal({
           : undefined,
       },
       {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: [GET_PROFESSIONAL_RATING_SUMMARY_KEY],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [GET_HEALTH_UNIT_RATING_SUMMARY_KEY],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [GET_APPOINTMENT_RATING_ELIGIBILITY_KEY],
-          });
-          onClose();
-        },
+        onSuccess: onClose,
         onError: (error: Error) => {
           onClose();
           Toast.show({

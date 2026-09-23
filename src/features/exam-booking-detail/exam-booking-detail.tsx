@@ -1,9 +1,5 @@
 import { useCancelExamBooking } from "@/src/api/cancel-exam-booking";
 import { useGetExamBookingById } from "@/src/api/get-exam-booking-by-id";
-import {
-  GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY,
-  GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY,
-} from "@/src/api/get-exam-bookings-by-patient-id";
 import { useGetExamOfferingById } from "@/src/api/get-exam-offering-by-id";
 import { HistorySkeleton } from "@/src/components/skeletons/history-skeleton";
 import {
@@ -12,7 +8,6 @@ import {
 } from "@/src/config/entities/exam-bookings/exam-bookings.type";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { formatExamDateTime } from "@/src/utils/exam-scheduling.util";
-import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import {
   CalendarClock,
@@ -29,7 +24,6 @@ interface ExamBookingDetailProps {
 }
 
 export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
-  const queryClient = useQueryClient();
   const colors = useThemeColors();
 
   const {
@@ -73,13 +67,6 @@ export function ExamBookingDetail({ bookingId }: ExamBookingDetailProps) {
                     type: "success",
                     text1: "Agendamento cancelado",
                   });
-                  queryClient.invalidateQueries({
-                    queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
-                  });
-                  queryClient.invalidateQueries({
-                    queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY],
-                  });
-                  refetch();
                 },
                 onError: (error: Error) => {
                   Toast.show({
