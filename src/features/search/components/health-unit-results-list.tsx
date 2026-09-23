@@ -1,8 +1,8 @@
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { Image } from "expo-image";
 import { MapPin } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
+import { HealthUnitImage } from "@/src/components/health-unit-image/health-unit-image";
 
 interface HealthUnitResultsListProps {
   units?: IHealthUnit[];
@@ -44,19 +44,7 @@ export function HealthUnitResultsList({
           className="flex-row gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3"
         >
           <View className="h-16 w-16 overflow-hidden rounded-xl bg-borderPrimary">
-            {unit.img ? (
-              <Image
-                source={{ uri: unit.img }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            ) : (
-              <Image
-                source={require("@/assets/images/Hospital.png")}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            )}
+            <HealthUnitImage uri={unit.img} />
           </View>
 
           <View className="flex-1 justify-center gap-1">
