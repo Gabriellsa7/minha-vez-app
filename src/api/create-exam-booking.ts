@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import { IExamBooking } from "../config/entities/exam-bookings/exam-bookings.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { EXAM_BOOKING_QUERY_KEYS } from "./query-groups";
 
 export const CREATE_EXAM_BOOKING_KEY = "CREATE_EXAM_BOOKING_KEY";
 
@@ -21,7 +22,10 @@ const createExamBooking = async (
     const response = await httpClient.post(path, payload);
     return response.data;
   } catch (error) {
-    if (isAxiosError<{ message?: string }>(error) && error.response?.data?.message) {
+    if (
+      isAxiosError<{ message?: string }>(error) &&
+      error.response?.data?.message
+    ) {
       throw new Error(error.response.data.message);
     }
 
@@ -32,4 +36,4 @@ const createExamBooking = async (
 export const useCreateExamBooking = generateReactQueryMutation<
   IExamBooking,
   ICreateExamBookingPayload
->(CREATE_EXAM_BOOKING_KEY, createExamBooking);
+>(CREATE_EXAM_BOOKING_KEY, createExamBooking, EXAM_BOOKING_QUERY_KEYS);

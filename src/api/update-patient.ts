@@ -5,6 +5,7 @@ import {
 } from "../config/entities/patients/patients.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { PATIENT_QUERY_KEYS } from "./query-groups";
 
 export interface IUpdatePatientPayload {
   patientId: string;
@@ -29,4 +30,4 @@ const updatePatient = async (
 export const useUpdatePatient = generateReactQueryMutation<
   IPatient,
   IUpdatePatientPayload
->(UPDATE_PATIENT_KEY, updatePatient);
+>(UPDATE_PATIENT_KEY, updatePatient, PATIENT_QUERY_KEYS);

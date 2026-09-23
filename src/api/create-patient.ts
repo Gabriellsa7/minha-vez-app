@@ -1,6 +1,10 @@
-import { EPatientPriority, IPatient } from "../config/entities/patients/patients.type";
+import {
+  EPatientPriority,
+  IPatient,
+} from "../config/entities/patients/patients.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { PATIENT_QUERY_KEYS } from "./query-groups";
 
 export interface ICreatePatientPayload {
   userId: string;
@@ -12,7 +16,9 @@ export interface ICreatePatientPayload {
 
 export const CREATE_PATIENT_KEY = "CREATE_PATIENT_KEY";
 
-const createPatient = async (payload: ICreatePatientPayload): Promise<IPatient> => {
+const createPatient = async (
+  payload: ICreatePatientPayload,
+): Promise<IPatient> => {
   const response = await httpClient.post("/patients", payload);
   return response.data;
 };
@@ -20,4 +26,4 @@ const createPatient = async (payload: ICreatePatientPayload): Promise<IPatient> 
 export const useCreatePatient = generateReactQueryMutation<
   IPatient,
   ICreatePatientPayload
->(CREATE_PATIENT_KEY, createPatient);
+>(CREATE_PATIENT_KEY, createPatient, PATIENT_QUERY_KEYS);

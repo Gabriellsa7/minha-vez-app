@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import { IExamBooking } from "../config/entities/exam-bookings/exam-bookings.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { EXAM_BOOKING_QUERY_KEYS } from "./query-groups";
 
 export const RESCHEDULE_EXAM_BOOKING_KEY = "RESCHEDULE_EXAM_BOOKING_KEY";
 
@@ -21,7 +22,10 @@ const rescheduleExamBooking = async (
     });
     return response.data;
   } catch (error) {
-    if (isAxiosError<{ message?: string }>(error) && error.response?.data?.message) {
+    if (
+      isAxiosError<{ message?: string }>(error) &&
+      error.response?.data?.message
+    ) {
       throw new Error(error.response.data.message);
     }
 
@@ -32,4 +36,4 @@ const rescheduleExamBooking = async (
 export const useRescheduleExamBooking = generateReactQueryMutation<
   IExamBooking,
   IRescheduleExamBookingPayload
->(RESCHEDULE_EXAM_BOOKING_KEY, rescheduleExamBooking);
+>(RESCHEDULE_EXAM_BOOKING_KEY, rescheduleExamBooking, EXAM_BOOKING_QUERY_KEYS);
