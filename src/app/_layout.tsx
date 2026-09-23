@@ -1,5 +1,5 @@
 import { StatusScreen } from "@/src/components/status-screen/status-screen";
-import { Stack, router, usePathname } from "expo-router";
+import { Stack } from "expo-router";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -7,44 +7,19 @@ import {
 import "../../global.css";
 
 import { QueryClientProvider, focusManager } from "@tanstack/react-query";
-import Constants from "expo-constants";
-import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef, useState } from "react";
-import { AppState, Linking } from "react-native";
+import { useEffect } from "react";
+import { AppState } from "react-native";
 import Toast from "react-native-toast-message";
-import {
-  GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY,
-  GET_APPOINTMENTS_BY_PATIENT_ID_KEY,
-} from "../api/get-appointment-by-patient-id";
-import {
-  GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY,
-  GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY,
-} from "../api/get-exam-bookings-by-patient-id";
-import {
-  GET_EXAMS_BY_PATIENT_ID_INFINITE_KEY,
-  GET_EXAMS_BY_PATIENT_ID_KEY,
-} from "../api/get-exams-by-patient-id";
-import { GET_QUEUE_ITEMS_KEY } from "../api/get-queue-item-by-patient-id";
-import { GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY } from "../api/get-queue-item-by-queue-id";
-import { GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY } from "../api/get-queues-with-details-by-patient-id";
 import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
-import { QueueClosedModal } from "../components/queue-closed/queue-closed-modal";
+import { NotificationAlertGate } from "../components/queue-closed/notification-alert-gate";
 import { useToastConfig } from "../components/toast/toast-config";
 import "../config/axios";
-import {
-  notificationQueryKeys,
-  useMarkNotificationAsRead,
-  useUnreadNotifications,
-} from "../hooks/use-notifications";
+import { usePushNotifications } from "../hooks/use-push-notifications";
 import { useThemeColors } from "../hooks/use-theme-colors";
 import { useThemePreference } from "../hooks/use-theme-preference";
 import { queryClient } from "../lib/react-query";
-import {
-  NotificationItem,
-  NotificationService,
-} from "../services/notifications/notification.service";
 
 const QUEUE_CLOSED_NOTIFICATION_TYPE = "QUEUE_CLOSED";
 const CHECK_IN_MISSED_NOTIFICATION_TYPE = "APPOINTMENT_AUTO_CANCELED";
@@ -72,138 +47,6 @@ Notifications.setNotificationHandler({
   }),
 });
 
-function navigateToNotification(data?: Record<string, unknown> | null) {
-  const notificationId = data?.notificationId;
-  if (typeof notificationId === "string" && notificationId.length > 0) {
-    router.push({
-      pathname: "/notifications-details/[id]",
-      params: { id: notificationId },
-    });
-  }
-}
-
-function QueueClosedNotificationGate() {
-  const [queueClosedNotification, setQueueClosedNotification] =
-    useState<NotificationItem | null>(null);
-
-  const dismissedNotificationIdsRef = useRef<Set<string>>(new Set());
-
-  const pathname = usePathname();
-  const isPastLoginScreen = pathname !== "/" && pathname !== "/login";
-
-  const { data: unreadNotifications } = useUnreadNotifications({
-    enabled: isPastLoginScreen,
-  });
-  const markNotificationAsRead = useMarkNotificationAsRead();
-
-  useEffect(() => {
-    if (queueClosedNotification) return;
-
-    const pendingQueueClosedNotification = unreadNotifications?.find(
-      (notification) =>
-        notification.type === QUEUE_CLOSED_NOTIFICATION_TYPE &&
-        !dismissedNotificationIdsRef.current.has(notification._id),
-    );
-
-    if (pendingQueueClosedNotification) {
-      setQueueClosedNotification(pendingQueueClosedNotification);
-    }
-  }, [queueClosedNotification, unreadNotifications]);
-
-  const handleCloseQueueClosedModal = () => {
-    if (!queueClosedNotification) return;
-    const notificationId = queueClosedNotification._id;
-    dismissedNotificationIdsRef.current.add(notificationId);
-    setQueueClosedNotification(null);
-    void markNotificationAsRead.mutateAsync(notificationId);
-  };
-
-  const closedQueueHealthUnitId =
-    typeof queueClosedNotification?.data?.healthUnitId === "string"
-      ? queueClosedNotification.data.healthUnitId
-      : undefined;
-
-  const handleFindAnotherDoctor = () => {
-    if (!closedQueueHealthUnitId) return;
-    handleCloseQueueClosedModal();
-    router.push({
-      pathname: "/agenda",
-      params: { unitId: closedQueueHealthUnitId },
-    });
-  };
-
-  return (
-    <QueueClosedModal
-      visible={Boolean(queueClosedNotification)}
-      message={queueClosedNotification?.message ?? ""}
-      onClose={handleCloseQueueClosedModal}
-      onFindAnotherDoctor={
-        closedQueueHealthUnitId ? handleFindAnotherDoctor : undefined
-      }
-    />
-  );
-}
-
-function CheckInMissedNotificationGate() {
-  const [checkInMissedNotification, setCheckInMissedNotification] =
-    useState<NotificationItem | null>(null);
-  const dismissedNotificationIdsRef = useRef<Set<string>>(new Set());
-
-  const pathname = usePathname();
-  const isPastLoginScreen = pathname !== "/" && pathname !== "/login";
-
-  const { data: unreadNotifications } = useUnreadNotifications({
-    enabled: isPastLoginScreen,
-  });
-  const markNotificationAsRead = useMarkNotificationAsRead();
-
-  useEffect(() => {
-    if (checkInMissedNotification) return;
-
-    const pendingNotification = unreadNotifications?.find(
-      (notification) =>
-        notification.type === CHECK_IN_MISSED_NOTIFICATION_TYPE &&
-        !dismissedNotificationIdsRef.current.has(notification._id),
-    );
-
-    if (pendingNotification) {
-      setCheckInMissedNotification(pendingNotification);
-    }
-  }, [checkInMissedNotification, unreadNotifications]);
-
-  const handleClose = () => {
-    if (!checkInMissedNotification) return;
-    const notificationId = checkInMissedNotification._id;
-    dismissedNotificationIdsRef.current.add(notificationId);
-    setCheckInMissedNotification(null);
-    void markNotificationAsRead.mutateAsync(notificationId);
-  };
-
-  const healthUnitId =
-    typeof checkInMissedNotification?.data?.healthUnitId === "string"
-      ? checkInMissedNotification.data.healthUnitId
-      : undefined;
-
-  const handleFindAnotherDoctor = () => {
-    if (!healthUnitId) return;
-    handleClose();
-    router.push({
-      pathname: "/agenda",
-      params: { unitId: healthUnitId },
-    });
-  };
-
-  return (
-    <QueueClosedModal
-      visible={Boolean(checkInMissedNotification)}
-      title="Check-in não identificado"
-      message={checkInMissedNotification?.message ?? ""}
-      onClose={handleClose}
-      onFindAnotherDoctor={healthUnitId ? handleFindAnotherDoctor : undefined}
-    />
-  );
-}
-
 function AppToast() {
   const insets = useSafeAreaInsets();
   const toastConfig = useToastConfig();
@@ -214,10 +57,8 @@ function AppToast() {
 export default function RootLayout() {
   const colors = useThemeColors();
   useThemePreference();
-  const [permissionModal, setPermissionModal] = useState({
-    visible: false,
-    canAskAgain: true,
-  });
+  const { permissionModal, allowNotifications, dismissPermissionModal } =
+    usePushNotifications();
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (status) => {
@@ -226,142 +67,6 @@ export default function RootLayout() {
 
     return () => subscription.remove();
   }, []);
-
-  useEffect(() => {
-    const evaluateNotificationPermission = async () => {
-      if (!Device.isDevice) return;
-      const { status, canAskAgain } = await Notifications.getPermissionsAsync();
-      if (status === "granted") {
-        void NotificationService.registerForPushNotifications();
-        return;
-      }
-      setPermissionModal({ visible: true, canAskAgain });
-    };
-
-    if (Constants.appOwnership === "expo") {
-      console.warn(
-        "[push] remote push is unavailable in Expo Go; use the development build",
-      );
-    } else {
-      void evaluateNotificationPermission();
-    }
-
-    const invalidateNotifications = () => {
-      queryClient.invalidateQueries({ queryKey: notificationQueryKeys.all });
-    };
-
-    const unsubscribeAppState = NotificationService.listenForAppStateChanges(
-      invalidateNotifications,
-    );
-
-    const appStateSubscription = AppState.addEventListener(
-      "change",
-      (state) => {
-        if (state !== "active" || Constants.appOwnership === "expo") return;
-        void evaluateNotificationPermission();
-      },
-    );
-
-    const tokenRotationUnsubscribe =
-      NotificationService.registerTokenRotationListener();
-
-    const receivedSubscription = Notifications.addNotificationReceivedListener(
-      (notification) => {
-        console.log("[push] received", {
-          appState: "foreground",
-          payload: notification.request.content.data,
-          title: notification.request.content.title,
-          body: notification.request.content.body,
-        });
-        invalidateNotifications();
-      },
-    );
-
-    const responseSubscription =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        const payload = response.notification.request.content.data as
-          Record<string, unknown> | undefined;
-        console.log("[push] user clicked notification", {
-          actionIdentifier: response.actionIdentifier,
-          payload,
-        });
-        navigateToNotification(payload);
-      });
-
-    const droppedSubscription = Notifications.addNotificationsDroppedListener(
-      () => {
-        console.warn("[push] notifications dropped by the OS/provider");
-      },
-    );
-
-    const unsubscribeSocket = NotificationService.subscribeToSocket(
-      (payload) => {
-        console.log("[realtime] invalidating queue and notification cache", {
-          payload,
-        });
-        invalidateNotifications();
-        void queryClient.invalidateQueries({ queryKey: [GET_QUEUE_ITEMS_KEY] });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_QUEUES_WITH_DETAILS_BY_PATIENT_ID_KEY],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_QUEUE_ITEMS_BY_QUEUE_ID_KEY],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_KEY],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_APPOINTMENTS_BY_PATIENT_ID_INFINITE_KEY],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_KEY],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_EXAM_BOOKINGS_BY_PATIENT_ID_INFINITE_KEY],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_EXAMS_BY_PATIENT_ID_KEY],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: [GET_EXAMS_BY_PATIENT_ID_INFINITE_KEY],
-        });
-      },
-    );
-
-    const stopSocket = NotificationService.startNotificationsSocket();
-
-    const lastResponse = Notifications.getLastNotificationResponse();
-    if (lastResponse) {
-      const payload = lastResponse.notification.request.content.data as
-        Record<string, unknown> | undefined;
-      console.log("[push] app opened from notification", { payload });
-      navigateToNotification(payload);
-    }
-
-    return () => {
-      unsubscribeAppState();
-      appStateSubscription.remove();
-      tokenRotationUnsubscribe();
-      receivedSubscription.remove();
-      responseSubscription.remove();
-      droppedSubscription.remove();
-      unsubscribeSocket();
-      stopSocket();
-    };
-  }, []);
-
-  const handleAllowNotifications = () => {
-    setPermissionModal((prev) => ({ ...prev, visible: false }));
-    if (!permissionModal.canAskAgain) {
-      void Linking.openSettings();
-      return;
-    }
-    void NotificationService.registerForPushNotifications();
-  };
-
-  const handleDismissNotifications = () => {
-    setPermissionModal((prev) => ({ ...prev, visible: false }));
-  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -374,7 +79,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="login" />
           <Stack.Screen name="notifications" />
-          <Stack.Screen name="notifications/[id]" />
+          <Stack.Screen name="notifications-details/[id]" />
           <Stack.Screen name="queue-info/[id]" />
           <Stack.Screen name="search" options={{ presentation: "modal" }} />
           <Stack.Screen
@@ -387,11 +92,16 @@ export default function RootLayout() {
         <NotificationPermissionModal
           visible={permissionModal.visible}
           canAskAgain={permissionModal.canAskAgain}
-          onAllow={handleAllowNotifications}
-          onDismiss={handleDismissNotifications}
+          onAllow={allowNotifications}
+          onDismiss={dismissPermissionModal}
         />
-        <QueueClosedNotificationGate />
-        <CheckInMissedNotificationGate />
+        <NotificationAlertGate
+          notificationType={QUEUE_CLOSED_NOTIFICATION_TYPE}
+        />
+        <NotificationAlertGate
+          notificationType={CHECK_IN_MISSED_NOTIFICATION_TYPE}
+          title="Check-in não identificado"
+        />
         <AppToast />
       </SafeAreaProvider>
     </QueryClientProvider>
