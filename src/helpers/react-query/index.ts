@@ -1,10 +1,26 @@
 import type {
   InfiniteData,
+  QueryClient,
   UndefinedInitialDataInfiniteOptions,
   UseMutationOptions,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+
+export const invalidateQueryKeys = (
+  queryClient: QueryClient,
+  queryKeys: readonly string[],
+) =>
+  Promise.all(
+    queryKeys.map((queryKey) =>
+      queryClient.invalidateQueries({ queryKey: [queryKey] }),
+    ),
+  );
 
 export const generateReactQuery = <TReturnData, TFilter>(
   queryKey: string,
@@ -28,6 +44,7 @@ export const generateReactQuery = <TReturnData, TFilter>(
 export const generateReactQueryMutation = <TReturnData = void, TFilter = void>(
   queryKey: string,
   fn: (filter: TFilter) => Promise<TReturnData> | void,
+  invalidates: readonly string[] = [],
 ) => {
   return (
     options?: Omit<
@@ -35,10 +52,16 @@ export const generateReactQueryMutation = <TReturnData = void, TFilter = void>(
       "mutationKey" | "mutationFn"
     >,
   ) => {
+    const queryClient = useQueryClient();
+
     return useMutation<TReturnData, Error, TFilter>({
       ...options,
       mutationKey: [queryKey],
       mutationFn: (event: TFilter) => fn(event) as Promise<TReturnData>,
+      onSuccess: (...args) => {
+        void invalidateQueryKeys(queryClient, invalidates);
+        return options?.onSuccess?.(...args);
+      },
     });
   };
 };
