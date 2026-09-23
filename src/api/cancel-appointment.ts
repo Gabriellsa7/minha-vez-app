@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import { IAppointment } from "../config/entities/appointments/appointments.types";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { APPOINTMENT_QUERY_KEYS, QUEUE_QUERY_KEYS } from "./query-groups";
 
 export const CANCEL_APPOINTMENT_KEY = "CANCEL_APPOINTMENT_KEY";
 
@@ -18,7 +19,10 @@ const cancelAppointment = async (
     const response = await httpClient.patch(path);
     return response.data;
   } catch (error) {
-    if (isAxiosError<{ message?: string }>(error) && error.response?.data?.message) {
+    if (
+      isAxiosError<{ message?: string }>(error) &&
+      error.response?.data?.message
+    ) {
       throw new Error(error.response.data.message);
     }
 
@@ -29,4 +33,7 @@ const cancelAppointment = async (
 export const useCancelAppointment = generateReactQueryMutation<
   IAppointment,
   ICancelAppointmentPayload
->(CANCEL_APPOINTMENT_KEY, cancelAppointment);
+>(CANCEL_APPOINTMENT_KEY, cancelAppointment, [
+  ...APPOINTMENT_QUERY_KEYS,
+  ...QUEUE_QUERY_KEYS,
+]);

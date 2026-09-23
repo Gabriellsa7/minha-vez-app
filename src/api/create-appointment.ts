@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import { IAppointment } from "../config/entities/appointments/appointments.types";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { APPOINTMENT_QUERY_KEYS, QUEUE_QUERY_KEYS } from "./query-groups";
 
 export interface ICreateAppointmentPayload {
   patientId: string;
@@ -25,7 +26,10 @@ const createAppointment = async (
   } catch (error) {
     console.error("Error creating appointment:", error);
 
-    if (isAxiosError<{ message?: string }>(error) && error.response?.data?.message) {
+    if (
+      isAxiosError<{ message?: string }>(error) &&
+      error.response?.data?.message
+    ) {
       throw new Error(error.response.data.message);
     }
 
@@ -36,4 +40,7 @@ const createAppointment = async (
 export const useCreateAppointment = generateReactQueryMutation<
   IAppointment,
   ICreateAppointmentPayload
->(CREATE_APPOINTMENT_KEY, createAppointment);
+>(CREATE_APPOINTMENT_KEY, createAppointment, [
+  ...APPOINTMENT_QUERY_KEYS,
+  ...QUEUE_QUERY_KEYS,
+]);

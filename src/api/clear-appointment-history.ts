@@ -1,5 +1,6 @@
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { APPOINTMENT_QUERY_KEYS } from "./query-groups";
 
 export interface IClearAppointmentHistoryPayload {
   patientId: string;
@@ -24,4 +25,8 @@ const clearAppointmentHistory = async (
 export const useClearAppointmentHistory = generateReactQueryMutation<
   IClearAppointmentHistoryResponse,
   IClearAppointmentHistoryPayload
->(CLEAR_APPOINTMENT_HISTORY_KEY, clearAppointmentHistory);
+>(
+  CLEAR_APPOINTMENT_HISTORY_KEY,
+  clearAppointmentHistory,
+  APPOINTMENT_QUERY_KEYS,
+);

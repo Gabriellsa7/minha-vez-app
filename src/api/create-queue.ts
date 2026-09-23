@@ -1,6 +1,7 @@
 import { IQueue } from "../config/entities/queue/queue.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { QUEUE_QUERY_KEYS } from "./query-groups";
 
 export const CREATE_QUEUE_KEY = "CREATE_QUEUE_KEY";
 
@@ -19,4 +20,4 @@ export const createQueue = async (
 export const useCreateQueue = generateReactQueryMutation<
   IQueue,
   ICreateQueueParams
->(CREATE_QUEUE_KEY, createQueue);
+>(CREATE_QUEUE_KEY, createQueue, QUEUE_QUERY_KEYS);

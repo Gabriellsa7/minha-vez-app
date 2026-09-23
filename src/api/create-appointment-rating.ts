@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import { IRating } from "../config/entities/rating/rating.types";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { RATING_QUERY_KEYS } from "./query-groups";
 
 export const CREATE_APPOINTMENT_RATING_KEY = "CREATE_APPOINTMENT_RATING_KEY";
 
@@ -23,7 +24,10 @@ const createAppointmentRating = async (
     const response = await httpClient.post(path, body);
     return response.data;
   } catch (error) {
-    if (isAxiosError<{ error?: string }>(error) && error.response?.data?.error) {
+    if (
+      isAxiosError<{ error?: string }>(error) &&
+      error.response?.data?.error
+    ) {
       throw new Error(error.response.data.error);
     }
 
@@ -34,4 +38,4 @@ const createAppointmentRating = async (
 export const useCreateAppointmentRating = generateReactQueryMutation<
   IRating,
   ICreateAppointmentRatingPayload
->(CREATE_APPOINTMENT_RATING_KEY, createAppointmentRating);
+>(CREATE_APPOINTMENT_RATING_KEY, createAppointmentRating, RATING_QUERY_KEYS);
