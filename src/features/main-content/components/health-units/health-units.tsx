@@ -4,10 +4,10 @@ import {
   IHealthUnit,
 } from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import { MapPin, Star } from "lucide-react-native/icons";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { HealthUnitImage } from "@/src/components/health-unit-image/health-unit-image";
 
 interface HealthUnitsProps {
   healthUnits?: IHealthUnit[];
@@ -54,19 +54,7 @@ function HealthUnitHomeCard({ unit }: HealthUnitHomeCardProps) {
     >
       <View className="w-64 h-56 bg-bgThird rounded-xl p-4">
         <View className="mb-3 h-32 w-full overflow-hidden rounded-xl bg-borderPrimary">
-          {unit.img ? (
-            <Image
-              source={{ uri: unit.img }}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          ) : (
-            <Image
-              source={require("../../../../../assets/images/Hospital.png")}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          )}
+          <HealthUnitImage uri={unit.img} />
 
           <View
             className={`absolute left-2 top-2 rounded-full px-2 py-1 ${

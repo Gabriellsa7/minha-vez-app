@@ -5,7 +5,6 @@ import { EHealthUnitType } from "@/src/config/entities/health-unit/health-unit.t
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { getServiceIcon } from "@/src/utils/service-icon.util";
 import { isToday, weekDayLabel } from "@/src/utils/util";
-import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   CalendarDays,
@@ -16,6 +15,7 @@ import {
   TestTube,
 } from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { HealthUnitImage } from "@/src/components/health-unit-image/health-unit-image";
 
 export default function HealthUnitInfo() {
   const { id } = useLocalSearchParams();
@@ -38,19 +38,7 @@ export default function HealthUnitInfo() {
       <View className="p-4 gap-6">
         <View>
           <View className=" h-64 w-full overflow-hidden rounded-xl bg-bgThird border-solid border-[6px] border-bgFourth">
-            {healthUnit?.img ? (
-              <Image
-                source={{ uri: healthUnit.img }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            ) : (
-              <Image
-                source={require("../../../assets/images/Hospital.png")}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            )}
+            <HealthUnitImage uri={healthUnit?.img} />
           </View>
         </View>
         <View className="bg-bgThird gap-4 p-4 rounded-xl">

@@ -9,7 +9,6 @@ import {
 import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
 import { useDebouncedValue } from "@/src/hooks/use-debounced-value";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import { MapPin, Star, Timer, Users } from "lucide-react-native";
 import { useState } from "react";
@@ -20,6 +19,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { HealthUnitImage } from "@/src/components/health-unit-image/health-unit-image";
 
 export function HealthUnitsList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,19 +104,7 @@ function HealthUnitListItem({ unit }: HealthUnitListItemProps) {
       className="flex-row gap-3 rounded-2xl border border-borderPrimary bg-bgThird p-3"
     >
       <View className="h-20 w-20 overflow-hidden rounded-xl bg-borderPrimary">
-        {unit.img ? (
-          <Image
-            source={{ uri: unit.img }}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        ) : (
-          <Image
-            source={require("../../../assets/images/Hospital.png")}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        )}
+        <HealthUnitImage uri={unit.img} />
       </View>
 
       <View className="flex-1 gap-1">

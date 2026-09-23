@@ -2,10 +2,10 @@ import { useGetHealthUnitQueueSummary } from "@/src/api/get-health-unit-queue-su
 import { useGetHealthUnitRatingSummary } from "@/src/api/get-health-unit-rating-summary";
 import { IHealthUnit } from "@/src/config/entities/health-unit/health-unit.types";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import { MapPin, Star, Timer, Users } from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { HealthUnitImage } from "@/src/components/health-unit-image/health-unit-image";
 
 interface ClinicsSectionProps {
   healthUnits?: IHealthUnit[];
@@ -77,19 +77,7 @@ function ClinicCard({ unit }: ClinicCardProps) {
       className="w-64 rounded-2xl border border-borderPrimary bg-bgThird"
     >
       <View className="h-32 w-full overflow-hidden rounded-t-2xl bg-borderPrimary">
-        {unit.img ? (
-          <Image
-            source={{ uri: unit.img }}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        ) : (
-          <Image
-            source={require("../../../../assets/images/Hospital.png")}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        )}
+        <HealthUnitImage uri={unit.img} />
 
         {rating && rating.count > 0 && (
           <View className="absolute right-2 top-2 flex-row items-center gap-1 rounded-full bg-bgThird px-2 py-1">
