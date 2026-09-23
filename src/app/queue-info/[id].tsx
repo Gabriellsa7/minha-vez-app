@@ -1,9 +1,7 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
-import { useGetPatientById } from "@/src/api/get-patient-by-id";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import { useGetQueueItemByQueueId } from "@/src/api/get-queue-item-by-queue-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
-import { useGetUser } from "@/src/api/get-user-me";
 import { CancelAppointmentModal } from "@/src/components/cancel-appointment/cancel-appointment-modal";
 import { RatingModal } from "@/src/components/rating/rating-modal";
 import { QueueInfoSkeleton } from "@/src/components/skeletons/queue-info-skeleton";
@@ -15,17 +13,14 @@ import { ArrowLeft, RefreshCw } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import QueueInfoSection from "./components/queue-info-section/queue-info-section";
+import QueueInfoSection from "@/src/features/queue-info/components/queue-info-section";
+import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 
 export default function QueueInfoScreen() {
   const colors = useThemeColors();
   const { id: queueId } = useLocalSearchParams<{ id: string }>();
 
-  const { data: user } = useGetUser();
-  const { data: patient } = useGetPatientById(
-    { userId: user?._id ?? "" },
-    { enabled: Boolean(user?._id) },
-  );
+  const { patient } = useCurrentPatient();
   const patientId = patient?._id;
 
   const {
