@@ -36,6 +36,7 @@ export function SecuritySettings() {
 
         {step === "REQUEST_CODE" && (
           <RequestCodeStep
+            visible
             onSuccess={(requestedEmail) => {
               setEmail(requestedEmail);
               setStep("VERIFY_CODE");
