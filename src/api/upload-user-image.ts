@@ -1,6 +1,7 @@
 import { IUser } from "../config/entities/user/user.types";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { USER_QUERY_KEYS } from "./query-groups";
 
 export interface IUploadUserImagePayload {
   userId: string;
@@ -23,4 +24,4 @@ const uploadUserImage = async (
 export const useUploadUserImage = generateReactQueryMutation<
   IUser,
   IUploadUserImagePayload
->(UPLOAD_USER_IMAGE_KEY, uploadUserImage);
+>(UPLOAD_USER_IMAGE_KEY, uploadUserImage, USER_QUERY_KEYS);

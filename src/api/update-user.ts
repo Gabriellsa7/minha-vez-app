@@ -1,6 +1,7 @@
 import { IUser } from "../config/entities/user/user.types";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { USER_QUERY_KEYS } from "./query-groups";
 
 export interface IUpdateUserPayload {
   userId: string;
@@ -20,4 +21,4 @@ const updateUser = async (payload: IUpdateUserPayload): Promise<IUser> => {
 export const useUpdateUser = generateReactQueryMutation<
   IUser,
   IUpdateUserPayload
->(UPDATE_USER_KEY, updateUser);
+>(UPDATE_USER_KEY, updateUser, USER_QUERY_KEYS);

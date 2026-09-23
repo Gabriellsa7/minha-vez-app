@@ -1,6 +1,7 @@
 import { IPatient } from "../config/entities/patients/patients.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { PATIENT_QUERY_KEYS } from "./query-groups";
 
 export interface IDeletePatientMedicalDocumentPayload {
   patientId: string;
@@ -24,4 +25,8 @@ const deletePatientMedicalDocument = async (
 export const useDeletePatientMedicalDocument = generateReactQueryMutation<
   IPatient,
   IDeletePatientMedicalDocumentPayload
->(DELETE_PATIENT_MEDICAL_DOCUMENT_KEY, deletePatientMedicalDocument);
+>(
+  DELETE_PATIENT_MEDICAL_DOCUMENT_KEY,
+  deletePatientMedicalDocument,
+  PATIENT_QUERY_KEYS,
+);

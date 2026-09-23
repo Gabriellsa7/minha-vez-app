@@ -1,6 +1,7 @@
 import { IPatient } from "../config/entities/patients/patients.type";
 import { generateReactQueryMutation } from "../helpers/react-query";
 import { httpClient } from "../services/api";
+import { PATIENT_QUERY_KEYS } from "./query-groups";
 
 export interface IUploadPatientMedicalDocumentPayload {
   patientId: string;
@@ -27,4 +28,8 @@ const uploadPatientMedicalDocument = async (
 export const useUploadPatientMedicalDocument = generateReactQueryMutation<
   IPatient,
   IUploadPatientMedicalDocumentPayload
->(UPLOAD_PATIENT_MEDICAL_DOCUMENT_KEY, uploadPatientMedicalDocument);
+>(
+  UPLOAD_PATIENT_MEDICAL_DOCUMENT_KEY,
+  uploadPatientMedicalDocument,
+  PATIENT_QUERY_KEYS,
+);
