@@ -18,6 +18,9 @@ export interface NotificationItem {
 
 type SocketSubscriber = (payload: Record<string, unknown>) => void;
 
+// Sent by the backend when the access token used in the handshake expires.
+const TOKEN_EXPIRED_CLOSE_CODE = 4401;
+
 export class NotificationService {
   private static socket: WebSocket | null = null;
   private static reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -153,7 +156,7 @@ export class NotificationService {
 
   static startNotificationsSocket() {
     this.shouldReconnect = true;
-    this.connect();
+    void this.connect();
     return () => this.stopNotificationsSocket();
   }
 
@@ -165,15 +168,35 @@ export class NotificationService {
     this.socket = null;
   }
 
-  private static connect() {
-    if (!this.shouldReconnect || this.socket) return;
+  private static isConnecting = false;
+
+  private static async connect() {
+    if (!this.shouldReconnect || this.socket || this.isConnecting) return;
     const url = process.env.EXPO_PUBLIC_WS_URL;
     if (!url) {
       console.error("[socket] missing EXPO_PUBLIC_WS_URL");
       return;
     }
+
+    this.isConnecting = true;
+    let token: string | null;
+    try {
+      token = await getToken();
+    } finally {
+      this.isConnecting = false;
+    }
+    if (!token) {
+      console.warn("[socket] skipped: no access token");
+      return;
+    }
+    // The socket may have been stopped or opened while the token was being read.
+    if (!this.shouldReconnect || this.socket) return;
+
     console.log("[socket] connecting", { url });
-    const socket = new WebSocket(url);
+    const separator = url.includes("?") ? "&" : "?";
+    const socket = new WebSocket(
+      `${url}${separator}token=${encodeURIComponent(token)}`,
+    );
     this.socket = socket;
 
     socket.addEventListener("open", () =>
@@ -206,8 +229,13 @@ export class NotificationService {
         return;
       }
 
+      if (event.code === TOKEN_EXPIRED_CLOSE_CODE) {
+        console.warn("[socket] session expired, not reconnecting");
+        return;
+      }
+
       this.reconnectTimer = setTimeout(() => {
-        this.connect();
+        void this.connect();
       }, 1000);
     });
   }
