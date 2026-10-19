@@ -80,7 +80,7 @@ export default function PatientRegistrationModal({
   const age = isValidBirthDate(birthDate)
     ? calculateAge(normalizeBirthDate(birthDate))
     : null;
-  const isAutoElderly = age !== null && age > ELDERLY_AGE_THRESHOLD;
+  const isAutoElderly = age !== null && age >= ELDERLY_AGE_THRESHOLD;
   const requiresProof =
     !isAutoElderly && PRIORITY_REASONS_REQUIRING_PROOF.has(priority);
 

@@ -26,7 +26,6 @@ export enum EPatientPriority {
   ELDERLY = "ELDERLY",
   PREGNANT = "PREGNANT",
   DISABLED = "DISABLED",
-  CHRONIC_CONDITION = "CHRONIC_CONDITION",
 }
 
 export enum EBloodType {

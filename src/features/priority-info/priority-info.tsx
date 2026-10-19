@@ -52,7 +52,7 @@ export function PriorityInfo() {
     PRIORITY_REASONS_REQUIRING_PROOF.has(selectedPriority);
 
   const age = patient ? calculateAge(patient.birthDate) : null;
-  const isAutoElderly = age !== null && age > ELDERLY_AGE_THRESHOLD;
+  const isAutoElderly = age !== null && age >= ELDERLY_AGE_THRESHOLD;
   const priorityChanged = Boolean(patient) && selectedPriority !== patient?.priority;
 
   const handleAttachProof = () => {
@@ -164,8 +164,7 @@ export function PriorityInfo() {
           </Text>
           <Text className="text-sm text-textFourth">
             Pessoas com 60 anos ou mais são identificadas automaticamente como
-            prioridade. Gestantes, pessoas com deficiência e pessoas com
-            alguma doença crônica ou condição de saúde também podem ter
+            prioridade. Gestantes e pessoas com deficiência também têm
             prioridade — basta selecionar a opção correspondente acima, a
             qualquer momento.
           </Text>
