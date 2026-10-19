@@ -41,7 +41,7 @@ const countByStatus = (items: IQueueItem[] = []): QueueCounts => {
 };
 
 const QUEUE_ORDER_NOTICE =
-  "Sua posição na fila pode mudar a qualquer momento. Pacientes com prioridade (idosos, gestantes, pessoas com deficiência ou condição de saúde), encaixes e ausências de outros pacientes podem alterar a ordem de atendimento.";
+  "Sua posição na fila pode mudar a qualquer momento. Pacientes com prioridade (idosos, gestantes e pessoas com deficiência), encaixes e ausências de outros pacientes podem alterar a ordem de atendimento.";
 
 export default function QueueInfoSection({
   queueItems,
