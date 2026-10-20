@@ -23,6 +23,7 @@ import { queryClient } from "../lib/react-query";
 
 const QUEUE_CLOSED_NOTIFICATION_TYPE = "QUEUE_CLOSED";
 const CHECK_IN_MISSED_NOTIFICATION_TYPE = "APPOINTMENT_AUTO_CANCELED";
+const DEFINITIVE_ABSENCE_NOTIFICATION_TYPE = "APPOINTMENT_CANCELED_FOR_ABSENCE";
 
 export function ErrorBoundary({ retry }: { retry: () => void }) {
   return (
@@ -101,6 +102,10 @@ export default function RootLayout() {
         <NotificationAlertGate
           notificationType={CHECK_IN_MISSED_NOTIFICATION_TYPE}
           title="Check-in não identificado"
+        />
+        <NotificationAlertGate
+          notificationType={DEFINITIVE_ABSENCE_NOTIFICATION_TYPE}
+          title="Consulta cancelada por ausência"
         />
         <AppToast />
       </SafeAreaProvider>

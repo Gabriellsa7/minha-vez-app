@@ -25,6 +25,7 @@ const NOTIFICATION_TYPE_LABEL: Record<string, string> = {
   QUEUE_CLOSED: "Fila encerrada",
   CHECK_IN_REMINDER: "Lembrete de check-in",
   APPOINTMENT_AUTO_CANCELED: "Cancelamento automático",
+  APPOINTMENT_CANCELED_FOR_ABSENCE: "Cancelamento por ausência",
 };
 
 const notificationTypeLabel = (type: string) =>
