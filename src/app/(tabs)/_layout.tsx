@@ -13,6 +13,9 @@ export default function TabsLayout() {
 
   return (
     <Tabs
+      // The floating bar is already lifted above the system navigation bar by its
+      // `bottom` offset, so the default inner bottom padding would only squash it.
+      safeAreaInsets={{ bottom: 0 }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.tabActive,
