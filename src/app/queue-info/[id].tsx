@@ -50,7 +50,9 @@ export default function QueueInfoScreen() {
     refetch: refetchQueueItems,
   } = useGetQueueItemByQueueId(
     { queueId: queueId ?? "" },
-    { enabled: Boolean(queueId) },
+    // Realtime events only reach the patient for changes that involve them, so the
+    // counters also poll to follow calls and finishes of the other patients.
+    { enabled: Boolean(queueId), refetchInterval: 5000 },
   );
 
   const queue = queuesWithDetails?.find((item) => item._id === queueId);

@@ -166,6 +166,18 @@ function QueueCard({
         )
       : queue.estimatedWaitMinutes;
 
+  const position = patientQueueItem?.position;
+  const queueSummary = isMyTurn
+    ? "Em atendimento"
+    : position
+      ? `Posição ${position} de ${queue.queueSize}`
+      : "Posição a definir";
+  const positionTitle = isMyTurn
+    ? "É a sua vez!"
+    : position
+      ? `Posição ${position}`
+      : "Posição a definir";
+
   return (
     <View style={{ width }}>
       <Pressable
@@ -198,15 +210,16 @@ function QueueCard({
           <View className="gap-1">
             <Text className="text-textPrimary">{queue.healthUnitName}</Text>
             <Text className="text-textPrimary text-sm opacity-50">
-              Atual Fila {patientQueueItem?.position || "N/A"} de{" "}
-              {queue.queueSize}
+              {queueSummary}
             </Text>
             <Text className="text-textPrimary text-sm opacity-50">
               Dia da consulta: {formatDateTime(queue.queueDate)}
             </Text>
-            <Text className="text-textPrimary text-sm opacity-50">
-              Sala: {professional?.room || "N/A"}
-            </Text>
+            {professional?.room && (
+              <Text className="text-textPrimary text-sm opacity-50">
+                Sala: {professional.room}
+              </Text>
+            )}
           </View>
         </View>
         <ArrowRight size={28} color={colors.textPrimary} />
@@ -214,7 +227,7 @@ function QueueCard({
       <View className="bg-bgPrimary rounded-b-xl p-3 w-[90%]">
         <View className="border border-borderPrimary gap-1 p-3 rounded-xl">
           <Text className="font-bold text-xl text-textBlack">
-            Posição {patientQueueItem?.position || "N/A"}
+            {positionTitle}
           </Text>
           <Text className="text-textFourth text-sm">
             Código #{patientQueueItem?.code || null}

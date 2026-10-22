@@ -89,7 +89,7 @@ export default function QueueInfoSection({
     ? "Agora"
     : estimatedWaitMinutes !== null
       ? `${estimatedWaitMinutes} min`
-      : "N/A";
+      : "A calcular";
 
   const hasMissedACall =
     patientQueueItem?.status === EQueueItemStatus.WAITING &&

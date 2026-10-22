@@ -141,7 +141,7 @@ export const ProfileContent = () => {
           <View className="flex-row items-center gap-4">
             <IdCard size={24} color={colors.textSecondary} />
             <Text className="text-textSecondary text-base font-bold">
-              Informações do Pessoais
+              Informações Pessoais
             </Text>
           </View>
           <View className="flex-row justify-between">
