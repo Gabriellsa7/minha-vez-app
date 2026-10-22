@@ -43,6 +43,9 @@ const countByStatus = (items: IQueueItem[] = []): QueueCounts => {
 const QUEUE_ORDER_NOTICE =
   "Sua posição na fila pode mudar a qualquer momento. Pacientes com prioridade (idosos, gestantes e pessoas com deficiência), encaixes e ausências de outros pacientes podem alterar a ordem de atendimento.";
 
+const MISSED_CALL_NOTICE =
+  "Você não compareceu quando foi chamado e voltou para o final da fila. Se não comparecer na próxima chamada, sua consulta será cancelada.";
+
 export default function QueueInfoSection({
   queueItems,
   queue,
@@ -88,11 +91,17 @@ export default function QueueInfoSection({
       ? `${estimatedWaitMinutes} min`
       : "N/A";
 
-  const noticeMessage = isWaitingWithoutPosition
-    ? `Sua posição na fila só será calculada quando faltarem 2 horas para sua consulta${
-        positionRevealTime ? `, a partir das ${positionRevealTime}` : ""
-      }. Volte a esta tela perto do horário para acompanhar sua vez.`
-    : QUEUE_ORDER_NOTICE;
+  const hasMissedACall =
+    patientQueueItem?.status === EQueueItemStatus.WAITING &&
+    (patientQueueItem.missedCalls ?? 0) > 0;
+
+  const noticeMessage = hasMissedACall
+    ? MISSED_CALL_NOTICE
+    : isWaitingWithoutPosition
+      ? `Sua posição na fila só será calculada quando faltarem 2 horas para sua consulta${
+          positionRevealTime ? `, a partir das ${positionRevealTime}` : ""
+        }. Volte a esta tela perto do horário para acompanhar sua vez.`
+      : QUEUE_ORDER_NOTICE;
 
   return (
     <ScrollView
@@ -120,6 +129,11 @@ export default function QueueInfoSection({
             <Text className="font-bold text-statusSuccessText">
               É a sua vez! Dirija-se ao consultório
               {professional?.room ? ` ${professional.room}` : ""}.
+            </Text>
+            <Text className="mt-1 text-xs text-statusSuccessText">
+              {patientQueueItem?.missedCalls
+                ? "Esta é a sua segunda chamada. Se não comparecer, sua consulta será cancelada."
+                : "Se não comparecer, você volta para o final da fila."}
             </Text>
           </View>
         )}

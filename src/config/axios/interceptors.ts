@@ -8,6 +8,11 @@ type ApiErrorResponse = {
 
 const METHODS_WITH_OWN_ERROR_HANDLING = ["post", "put", "patch", "delete"];
 
+const CONNECTION_ERROR_MESSAGE = "Não foi possível conectar ao servidor";
+const CONNECTION_ERROR_HINT = "Verifique sua internet e tente novamente.";
+const GENERIC_ERROR_MESSAGE =
+  "Não foi possível concluir a ação. Tente novamente em instantes.";
+
 export const handleSuccessResponse = async (response: AxiosResponse) => {
   const { data } = response;
 
@@ -37,6 +42,12 @@ export const handleErrorResponse = async (
   const hasOwnErrorHandling =
     !!method && METHODS_WITH_OWN_ERROR_HANDLING.includes(method);
 
+  // Screens show error.message in their own toasts, so replace axios' technical
+  // English text ("Network Error", "Request failed with status code 500").
+  error.message = error.response
+    ? error.response.data?.message || GENERIC_ERROR_MESSAGE
+    : `${CONNECTION_ERROR_MESSAGE}. ${CONNECTION_ERROR_HINT}`;
+
   if (error.response) {
     const status = error.response.status;
     const data = error.response.data;
@@ -48,7 +59,7 @@ export const handleErrorResponse = async (
     if (!hasOwnErrorHandling) {
       Toast.show({
         type: "error",
-        text1: data?.message || "Erro na requisição",
+        text1: data?.message || GENERIC_ERROR_MESSAGE,
       });
     }
 
@@ -58,8 +69,8 @@ export const handleErrorResponse = async (
   } else if (!hasOwnErrorHandling) {
     Toast.show({
       type: "error",
-      text1: "Nao foi possivel conectar ao servidor",
-      text2: error.message,
+      text1: CONNECTION_ERROR_MESSAGE,
+      text2: CONNECTION_ERROR_HINT,
     });
   }
 

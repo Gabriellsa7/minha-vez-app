@@ -53,7 +53,17 @@ export default function AvaliableTimes({
           professional.schedule.afternoon?.end || "",
           professional.schedule.appointmentDuration,
         ),
-      ].filter((time) => isTimeWithinOpeningHours(openingHours, selectedDate, time));
+      ].filter((time) =>
+        isTimeWithinOpeningHours(openingHours, selectedDate, time),
+      );
+
+  const isTimeTaken = (time: string) =>
+    bookedTimes.has(time) ||
+    Boolean(
+      selectedDate &&
+      getDateTimeFromDateAndTime(selectedDate, time) <= new Date(),
+    );
+  const hasFreeTime = AVAILABLE_TIMES.some((time) => !isTimeTaken(time));
 
   if (isUnitClosedToday) {
     return (
@@ -133,6 +143,18 @@ export default function AvaliableTimes({
           })}
         </View>
       </ScrollView>
+      {!selectedDate ? (
+        <Text className="mt-3 text-sm text-textFourth">
+          Escolha um dia para ver os horários livres.
+        </Text>
+      ) : (
+        !isProfessionalAppointmentsLoading &&
+        !hasFreeTime && (
+          <Text className="mt-3 text-sm text-textFourth">
+            Não há horários livres neste dia. Escolha outro dia.
+          </Text>
+        )
+      )}
     </View>
   );
 }
