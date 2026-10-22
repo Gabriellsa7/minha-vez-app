@@ -1,3 +1,4 @@
+import { refreshAccessToken } from "@/src/services/auth/auth.session";
 import { getToken } from "@/src/services/auth/auth.storage";
 import { httpClient } from "@/src/services/api";
 import Constants from "expo-constants";
@@ -236,7 +237,13 @@ export class NotificationService {
       }
 
       if (event.code === TOKEN_EXPIRED_CLOSE_CODE) {
-        console.warn("[socket] session expired, not reconnecting");
+        void refreshAccessToken().then((accessToken) => {
+          if (!accessToken) {
+            console.warn("[socket] session expired, not reconnecting");
+            return;
+          }
+          void this.connect();
+        });
         return;
       }
 

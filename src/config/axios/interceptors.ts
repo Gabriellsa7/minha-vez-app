@@ -1,5 +1,12 @@
-import { getToken, removeToken } from "@/src/services/auth/auth.storage";
-import { AxiosError, AxiosResponse } from "axios";
+import { httpClient } from "@/src/services/api";
+import { refreshAccessToken } from "@/src/services/auth/auth.session";
+import {
+  getRefreshToken,
+  getToken,
+  removeToken,
+} from "@/src/services/auth/auth.storage";
+import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 
 type ApiErrorResponse = {
@@ -38,6 +45,23 @@ export const handleSuccessResponse = async (response: AxiosResponse) => {
 export const handleErrorResponse = async (
   error: AxiosError<ApiErrorResponse>,
 ) => {
+  // The access token is short-lived: on a 401, refresh it once and retry the
+  // request instead of signing the patient out.
+  const config = error.config as
+    | (InternalAxiosRequestConfig & { _retriedAfterRefresh?: boolean })
+    | undefined;
+  if (
+    error.response?.status === 401 &&
+    config &&
+    !config._retriedAfterRefresh &&
+    !config.url?.startsWith("/auth/") &&
+    (await getRefreshToken())
+  ) {
+    config._retriedAfterRefresh = true;
+    if (await refreshAccessToken()) return httpClient(config);
+    router.replace("/login");
+  }
+
   const method = error.config?.method?.toLowerCase();
   const hasOwnErrorHandling =
     !!method && METHODS_WITH_OWN_ERROR_HANDLING.includes(method);
@@ -63,7 +87,15 @@ export const handleErrorResponse = async (
       });
     }
 
-    if (status === 401 || status === 403) {
+    // A request sent with a token that was replaced meanwhile (e.g. refreshed on
+    // app open) must not sign out the newer session.
+    const sentToken = String(
+      error.config?.headers?.Authorization ?? "",
+    ).replace("Bearer ", "");
+    if (
+      (status === 401 || status === 403) &&
+      (!sentToken || sentToken === (await getToken()))
+    ) {
       await removeToken();
     }
   } else if (!hasOwnErrorHandling) {
