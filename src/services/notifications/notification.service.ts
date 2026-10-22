@@ -73,9 +73,13 @@ export class NotificationService {
       const token = (await Notifications.getExpoPushTokenAsync({ projectId }))
         .data;
       console.log("[push] Expo token obtained", { token, projectId });
-      if (token !== this.lastRegisteredToken) {
+      // Only remember the token once the backend has it: a token fetched before
+      // login must still be sent after the user signs in.
+      if (
+        token !== this.lastRegisteredToken &&
+        (await this.registerTokenWithBackend(token))
+      ) {
         this.lastRegisteredToken = token;
-        await this.registerTokenWithBackend(token);
       }
       return token;
     } catch (error) {
@@ -84,13 +88,13 @@ export class NotificationService {
     }
   }
 
-  static async registerTokenWithBackend(token: string) {
+  static async registerTokenWithBackend(token: string): Promise<boolean> {
     const authToken = await getToken();
     if (!authToken) {
       console.log(
         "[push] token registration deferred: user not authenticated yet",
       );
-      return;
+      return false;
     }
     try {
       await httpClient.post("/notifications/register-token", {
@@ -98,8 +102,10 @@ export class NotificationService {
         platform: Platform.OS,
       });
       console.log("[push] Expo token registered in backend", { token });
+      return true;
     } catch (error) {
       console.error("[push] token registration failed", { error });
+      return false;
     }
   }
 
