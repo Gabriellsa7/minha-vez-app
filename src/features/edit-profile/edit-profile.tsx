@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -148,7 +147,7 @@ export function EditProfile() {
   return (
     <KeyboardAvoidingView
       className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior="padding"
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView

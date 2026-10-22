@@ -12,7 +12,7 @@ import {
   getDateTimeFromDateAndTime,
   isTimeWithinOpeningHours,
 } from "@/src/utils/util";
-import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
+import { useTabBarHeight } from "@/src/hooks/use-tab-bar-height";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { CalendarDays, Sparkles } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -169,7 +169,7 @@ export default function AgendaContent({ user }: AgendaContentProps) {
     setSelectedTime,
   });
 
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = useTabBarHeight();
 
   const isLoading =
     booking.isPatientLoading ||

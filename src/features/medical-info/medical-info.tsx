@@ -3,7 +3,6 @@ import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   View,
 } from "react-native";
@@ -25,7 +24,7 @@ export function MedicalInfo() {
   return (
     <KeyboardAvoidingView
       className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior="padding"
     >
       <ScrollView
         showsVerticalScrollIndicator={false}

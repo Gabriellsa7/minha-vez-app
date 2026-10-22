@@ -7,7 +7,7 @@ import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { logout } from "@/src/services/auth/auth.api";
 import { formatBirthDateForDisplay } from "@/src/utils/util";
-import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
+import { useTabBarHeight } from "@/src/hooks/use-tab-bar-height";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { Href, useRouter } from "expo-router";
@@ -43,7 +43,7 @@ export const ProfileContent = () => {
   const { mutate: uploadUserImage, isPending: isUploadingImage } =
     useUploadUserImage();
   const colors = useThemeColors();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = useTabBarHeight();
 
   const handleOpenLogoutModal = () => {
     setOpenLogoutModal(true);

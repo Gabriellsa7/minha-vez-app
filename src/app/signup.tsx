@@ -1,7 +1,6 @@
 import {
   Image,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Text,
   View,
@@ -12,7 +11,7 @@ export default function Signup() {
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-bgPrimary"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior="padding"
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}

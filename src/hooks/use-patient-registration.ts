@@ -12,11 +12,13 @@ import Toast from "react-native-toast-message";
 interface UsePatientRegistrationParams {
   userId?: string;
   onRegistered: () => void;
+  successMessage?: string;
 }
 
 export function usePatientRegistration({
   userId,
   onRegistered,
+  successMessage = "Agora você pode confirmar o agendamento.",
 }: UsePatientRegistrationParams) {
   const [cpf, setCpf] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -31,7 +33,12 @@ export function usePatientRegistration({
   const handlePatientRegistrationSubmit = () => {
     const normalizedBirthDate = normalizeBirthDate(birthDate);
 
-    if (!userId || !cpf.trim() || !normalizedBirthDate.trim() || !phone.trim()) {
+    if (
+      !userId ||
+      !cpf.trim() ||
+      !normalizedBirthDate.trim() ||
+      !phone.trim()
+    ) {
       Toast.show({ type: "error", text1: "Preencha todos os dados" });
       return;
     }
@@ -50,7 +57,7 @@ export function usePatientRegistration({
           Toast.show({
             type: "success",
             text1: "Cadastro concluído",
-            text2: "Agora você pode confirmar o agendamento.",
+            text2: successMessage,
           });
         },
         onError: (error: Error) => {

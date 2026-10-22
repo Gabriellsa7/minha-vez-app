@@ -138,6 +138,14 @@ export default function QueueInfoSection({
           </View>
         )}
 
+        {patientQueueItem?.status === EQueueItemStatus.FINISHED && (
+          <View className="rounded-2xl border border-borderPrimary bg-statusSuccessBg p-4">
+            <Text className="font-bold text-statusSuccessText">
+              Atendimento concluído. Você foi atendido com sucesso!
+            </Text>
+          </View>
+        )}
+
         <QueueStats counts={counts} estimatedWaitLabel={estimatedWaitLabel} />
 
         {patientQueueItem && (

@@ -9,7 +9,7 @@ import { IHealthProfessional } from "@/src/config/entities/health-professional/h
 import { flattenPaginatedPages } from "@/src/helpers/react-query/pagination";
 import { useDebouncedValue } from "@/src/hooks/use-debounced-value";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
-import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
+import { useTabBarHeight } from "@/src/hooks/use-tab-bar-height";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import {
@@ -20,7 +20,7 @@ import { ClinicsSection } from "./components/clinics-section";
 import { ProfessionalCard } from "./components/professionals-section";
 
 export function ExploreContent() {
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = useTabBarHeight();
   const colors = useThemeColors();
 
   const [searchQuery, setSearchQuery] = useState("");

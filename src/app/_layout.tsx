@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import { AppState } from "react-native";
 import Toast from "react-native-toast-message";
 import { NotificationPermissionModal } from "../components/notifications/notification-permission-modal";
+import { OfflineGate } from "../components/offline-gate/offline-gate";
 import { NotificationAlertGate } from "../components/queue-closed/notification-alert-gate";
 import { useToastConfig } from "../components/toast/toast-config";
 import "../config/axios";
@@ -107,6 +108,7 @@ export default function RootLayout() {
           notificationType={DEFINITIVE_ABSENCE_NOTIFICATION_TYPE}
           title="Consulta cancelada por ausência"
         />
+        <OfflineGate />
         <AppToast />
       </SafeAreaProvider>
     </QueryClientProvider>

@@ -2,12 +2,14 @@ import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { Calendar, House, Search, User } from "lucide-react-native";
 import { useColorScheme, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 
 export default function TabsLayout() {
   const colors = useThemeColors();
   const scheme = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -32,7 +34,7 @@ export default function TabsLayout() {
 
         tabBarStyle: {
           position: "absolute",
-          bottom: 20,
+          bottom: 20 + insets.bottom,
           left: 20,
           right: 20,
           height: 80,

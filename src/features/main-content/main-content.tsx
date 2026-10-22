@@ -4,10 +4,13 @@ import { IAppointment } from "@/src/config/entities/appointments/appointments.ty
 import { IExamBooking } from "@/src/config/entities/exam-bookings/exam-bookings.type";
 import { IPatient } from "@/src/config/entities/patients/patients.type";
 import { IUser } from "@/src/config/entities/user/user.types";
+import PatientRegistrationModal from "@/src/features/agenda-content/components/patient-registration-modal/patient-registration-modal";
+import { usePatientRegistration } from "@/src/hooks/use-patient-registration";
 import { useThemeColors } from "@/src/hooks/use-theme-colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { useBottomTabBarHeight } from "expo-router/build/react-navigation/bottom-tabs";
+import { useTabBarHeight } from "@/src/hooks/use-tab-bar-height";
+import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import Toast from "react-native-toast-message";
 import HomeHeader from "./components/header/header";
@@ -35,7 +38,7 @@ const openExamBooking = (examBooking: IExamBooking) => {
 
 export default function MainContent({ user, patient }: MainContentProps) {
   const colors = useThemeColors();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = useTabBarHeight();
   const patientId = patient?._id;
 
   const { data: healthUnits } = useGetHealthUnits();
@@ -50,6 +53,13 @@ export default function MainContent({ user, patient }: MainContentProps) {
     getQueueIdForAppointment,
   } = useHomeVisits(patientId);
   const needsMedicalInfoReminder = useMedicalInfoReminder(patient);
+
+  const [isRegistrationModalOpen, setRegistrationModalOpen] = useState(false);
+  const registration = usePatientRegistration({
+    userId: user._id,
+    onRegistered: () => setRegistrationModalOpen(false),
+    successMessage: "Agora você pode agendar consultas e exames.",
+  });
 
   const handleUpcomingVisitPress = () => {
     if (!nextUpcomingVisit) return;
@@ -79,58 +89,75 @@ export default function MainContent({ user, patient }: MainContentProps) {
   };
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: tabBarHeight + 20 }}
-    >
-      <View className="items-center justify-center bg-bgPrimary">
-        <LinearGradient
-          colors={[colors.bgFourth, colors.bgSecondary]}
-          style={{ width: "100%", gap: 12, paddingBottom: 20 }}
-        >
-          <View className="w-full gap-3 p-5">
-            <HomeHeader user={user} />
-            <QueueStatusCard
-              patientId={patientId}
-              isLoading={isAppointmentsLoading}
-              hasActiveQueueItem={hasRevealedActiveQueueItem}
-              scheduledAppointment={
-                hasScheduledAppointment ? nextAppointment : undefined
-              }
-            />
+    <>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: tabBarHeight + 20 }}
+      >
+        <View className="items-center justify-center bg-bgPrimary">
+          <LinearGradient
+            colors={[colors.bgFourth, colors.bgSecondary]}
+            style={{ width: "100%", gap: 12, paddingBottom: 20 }}
+          >
+            <View className="w-full gap-3 p-5">
+              <HomeHeader user={user} />
+              <QueueStatusCard
+                patientId={patientId}
+                isLoading={isAppointmentsLoading}
+                hasActiveQueueItem={hasRevealedActiveQueueItem}
+                scheduledAppointment={
+                  hasScheduledAppointment ? nextAppointment : undefined
+                }
+              />
+            </View>
+          </LinearGradient>
+          <View className="relative mb-6 w-full">
+            <View className="absolute -bottom-6 left-5 right-5">
+              <SearchInput
+                placeholder="Buscar clínica ou especialidade"
+                onPress={() => router.push("/search")}
+              />
+            </View>
           </View>
-        </LinearGradient>
-        <View className="relative mb-6 w-full">
-          <View className="absolute -bottom-6 left-5 right-5">
-            <SearchInput
-              placeholder="Buscar clínica ou especialidade"
-              onPress={() => router.push("/search")}
-            />
-          </View>
-        </View>
 
-        <View className="w-full gap-5 p-5">
-          <HomeAlerts
-            hasPatientProfile={Boolean(patient)}
-            needsMedicalInfoReminder={needsMedicalInfoReminder}
-          />
-          {nextUpcomingVisit && (
-            <NextVisitBanner
-              visit={nextUpcomingVisit}
-              onPress={handleUpcomingVisitPress}
+          <View className="w-full gap-5 p-5">
+            <HomeAlerts
+              hasPatientProfile={Boolean(patient)}
+              needsMedicalInfoReminder={needsMedicalInfoReminder}
+              onCompleteRegistration={() => setRegistrationModalOpen(true)}
             />
-          )}
-          <UpcomingVisits
-            appointments={upcomingAppointments}
-            healthUnits={healthUnits}
-            onPressAppointment={handlePressAppointment}
-            examBookings={upcomingExamBookings}
-            onPressExam={openExamBooking}
-          />
-          <QuickServices />
-          <HealthUnits healthUnits={healthUnits} />
+            {nextUpcomingVisit && (
+              <NextVisitBanner
+                visit={nextUpcomingVisit}
+                onPress={handleUpcomingVisitPress}
+              />
+            )}
+            <UpcomingVisits
+              appointments={upcomingAppointments}
+              healthUnits={healthUnits}
+              onPressAppointment={handlePressAppointment}
+              examBookings={upcomingExamBookings}
+              onPressExam={openExamBooking}
+            />
+            <QuickServices />
+            <HealthUnits healthUnits={healthUnits} />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      <PatientRegistrationModal
+        visible={isRegistrationModalOpen}
+        onClose={() => setRegistrationModalOpen(false)}
+        cpf={registration.cpf}
+        setCpf={registration.setCpf}
+        birthDate={registration.birthDate}
+        setBirthDate={registration.setBirthDate}
+        phone={registration.phone}
+        setPhone={registration.setPhone}
+        priority={registration.priority}
+        setPriority={registration.setPriority}
+        onSubmit={registration.handlePatientRegistrationSubmit}
+        isSubmitting={registration.isCreatingPatient}
+      />
+    </>
   );
 }

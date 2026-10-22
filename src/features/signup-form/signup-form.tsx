@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { SIGNUP_FORM_SCHEMA } from "./entities/signup-form.constants";
 import { SignupFormSchema } from "./entities/signup-form.types";
 
@@ -23,6 +24,11 @@ export function SignupForm() {
       { name: data.name, email: data.email, password: data.password },
       {
         onSuccess: () => {
+          Toast.show({
+            type: "success",
+            text1: "Conta criada com sucesso!",
+            text2: "Entre com seu e-mail e senha para continuar.",
+          });
           router.replace("/login");
         },
       },
@@ -102,7 +108,10 @@ export function SignupForm() {
           <Text className="text-textPrimary">Entrar</Text>
         </TouchableOpacity>
         <View className="items-center">
-          <Text className="text-textBlack" onPress={() => router.push("/login")}>
+          <Text
+            className="text-textBlack"
+            onPress={() => router.push("/login")}
+          >
             Já tem uma conta?{" "}
             <Text className="text-textSecondary underline">Entrar</Text>
           </Text>

@@ -13,6 +13,7 @@ import { ArrowLeft, RefreshCw } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import QueueInfoSection from "@/src/features/queue-info/components/queue-info-section";
 import { useCurrentPatient } from "@/src/hooks/use-current-patient";
 
@@ -117,10 +118,16 @@ export default function QueueInfoScreen() {
       previousStatus !== undefined &&
       previousStatus !== EQueueItemStatus.FINISHED
     ) {
+      Toast.show({
+        type: "success",
+        text1: "Atendimento concluído",
+        text2: "Você foi atendido com sucesso. Obrigado por usar o Minha Vez!",
+      });
+
+      // The appointments list may still show it as scheduled at this point, so
+      // match by queue item instead of by status.
       const completedAppointment = patientAppointments?.find(
-        (appointment) =>
-          appointment.queueItemId === patientQueueItem?._id &&
-          appointment.status === EAppointmentStatus.COMPLETED,
+        (appointment) => appointment.queueItemId === patientQueueItem?._id,
       );
 
       if (completedAppointment) {
