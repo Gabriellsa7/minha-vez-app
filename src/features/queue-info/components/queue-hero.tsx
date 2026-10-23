@@ -73,8 +73,14 @@ export function QueueHero({
 
       <View className="flex-row flex-wrap gap-2">
         <Chip label={QUEUE_STATUS_LABEL[queue.status] ?? queue.status} />
-        <Chip label={`Turno: ${QUEUE_SHIFT_LABEL[queue.shift] ?? queue.shift}`} />
-        <Chip label={formatDateTime(queue.queueDate)} />
+        <Chip
+          label={`Turno: ${QUEUE_SHIFT_LABEL[queue.shift] ?? queue.shift}`}
+        />
+        <Chip
+          label={formatDateTime(
+            patientQueueItem?.scheduledDateTime ?? queue.queueDate,
+          )}
+        />
       </View>
 
       <View className="items-center gap-3 py-4">

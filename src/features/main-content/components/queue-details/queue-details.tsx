@@ -213,7 +213,10 @@ function QueueCard({
               {queueSummary}
             </Text>
             <Text className="text-textPrimary text-sm opacity-50">
-              Dia da consulta: {formatDateTime(queue.queueDate)}
+              Dia da consulta:{" "}
+              {formatDateTime(
+                patientQueueItem?.scheduledDateTime ?? queue.queueDate,
+              )}
             </Text>
             {professional?.room && (
               <Text className="text-textPrimary text-sm opacity-50">

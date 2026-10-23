@@ -29,7 +29,8 @@ export function SignupForm() {
             text1: "Conta criada com sucesso!",
             text2: "Entre com seu e-mail e senha para continuar.",
           });
-          router.replace("/login");
+          // Carry the email over so the patient does not have to type it again.
+          router.replace({ pathname: "/login", params: { email: data.email } });
         },
       },
     );

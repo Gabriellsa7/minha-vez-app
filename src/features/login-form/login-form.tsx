@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -15,6 +15,7 @@ import { NotificationService } from "@/src/services/notifications/notification.s
 export function LoginForm() {
   const [isForgotPasswordVisible, setIsForgotPasswordVisible] = useState(false);
   const colors = useThemeColors();
+  const { email: signupEmail } = useLocalSearchParams<{ email?: string }>();
 
   const {
     control,
@@ -23,6 +24,7 @@ export function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(LOGIN_FORM_SCHEMA),
+    defaultValues: { email: signupEmail ?? "" },
   });
 
   const emailValue = watch("email");

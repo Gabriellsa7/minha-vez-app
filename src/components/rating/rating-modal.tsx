@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -119,9 +118,7 @@ export function RatingModal({
       statusBarTranslucent
     >
       <SafeAreaView className="flex-1 justify-center bg-black/50 px-4">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
+        <KeyboardAvoidingView behavior="padding">
           <View className="max-h-[85%] rounded-2xl bg-bgThird">
             <View className="flex-row items-center justify-between border-b border-borderPrimary px-5 py-4">
               <Text className="text-lg font-bold text-textBlack">

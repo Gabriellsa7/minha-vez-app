@@ -151,7 +151,7 @@ export default function QueueInfoScreen() {
   }, [patientQueueItem?.status, patientQueueItem?._id, patientAppointments]);
 
   return (
-    <SafeAreaView className="flex-1 bg-bgPrimary" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bgPrimary" edges={["top", "bottom"]}>
       <View className="flex-row items-center gap-3 px-4 pt-2 pb-3">
         <Pressable
           accessibilityRole="button"
