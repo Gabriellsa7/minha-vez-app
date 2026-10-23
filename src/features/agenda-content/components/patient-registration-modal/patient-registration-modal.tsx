@@ -271,7 +271,7 @@ export default function PatientRegistrationModal({
                 onPress={handleSubmit}
                 disabled={isSubmitting}
                 className={`flex-1 rounded-[16px] px-4 py-3 ${
-                  isSubmitting ? "bg-buttonPrimary" : "bg-bgSecondary"
+                  isSubmitting ? "bg-bgSecondary opacity-70" : "bg-bgSecondary"
                 }`}
               >
                 {isSubmitting ? (

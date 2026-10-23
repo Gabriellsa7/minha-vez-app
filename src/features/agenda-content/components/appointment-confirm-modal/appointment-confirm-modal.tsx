@@ -99,7 +99,7 @@ export default function AppointmentConfirmModal({
               onPress={onConfirm}
               disabled={isConfirming}
               className={`flex-1 rounded-[16px] px-4 py-3 ${
-                isConfirming ? "bg-buttonPrimary" : "bg-bgSecondary"
+                isConfirming ? "bg-bgSecondary opacity-70" : "bg-bgSecondary"
               }`}
             >
               {isConfirming ? (
