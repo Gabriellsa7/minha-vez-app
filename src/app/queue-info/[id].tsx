@@ -1,4 +1,5 @@
 import { useGetAppointmentsByPatientId } from "@/src/api/get-appointment-by-patient-id";
+import { useGetAppointmentRatingEligibility } from "@/src/api/get-appointment-rating-eligibility";
 import { useGetQueueItemByPatientId } from "@/src/api/get-queue-item-by-patient-id";
 import { useGetQueueItemByQueueId } from "@/src/api/get-queue-item-by-queue-id";
 import { useGetQueuesWithDetailsByPatientId } from "@/src/api/get-queues-with-details-by-patient-id";
@@ -73,6 +74,17 @@ export default function QueueInfoScreen() {
     null,
   );
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
+  // Only the first completed appointment with a professional or clinic can be
+  // rated, so the rating is offered only when the backend says there is something
+  // to rate, instead of opening an empty modal.
+  const { data: ratingEligibility } = useGetAppointmentRatingEligibility(
+    { appointmentId: ratingAppointmentId ?? "" },
+    { enabled: Boolean(ratingAppointmentId) },
+  );
+  const canRate = Boolean(
+    ratingEligibility?.canRateProfessional || ratingEligibility?.canRateClinic,
+  );
   const previousQueueItemStatusRef = useRef<EQueueItemStatus | undefined>(
     undefined,
   );
@@ -194,7 +206,7 @@ export default function QueueInfoScreen() {
 
       <RatingModal
         appointmentId={ratingAppointmentId}
-        visible={Boolean(ratingAppointmentId)}
+        visible={Boolean(ratingAppointmentId) && canRate}
         onClose={() => setRatingAppointmentId(null)}
       />
 
